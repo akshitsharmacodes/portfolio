@@ -308,19 +308,7 @@ export default function Contact({ motionEnabled = true }) {
                   <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--text)' }}>
                     SEND A MESSAGE
                   </h3>
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: '0.74rem',
-                      color: 'var(--text-muted)',
-                      background: 'rgba(255,255,255,0.04)',
-                      padding: '4px 10px',
-                      borderRadius: 'var(--radius-full)',
-                      border: '1px solid var(--border)',
-                    }}
-                  >
+                  <div className="contact-inbox-pill">
                     <Inbox size={13} className="text-accent" />
                     <span>Delivered to: <strong>akshitsharmacodes@gmail.com</strong></span>
                   </div>
