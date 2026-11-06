@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import ClientEngine from './components/ClientEngine';
 import ProjectGrid from './components/ProjectGrid';
 import ProjectDialog from './components/ProjectDialog';
 import About from './components/About';
@@ -16,6 +17,14 @@ import { siteConfig } from './config/site';
 import { projects } from './data/projects';
 
 export default function App() {
+  // Theme state with localStorage persistence
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'dark';
+    const stored = localStorage.getItem('akshit-portfolio-theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return 'dark';
+  });
+
   // Motion preference state with localStorage persistence
   const [motionEnabled, setMotionEnabled] = useState(() => {
     if (typeof window === 'undefined') return true;
@@ -23,12 +32,20 @@ export default function App() {
     if (stored !== null) {
       return stored === 'on';
     }
-    // Check OS preference
     return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [swarmActive, setSwarmActive] = useState(false);
+
+  // Sync theme attribute on <html> element
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    root.classList.remove('dark', 'light');
+    root.classList.add(theme);
+    localStorage.setItem('akshit-portfolio-theme', theme);
+  }, [theme]);
 
   // Sync motion state attribute on root element
   useEffect(() => {
@@ -42,6 +59,10 @@ export default function App() {
     }
   }, [motionEnabled]);
 
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   const toggleMotion = () => {
     setMotionEnabled((prev) => !prev);
   };
@@ -51,7 +72,7 @@ export default function App() {
   };
 
   return (
-    <div className="portfolio-app">
+    <div className={`portfolio-app theme-${theme}`}>
       {/* Skip to Content for Keyboard Accessibility */}
       <a href="#work" className="skip-link">
         Skip to main content
@@ -60,11 +81,13 @@ export default function App() {
       {/* Top Scroll Indicator */}
       <ScrollProgress motionEnabled={motionEnabled} />
 
-      {/* Subtle Ambient Mouse Spotlight */}
-      <CursorGlow motionEnabled={motionEnabled} />
+      {/* Subtle Ambient Mouse Spotlight (Dark mode fine-pointer) */}
+      {theme === 'dark' && <CursorGlow motionEnabled={motionEnabled} />}
 
-      {/* Sticky Header with "Motion" Swarm Button */}
+      {/* Clean & Elegant Navbar with Theme Toggle, Motion Trigger, and Red Resume Button */}
       <Header
+        theme={theme}
+        onToggleTheme={toggleTheme}
         motionEnabled={motionEnabled}
         onToggleMotion={toggleMotion}
         onTriggerSwarm={handleTriggerSwarm}
@@ -74,6 +97,11 @@ export default function App() {
       {/* Main Page Content with Scroll Animations */}
       <main id="main-content">
         <Hero motionEnabled={motionEnabled} />
+
+        <hr className="section-divider" />
+
+        {/* Client Acquisition Engine / Hire Me Solutions */}
+        <ClientEngine motionEnabled={motionEnabled} />
 
         <hr className="section-divider" />
 

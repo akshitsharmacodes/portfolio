@@ -53,7 +53,10 @@ Portfolio_website/
 All personal data is completely decoupled from UI presentation:
 
 1. **Identity & Contact Details**:
-   Edit `src/config/site.js`. To add your custom domain, GitHub, LeetCode, or Resume, update the corresponding fields. If left blank or containing `[PLACEHOLDER]`, the site will automatically omit the link cleanly with zero dead buttons.
+   Edit `src/config/site.js`. To update your custom domain, GitHub, LeetCode, Resume, or Upwork, update the corresponding fields.
+   - **Upwork Profile**: Direct client acquisition link (`https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1`).
+   - **Resume**: Configured with Google Drive link (`https://drive.google.com/file/d/1Mh6jHs3Itk818LOrLuyLDyQyHJsScBcZ/view`).
+   - **GitHub**: Configured with verified profile (`https://github.com/akshitsharmacodes`).
 2. **Projects & Architecture Steps**:
    Edit `src/data/projects.js` to modify or add projects, tools, and technical breakdowns.
 3. **Experience, Education & Skills**:

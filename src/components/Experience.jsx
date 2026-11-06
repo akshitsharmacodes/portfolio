@@ -58,7 +58,7 @@ export default function Experience({ motionEnabled = true }) {
                   <div className="timeline-dot" aria-hidden="true"></div>
 
                   <div className="timeline-dates">
-                    {item.dates} {item.current && '· Current'}
+                    {item.dates}
                   </div>
 
                   <h4 className="timeline-role">{item.role}</h4>

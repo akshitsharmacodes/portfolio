@@ -14,7 +14,7 @@ export const siteConfig = {
     profession: "AI/ML Developer",
     roleLine2: "Python · GenAI & RAG · AI Agents",
     location: "Chandigarh, India",
-    availability: "Open to AI/ML engineering opportunities",
+    availability: "Available for Hire · Contract & Freelance Projects",
     headline: "I build AI agents that eliminate repetitive work.",
     headlineAccent: "eliminate repetitive work.",
     intro:
@@ -32,12 +32,14 @@ export const siteConfig = {
     whatsapp: "", // empty => no WhatsApp button
     linkedin: "https://www.linkedin.com/in/akshitsharmacodes",
     github: "https://github.com/akshitsharmacodes",
+    upwork: "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1",
     instagram: "",
     youtube: "",
     behance: "",
     dribbble: "",
     otherLinks: [
-      { label: "Book a call", url: "https://cal.com/akshitsharmacodes" },
+      { label: "Book a Consultation", url: "https://cal.com/akshitsharmacodes" },
+      { label: "Hire on Upwork", url: "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1" },
       { label: "LeetCode", url: "[PLACEHOLDER]" },
     ],
   },

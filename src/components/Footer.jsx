@@ -22,6 +22,18 @@ export default function Footer() {
 
         {/* Links */}
         <div className="footer-links">
+          {isValidContent(siteConfig.contact.upwork) && (
+            <a
+              href={siteConfig.contact.upwork}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+              style={{ color: '#14a800', fontWeight: 700 }}
+            >
+              Hire on Upwork
+            </a>
+          )}
+
           {isValidContent(siteConfig.contact.linkedin) && (
             <a
               href={siteConfig.contact.linkedin}
@@ -30,6 +42,28 @@ export default function Footer() {
               className="footer-link"
             >
               LinkedIn
+            </a>
+          )}
+
+          {isValidContent(siteConfig.contact.github) && (
+            <a
+              href={siteConfig.contact.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              GitHub
+            </a>
+          )}
+
+          {isValidContent(siteConfig.identity.resume) && (
+            <a
+              href={siteConfig.identity.resume}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              Resume
             </a>
           )}
 

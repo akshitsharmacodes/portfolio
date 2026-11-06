@@ -95,13 +95,28 @@ export default function Hero({ motionEnabled }) {
 
           {/* Action CTAs */}
           <MotionDiv className="hero-actions" variants={motionEnabled ? itemVariants : undefined}>
-            <a href="#work" className="btn btn-primary">
+            {/* Direct Client Acquisition CTA */}
+            {isValidContent(siteConfig.contact.upwork) && (
+              <a
+                href={siteConfig.contact.upwork}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                style={{
+                  backgroundColor: '#14a800',
+                  boxShadow: '0 4px 20px rgba(20, 168, 0, 0.35)',
+                  fontWeight: 700,
+                }}
+                title="Hire Akshit on Upwork"
+              >
+                <span>Hire Me on Upwork</span>
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
+            )}
+
+            <a href="#work" className="btn btn-secondary">
               <span>View Selected Work</span>
               <ArrowDown size={16} aria-hidden="true" />
-            </a>
-            <a href="#contact" className="btn btn-secondary">
-              <span>Get In Touch</span>
-              <ArrowUpRight size={16} aria-hidden="true" />
             </a>
 
             {/* Resume Button */}
@@ -119,20 +134,10 @@ export default function Hero({ motionEnabled }) {
               </a>
             )}
 
-            {/* GitHub Button */}
-            {isValidContent(siteConfig.contact.github) && (
-              <a
-                href={siteConfig.contact.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                aria-label="Visit GitHub Profile"
-              >
-                <Github size={16} aria-hidden="true" />
-                <span>GitHub</span>
-                <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
+            <a href="#contact" className="btn btn-ghost" style={{ border: '1px solid var(--border)' }}>
+              <span>Get In Touch</span>
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </a>
 
             {/* Verified Location */}
             <div className="hero-location" title="Current base">

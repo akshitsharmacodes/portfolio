@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowRight, Zap, Play, Github, FileText } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Zap, Github, FileText, Sun, Moon } from 'lucide-react';
 
 export default function Header({
-  motionEnabled,
-  onToggleMotion,
+  theme,
+  onToggleTheme,
   onTriggerSwarm,
   swarmActive,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('');
+  const [activeSection, setActiveSection] = useState('work');
+  const [scrolled, setScrolled] = useState(false);
 
-  // Handle active section on scroll
+  // Handle active section and scrolled state
   useEffect(() => {
     const handleScroll = () => {
+      setScrolled(window.scrollY > 30);
+
       const sections = ['work', 'about', 'skills', 'experience', 'awards', 'contact'];
-      const scrollPosition = window.scrollY + 200;
+      const scrollPosition = window.scrollY + 220;
 
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
@@ -45,7 +48,7 @@ export default function Header({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
-  // Prevent background scroll when mobile menu is open
+  // Lock scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -58,105 +61,115 @@ export default function Header({
   }, [mobileMenuOpen]);
 
   const navLinks = [
-    { label: 'Work', href: '#work', show: true },
-    { label: 'About', href: '#about', show: true },
-    { label: 'Skills', href: '#skills', show: true },
-    { label: 'Experience', href: '#experience', show: siteConfig.preferences.showExperience },
-    { label: 'Recognition', href: '#awards', show: siteConfig.preferences.showAwards },
-    { label: 'Contact', href: '#contact', show: true },
+    { label: 'Work', href: '#work', id: 'work', show: true },
+    { label: 'Hire Me', href: '#hire-me', id: 'hire-me', show: true },
+    { label: 'About', href: '#about', id: 'about', show: true },
+    { label: 'Skills', href: '#skills', id: 'skills', show: true },
+    { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience },
+    { label: 'Recognition', href: '#awards', id: 'awards', show: siteConfig.preferences.showAwards },
+    { label: 'Contact', href: '#contact', id: 'contact', show: true },
   ].filter((item) => item.show);
 
   return (
     <>
-      <header className="header" role="banner">
-        <div className="container header-container">
-          {/* Brand Wordmark */}
-          <a href="#" className="brand-logo" aria-label="Akshit Sharma Home">
-            <span className="brand-badge" aria-hidden="true">AS</span>
-            <span>{siteConfig.identity.displayName}</span>
+      <header className={`header-wrapper ${scrolled ? 'is-scrolled' : ''}`} role="banner">
+        <div className="header-glass-dock">
+          {/* Brand Identity */}
+          <a href="#" className="brand-pill" aria-label="Akshit Sharma Home">
+            <span className="brand-initials">AS</span>
+            <div className="brand-text">
+              <span className="brand-name">{siteConfig.identity.displayName}</span>
+              <span className="brand-sub">AI/ML</span>
+            </div>
           </a>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Center Navigation Links */}
           <nav className="desktop-only" aria-label="Main Navigation">
-            <ul className="nav-links">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className={`nav-link ${activeSection === link.href.slice(1) ? 'active' : ''}`}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+            <ul className="nav-dock-list">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.id;
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      className={`nav-dock-link ${isActive ? 'active' : ''}`}
+                    >
+                      {isActive && <span className="nav-active-dot" aria-hidden="true" />}
+                      <span>{link.label}</span>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
-          {/* Actions: "Motion" Swarm Trigger + Resume + GitHub + CTA + Mobile Trigger */}
-          <div className="header-actions">
-            {/* The primary "Motion" button requested */}
+          {/* Right Actions: Theme Toggle + Swarm Motion + GitHub + Red Resume Button */}
+          <div className="dock-actions">
+            {/* Theme Toggle Button */}
             <button
               type="button"
-              className={`motion-btn ${swarmActive ? 'active' : ''}`}
-              onClick={onTriggerSwarm}
-              aria-label="Trigger Swarm Motion Animation"
-              title="Click to trigger interactive Agent Swarm animation"
+              className="theme-toggle-btn"
+              onClick={onToggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              <Zap size={14} className="motion-btn-icon" aria-hidden="true" />
-              <span>Motion</span>
-              {swarmActive && <span className="motion-live-badge">Live</span>}
+              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            {/* Resume button */}
-            {isValidContent(siteConfig.identity.resume) && (
-              <a
-                href={siteConfig.identity.resume}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary desktop-only"
-                style={{ padding: '6px 14px', minHeight: '38px', fontSize: '0.82rem' }}
-                aria-label="View Resume on Google Drive"
-                title="View Resume"
-              >
-                <FileText size={14} className="text-accent" aria-hidden="true" />
-                <span>Resume</span>
-              </a>
-            )}
+            {/* Swarm Motion Trigger Button */}
+            <button
+              type="button"
+              className={`motion-pill-trigger ${swarmActive ? 'active' : ''}`}
+              onClick={onTriggerSwarm}
+              aria-label="Toggle Interactive Agent Swarm"
+              title="Click to trigger interactive Agent Swarm animation"
+            >
+              <Zap size={13} className="motion-pill-icon" aria-hidden="true" />
+              <span>Motion</span>
+              {swarmActive && <span className="motion-indicator-dot" />}
+            </button>
 
-            {/* GitHub Logo Link */}
+            {/* GitHub Icon Link */}
             {isValidContent(siteConfig.contact.github) && (
               <a
                 href={siteConfig.contact.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-ghost desktop-only"
-                style={{ padding: '8px', minWidth: '40px', minHeight: '40px', borderRadius: '50%' }}
-                aria-label="Visit GitHub Profile (akshitsharmacodes)"
+                className="dock-icon-btn desktop-only"
+                aria-label="GitHub Profile"
                 title="GitHub: akshitsharmacodes"
               >
-                <Github size={18} aria-hidden="true" />
+                <Github size={16} aria-hidden="true" />
               </a>
             )}
 
-            {/* Desktop Contact CTA */}
-            <a
-              href="#contact"
-              className="btn btn-primary desktop-only"
-              style={{ padding: '8px 18px', minHeight: '40px', fontSize: '0.84rem' }}
-            >
-              <span>Let's Talk</span>
-              <ArrowRight size={14} aria-hidden="true" />
-            </a>
+            <span className="dock-divider desktop-only" aria-hidden="true" />
+
+            {/* Prominent Red Button: RESUME */}
+            {isValidContent(siteConfig.identity.resume) && (
+              <a
+                href={siteConfig.identity.resume}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-resume-btn desktop-only"
+                title="View Resume on Google Drive"
+                aria-label="View Resume PDF"
+              >
+                <FileText size={14} aria-hidden="true" />
+                <span>Resume</span>
+                <ArrowUpRight size={13} aria-hidden="true" />
+              </a>
+            )}
 
             {/* Mobile Hamburger Button */}
             <button
               type="button"
-              className="menu-trigger"
+              className="menu-trigger-sleek"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open mobile navigation menu"
+              aria-label="Open mobile navigation"
               aria-expanded={mobileMenuOpen}
             >
-              <Menu size={22} aria-hidden="true" />
+              <Menu size={18} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -164,91 +177,123 @@ export default function Header({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="mobile-drawer" role="dialog" aria-modal="true" aria-label="Navigation Menu">
-          <div className="mobile-drawer-header">
-            <a
-              href="#"
-              className="brand-logo"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span className="brand-badge">AS</span>
-              <span>{siteConfig.identity.displayName}</span>
-            </a>
-            <button
-              type="button"
-              className="menu-trigger"
-              style={{ display: 'flex' }}
-              onClick={() => setMobileMenuOpen(false)}
-              aria-label="Close navigation menu"
-            >
-              <X size={22} aria-hidden="true" />
-            </button>
-          </div>
+        <div className="mobile-drawer-overlay" role="dialog" aria-modal="true" aria-label="Navigation Menu">
+          <div className="mobile-drawer-card">
+            <div className="mobile-drawer-top">
+              <a
+                href="#"
+                className="brand-pill"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span className="brand-initials">AS</span>
+                <div className="brand-text">
+                  <span className="brand-name">{siteConfig.identity.displayName}</span>
+                  <span className="brand-sub">AI/ML</span>
+                </div>
+              </a>
 
-          <ul className="mobile-drawer-links">
-            {navLinks.map((link) => (
-              <li key={link.href}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="theme-toggle-btn"
+                  onClick={onToggleTheme}
+                  aria-label="Toggle theme"
+                >
+                  {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                </button>
+                <button
+                  type="button"
+                  className="menu-trigger-sleek"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close navigation"
+                >
+                  <X size={18} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <ul className="mobile-drawer-nav">
+              {navLinks.map((link, idx) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className={`mobile-nav-item ${activeSection === link.id ? 'active' : ''}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="mobile-nav-num">0{idx + 1}</span>
+                    <span className="mobile-nav-label">{link.label}</span>
+                    <ArrowUpRight size={16} className="mobile-nav-arrow" aria-hidden="true" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mobile-drawer-bottom">
+              {/* Hire on Upwork */}
+              {isValidContent(siteConfig.contact.upwork) && (
                 <a
-                  href={link.href}
-                  className={`mobile-drawer-link ${activeSection === link.href.slice(1) ? 'active' : ''}`}
+                  href={siteConfig.contact.upwork}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{
+                    width: '100%',
+                    minHeight: '46px',
+                    justifyContent: 'center',
+                    backgroundColor: '#14a800',
+                    boxShadow: '0 4px 16px rgba(20, 168, 0, 0.3)',
+                    fontWeight: 700,
+                  }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <span>{link.label}</span>
-                  <ArrowRight size={20} aria-hidden="true" />
+                  <span>Hire Me on Upwork</span>
+                  <ArrowUpRight size={16} />
                 </a>
-              </li>
-            ))}
-          </ul>
+              )}
 
-          <div className="mobile-drawer-footer">
-            <div style={{ display: 'flex', gap: '10px' }}>
+              {/* Primary Mobile Red Resume Button */}
               {isValidContent(siteConfig.identity.resume) && (
                 <a
                   href={siteConfig.identity.resume}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-secondary"
-                  style={{ flex: 1, justifyContent: 'center' }}
+                  style={{ width: '100%', minHeight: '44px', justifyContent: 'center' }}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   <FileText size={16} className="text-accent" />
-                  <span>Resume</span>
+                  <span>View Resume</span>
+                  <ArrowUpRight size={16} />
                 </a>
               )}
-              {isValidContent(siteConfig.contact.github) && (
-                <a
-                  href={siteConfig.contact.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
+
+              <div className="mobile-quick-links">
+                {isValidContent(siteConfig.contact.github) && (
+                  <a
+                    href={siteConfig.contact.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                    style={{ flex: 1, minHeight: '44px', fontSize: '0.84rem', justifyContent: 'center' }}
+                  >
+                    <Github size={16} />
+                    <span>GitHub</span>
+                  </a>
+                )}
+                <button
+                  type="button"
                   className="btn btn-secondary"
-                  style={{ flex: 1, justifyContent: 'center' }}
+                  style={{ flex: 1, minHeight: '44px', fontSize: '0.84rem', justifyContent: 'center' }}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onTriggerSwarm();
+                  }}
                 >
-                  <Github size={16} />
-                  <span>GitHub</span>
-                </a>
-              )}
+                  <Zap size={15} className="text-accent" />
+                  <span>{swarmActive ? 'Stop Swarm' : 'Swarm Motion'}</span>
+                </button>
+              </div>
             </div>
-
-            <button
-              type="button"
-              className="btn btn-secondary"
-              style={{ justifyContent: 'center' }}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onTriggerSwarm();
-              }}
-            >
-              <Zap size={16} className="text-accent" />
-              <span>Trigger Swarm Motion</span>
-            </button>
-
-            <a
-              href="#contact"
-              className="btn btn-primary"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <span>Get In Touch</span>
-              <ArrowRight size={16} />
-            </a>
           </div>
         </div>
       )}
