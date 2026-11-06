@@ -5,6 +5,27 @@
 
 export const projects = [
   {
+    id: "zero-ops-autosre",
+    title: "Zero-Ops AutoSRE",
+    category: "AI / DevOps",
+    year: "2026",
+    summary: "Autonomous Site Reliability Engineering agent shortlisted as Top 10 National Finalist in Hack-O-Octo 4.0 by GDG Chandigarh University.",
+    description:
+      "Modern cloud infrastructure produces massive alert fatigue during incidents. I designed and built Zero-Ops AutoSRE, an autonomous AI-powered Site Reliability Engineering agent that detects anomalies, performs multi-agent root cause analysis, and safely executes self-healing runbooks in real-time. Shortlisted among the Top 10 National Finalist teams across India in Hack-O-Octo 4.0 organized by Google Developer Groups (GDG) at Chandigarh University.",
+    architecture: [
+      { step: "01", name: "Telemetry & Log Ingestion", desc: "Real-time streaming metrics, error spikes, and cloud health events ingestion" },
+      { step: "02", name: "LangGraph Root Cause Analysis", desc: "Diagnostic supervisor coordinating log parsing, dependency mapping, and commit diff inspection" },
+      { step: "03", name: "Autonomous Runbook Remediation", desc: "Safety-gated automated rollbacks, self-healing pod restarts, and configuration hot-patches" },
+      { step: "04", name: "Incident Telemetry Dashboard", desc: "Real-time cockpit streaming incident resolution logs, audit trails, and MTTR telemetry" },
+    ],
+    role: "Lead Architect & Developer",
+    tools: ["Python", "FastAPI", "AI Agents", "LangGraph", "Docker", "React", "DevOps"],
+    coverImage: "",
+    liveUrl: "https://landing-page-for-auto-sre.vercel.app/",
+    sourceUrl: "https://github.com/akshitsharmacodes/zero-ops-autosre",
+    featured: true,
+  },
+  {
     id: "matcha-ai",
     title: "Matcha AI",
     category: "AI / LLM",
@@ -21,8 +42,8 @@ export const projects = [
     role: "AI/ML Engineer Intern, Signity Solutions",
     tools: ["Python", "LangChain", "LangGraph", "RAG", "ChromaDB", "PostgreSQL", "Redis"],
     coverImage: "", // Designed abstract card fallback
-    liveUrl: "[PLACEHOLDER]",
-    sourceUrl: "[PLACEHOLDER]",
+    liveUrl: "https://matcha-ai-five.vercel.app/",
+    sourceUrl: "https://github.com/akshitsharmacodes/Matcha-AI",
     featured: true,
   },
   {
@@ -42,6 +63,7 @@ export const projects = [
     role: "Developer",
     tools: ["Python", "React", "LangChain", "LangGraph", "RAG", "PostgreSQL", "Celery", "Redis"],
     coverImage: "",
+    liveUrl: "https://sofricai.vercel.app/",
     sourceUrl: "[PLACEHOLDER]",
     featured: true,
   },
@@ -63,7 +85,27 @@ export const projects = [
     tools: ["Django", "Django REST Framework", "React", "PostgreSQL"],
     coverImage: "",
     videoUrl: "[PLACEHOLDER]",
-    sourceUrl: "[PLACEHOLDER]",
+    sourceUrl: "https://github.com/akshitsharmacodes/SIH-Backend",
+    featured: true,
+  },
+  {
+    id: "nova-sight",
+    title: "NovaSight",
+    category: "AI / Vision",
+    year: "2025",
+    summary: "Real-time object detection in space station environments using custom YOLOv8 trained on Falcon digital twins.",
+    description:
+      "Developed for the Duality AI Space Station Hackathon, NovaSight combines a custom fine-tuned YOLOv8 model with a Flask backend and React frontend to deliver real-time object detection in high-risk space station environments. Trained entirely on 100% synthetic digital twin data from Falcon, achieving 98.4% precision and 94.4% mAP@0.5 for critical safety equipment, oxygen tanks, and maintenance toolboxes.",
+    architecture: [
+      { step: "01", name: "Falcon Synthetic Ingestion", desc: "Data ingestion pipeline parsing synthetic digital twin renders across varied orbital lighting conditions" },
+      { step: "02", name: "Custom YOLOv8 Training", desc: "Fine-tuned model achieving 98.4% precision and 94.4% mAP@0.5 over 100 training epochs" },
+      { step: "03", name: "Flask Inference API", desc: "Sub-second REST endpoints returning bounding box coordinates, confidence scores, and annotations" },
+      { step: "04", name: "Interactive Mission Control UI", desc: "React dashboard providing real-time visual inspection and telemetry analytics" },
+    ],
+    role: "AI/ML Developer",
+    tools: ["Python", "YOLOv8", "Flask", "React", "OpenCV", "Roboflow"],
+    coverImage: "",
+    sourceUrl: "https://github.com/akshitsharmacodes/Nova-Sight",
     featured: true,
   },
 ];

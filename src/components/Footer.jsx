@@ -22,6 +22,18 @@ export default function Footer() {
 
         {/* Links */}
         <div className="footer-links">
+          {isValidContent(siteConfig.contact.whatsapp) && (
+            <a
+              href={siteConfig.contact.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+              style={{ color: '#25D366', fontWeight: 700 }}
+            >
+              WhatsApp
+            </a>
+          )}
+
           {isValidContent(siteConfig.contact.upwork) && (
             <a
               href={siteConfig.contact.upwork}

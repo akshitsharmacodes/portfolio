@@ -1,8 +1,14 @@
 import React from 'react';
 import { awardsData } from '../data/experience';
-import { siteConfig } from '../config/site';
-import { Trophy, Award, ShieldCheck } from 'lucide-react';
+import { siteConfig, isValidContent } from '../config/site';
+import { Trophy, Award, ShieldCheck, ExternalLink, Github } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+  cardRevealVariant,
+} from '../config/motion';
 
 export default function Awards({ motionEnabled = true }) {
   if (!siteConfig.preferences.showAwards) return null;
@@ -14,10 +20,10 @@ export default function Awards({ motionEnabled = true }) {
       <div className="container">
         {/* Section Header */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">05</span>
@@ -34,10 +40,11 @@ export default function Awards({ motionEnabled = true }) {
             <MotionDiv
               key={award.id}
               className="award-card interactive-hover-card"
-              initial={motionEnabled ? { opacity: 0, y: 28 } : undefined}
-              whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-              viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-              transition={{ duration: 0.55, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              variants={motionEnabled ? cardRevealVariant : undefined}
+              custom={index * 0.08}
+              initial={motionEnabled ? "hidden" : undefined}
+              whileInView={motionEnabled ? "visible" : undefined}
+              viewport={motionEnabled ? scrollViewportEarly : undefined}
               whileHover={motionEnabled ? { y: -6 } : undefined}
             >
               <div className="award-badge-row">
@@ -49,6 +56,86 @@ export default function Awards({ motionEnabled = true }) {
 
               <h3 className="award-title">{award.title}</h3>
               <p className="award-detail">{award.detail}</p>
+
+              {(isValidContent(award.liveUrl) || isValidContent(award.sourceUrl) || isValidContent(award.credentialUrl)) && (
+                <div className="award-action-links" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                  {isValidContent(award.liveUrl) && (
+                    <a
+                      href={award.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="award-link-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--accent)',
+                        textDecoration: 'none',
+                        padding: '5px 12px',
+                        background: 'rgba(227, 43, 60, 0.08)',
+                        border: '1px solid var(--border-accent)',
+                        borderRadius: 'var(--radius-full)',
+                        transition: 'all 160ms ease',
+                      }}
+                    >
+                      <span>Live Site</span>
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
+                  {isValidContent(award.sourceUrl) && (
+                    <a
+                      href={award.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="award-link-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--text-muted)',
+                        textDecoration: 'none',
+                        padding: '5px 12px',
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius-full)',
+                        transition: 'all 160ms ease',
+                      }}
+                    >
+                      <Github size={13} />
+                      <span>Source Code</span>
+                    </a>
+                  )}
+                  {isValidContent(award.credentialUrl) && (
+                    <a
+                      href={award.credentialUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="award-link-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--accent)',
+                        textDecoration: 'none',
+                        padding: '5px 12px',
+                        background: 'rgba(227, 43, 60, 0.08)',
+                        border: '1px solid var(--border-accent)',
+                        borderRadius: 'var(--radius-full)',
+                        transition: 'all 160ms ease',
+                      }}
+                    >
+                      <span>{award.credentialLabel || 'View Credential'}</span>
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
+                </div>
+              )}
             </MotionDiv>
           ))}
         </div>

@@ -44,8 +44,8 @@ export default function CursorGlow({ motionEnabled }) {
         width: '100vw',
         height: '100vh',
         pointerEvents: 'none',
-        zIndex: 2,
-        background: `radial-gradient(650px circle at ${pos.x}px ${pos.y}px, rgba(227, 43, 60, 0.045), transparent 80%)`,
+        zIndex: 3,
+        background: `radial-gradient(650px circle at ${pos.x}px ${pos.y}px, rgba(227, 43, 60, 0.025), transparent 80%)`,
         transition: 'background 40ms ease-out',
       }}
       aria-hidden="true"

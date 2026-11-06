@@ -8,11 +8,14 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Experience from './components/Experience';
 import Awards from './components/Awards';
+import Ventures from './components/Ventures';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ScrollProgress from './components/ScrollProgress';
 import CursorGlow from './components/CursorGlow';
+import BackgroundGradient from './components/BackgroundGradient';
 import SwarmEffect from './components/SwarmEffect';
+import SectionDivider from './components/SectionDivider';
 import { siteConfig } from './config/site';
 import { projects } from './data/projects';
 
@@ -81,6 +84,9 @@ export default function App() {
       {/* Top Scroll Indicator */}
       <ScrollProgress motionEnabled={motionEnabled} />
 
+      {/* Palette-Complementary Ambient Background Gradient */}
+      <BackgroundGradient motionEnabled={motionEnabled} />
+
       {/* Subtle Ambient Mouse Spotlight (Dark mode fine-pointer) */}
       {theme === 'dark' && <CursorGlow motionEnabled={motionEnabled} />}
 
@@ -98,12 +104,12 @@ export default function App() {
       <main id="main-content">
         <Hero motionEnabled={motionEnabled} />
 
-        <hr className="section-divider" />
+        <SectionDivider motionEnabled={motionEnabled} />
 
         {/* Client Acquisition Engine / Hire Me Solutions */}
         <ClientEngine motionEnabled={motionEnabled} />
 
-        <hr className="section-divider" />
+        <SectionDivider motionEnabled={motionEnabled} />
 
         <ProjectGrid
           projects={projects}
@@ -111,7 +117,7 @@ export default function App() {
           onSelectProject={(project) => setSelectedProject(project)}
         />
 
-        <hr className="section-divider" />
+        <SectionDivider motionEnabled={motionEnabled} />
 
         <About motionEnabled={motionEnabled} />
 
@@ -119,19 +125,26 @@ export default function App() {
 
         {siteConfig.preferences.showExperience && (
           <>
-            <hr className="section-divider" />
+            <SectionDivider motionEnabled={motionEnabled} />
             <Experience motionEnabled={motionEnabled} />
           </>
         )}
 
         {siteConfig.preferences.showAwards && (
           <>
-            <hr className="section-divider" />
+            <SectionDivider motionEnabled={motionEnabled} />
             <Awards motionEnabled={motionEnabled} />
           </>
         )}
 
-        <hr className="section-divider" />
+        {(siteConfig.preferences.showVentures ?? true) && (
+          <>
+            <SectionDivider motionEnabled={motionEnabled} />
+            <Ventures motionEnabled={motionEnabled} />
+          </>
+        )}
+
+        <SectionDivider motionEnabled={motionEnabled} />
 
         <Contact motionEnabled={motionEnabled} />
       </main>
@@ -150,6 +163,7 @@ export default function App() {
       {/* Standalone Swarm Rebuild Animation Feature */}
       <SwarmEffect
         isActive={swarmActive}
+        theme={theme}
         onClose={() => setSwarmActive(false)}
       />
     </div>

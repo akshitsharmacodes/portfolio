@@ -13,8 +13,18 @@ import {
   FileText,
   Inbox,
   Sparkles,
+  MessageCircle,
+  MapPin,
+  Code2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+  fadeInLeftVariant,
+  fadeInRightVariant,
+} from '../config/motion';
 
 export default function Contact({ motionEnabled = true }) {
   const [formData, setFormData] = useState({
@@ -41,42 +51,45 @@ export default function Contact({ motionEnabled = true }) {
     return Object.keys(errs).length === 0;
   };
 
-  // Direct submit: tries async dispatch or opens Gmail compose
+  // Direct submit: sends message via Web3Forms API to akshitsharmacodes@gmail.com
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setSubmittedStatus('sending');
 
+    const accessKey =
+      import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ||
+      siteConfig.contact.web3formsKey ||
+      '4adaa253-515d-4e65-a0df-ea4f4d7a2041';
+
     try {
-      // Direct Web3Forms submission to delivered email
+      const submission = new FormData();
+      submission.append('access_key', accessKey);
+      submission.append('name', formData.name);
+      submission.append('email', formData.email);
+      submission.append('from_name', formData.name);
+      submission.append('subject', formData.subject || `Inquiry from ${formData.name} via Portfolio`);
+      submission.append('message', formData.message);
+
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: 'YOUR_ACCESS_KEY_HERE', // optional Web3Forms key
-          email_to: siteConfig.contact.email,
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject || `Inquiry from ${formData.name} via Portfolio`,
-          message: formData.message,
-        }),
+        body: submission,
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (data.success) {
         setSubmittedStatus('success');
       } else {
         // Fallback directly to mailto
         triggerMailto();
-        setSubmittedStatus('success');
+        setSubmittedStatus('fallback');
       }
     } catch (err) {
       // In case of offline/network block, trigger mailto directly
       triggerMailto();
-      setSubmittedStatus('success');
+      setSubmittedStatus('fallback');
     }
   };
 
@@ -109,10 +122,10 @@ export default function Contact({ motionEnabled = true }) {
       <div className="container">
         {/* Section Header */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">06</span>
@@ -124,184 +137,188 @@ export default function Contact({ motionEnabled = true }) {
           {/* Contact Information & Channels */}
           <MotionDiv
             className="contact-info-column"
-            initial={motionEnabled ? { opacity: 0, x: -24 } : undefined}
-            whileInView={motionEnabled ? { opacity: 1, x: 0 } : undefined}
-            viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            variants={motionEnabled ? fadeInLeftVariant : undefined}
+            initial={motionEnabled ? "hidden" : undefined}
+            whileInView={motionEnabled ? "visible" : undefined}
+            viewport={motionEnabled ? scrollViewportEarly : undefined}
           >
-            <h2 className="contact-headline">
-              Let's Build Something <span className="text-accent">Intelligent.</span>
-            </h2>
-            <p style={{ fontSize: '1.05rem', color: 'var(--text-muted)', lineHeight: '1.7' }}>
-              Whether you are looking to deploy multi-agent LLM systems, build production RAG pipelines, or automate complex business workflows, I am currently open to AI/ML engineering opportunities.
-            </p>
+            <div className="contact-info-header">
+              <div className="contact-status-badge">
+                <span className="contact-status-dot"></span>
+                <span>Available for Immediate Contracts & Full-time Roles</span>
+              </div>
+              <h2 className="contact-headline">
+                Let's Build Something <span className="text-accent">Intelligent.</span>
+              </h2>
+              <p className="contact-intro-text">
+                Whether deploying multi-agent LLM systems, production RAG pipelines with LangGraph & ChromaDB, or high-throughput async FastAPI services, let's connect directly.
+              </p>
+            </div>
 
-            <div className="contact-channels">
-              {/* Upwork - Top Client Acquisition Channel */}
+            {/* Direct Priority Action Cards */}
+            <div className="contact-priority-actions">
+              {/* WhatsApp DM */}
+              {isValidContent(siteConfig.contact.whatsapp) && (
+                <a
+                  href={siteConfig.contact.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contact-action-card whatsapp-card"
+                  aria-label="Direct WhatsApp Message to Akshit Sharma"
+                >
+                  <div className="action-card-icon whatsapp-icon">
+                    <MessageCircle size={18} />
+                  </div>
+                  <div className="action-card-text">
+                    <div className="action-card-tag">Fastest Response</div>
+                    <div className="action-card-title">WhatsApp DM</div>
+                    <div className="action-card-sub">+91 7888327471</div>
+                  </div>
+                  <ArrowUpRight size={18} className="action-card-arrow" />
+                </a>
+              )}
+
+              {/* Hire on Upwork */}
               {isValidContent(siteConfig.contact.upwork) && (
                 <a
                   href={siteConfig.contact.upwork}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="channel-card interactive-hover-card"
-                  style={{ borderLeft: '3px solid #14a800' }}
+                  className="contact-action-card upwork-card"
                   aria-label="Hire Akshit on Upwork"
                 >
-                  <div className="channel-info">
-                    <div
-                      style={{
-                        width: '26px',
-                        height: '26px',
-                        borderRadius: '50%',
-                        backgroundColor: 'rgba(20, 168, 0, 0.15)',
-                        color: '#14a800',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 900,
-                        fontSize: '0.8rem',
-                      }}
-                    >
-                      Up
-                    </div>
-                    <div>
-                      <div className="channel-label" style={{ color: '#14a800' }}>Hire on Upwork</div>
-                      <div className="channel-value">Contract & Project Workroom</div>
-                    </div>
+                  <div className="action-card-icon upwork-icon">
+                    Up
                   </div>
-                  <ArrowUpRight size={18} style={{ color: '#14a800' }} className="channel-arrow" aria-hidden="true" />
+                  <div className="action-card-text">
+                    <div className="action-card-tag">Milestone Contracts</div>
+                    <div className="action-card-title">Hire on Upwork</div>
+                    <div className="action-card-sub">Top Rated Profile</div>
+                  </div>
+                  <ArrowUpRight size={18} className="action-card-arrow" />
                 </a>
               )}
+            </div>
 
-              {/* Email */}
+            {/* Direct Channels Compact Grid */}
+            <div className="contact-details-grid">
               {isValidContent(siteConfig.contact.email) && (
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
-                  className="channel-card interactive-hover-card"
+                  className="contact-mini-item"
                   aria-label={`Send email to ${siteConfig.contact.email}`}
                 >
-                  <div className="channel-info">
-                    <Mail size={20} className="text-accent channel-icon" aria-hidden="true" />
-                    <div>
-                      <div className="channel-label">Email Inbox</div>
-                      <div className="channel-value">{siteConfig.contact.email}</div>
-                    </div>
+                  <Mail size={16} className="text-accent flex-shrink-0" />
+                  <div className="mini-item-content">
+                    <span className="mini-item-label">Direct Email</span>
+                    <span className="mini-item-val">{siteConfig.contact.email}</span>
                   </div>
-                  <ArrowUpRight size={18} className="text-accent channel-arrow" aria-hidden="true" />
                 </a>
               )}
 
-              {/* Phone */}
               {isValidContent(siteConfig.contact.phone) && (
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
-                  className="channel-card interactive-hover-card"
+                  className="contact-mini-item"
                   aria-label={`Call ${siteConfig.contact.phone}`}
                 >
-                  <div className="channel-info">
-                    <Phone size={20} className="text-accent channel-icon" aria-hidden="true" />
-                    <div>
-                      <div className="channel-label">Direct Phone</div>
-                      <div className="channel-value">{siteConfig.contact.phone}</div>
-                    </div>
+                  <Phone size={16} className="text-accent flex-shrink-0" />
+                  <div className="mini-item-content">
+                    <span className="mini-item-label">Direct Phone</span>
+                    <span className="mini-item-val">{siteConfig.contact.phone}</span>
                   </div>
-                  <ArrowUpRight size={18} className="text-accent channel-arrow" aria-hidden="true" />
                 </a>
               )}
 
-              {/* LinkedIn */}
-              {isValidContent(siteConfig.contact.linkedin) && (
-                <a
-                  href={siteConfig.contact.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="channel-card interactive-hover-card"
-                  aria-label="Visit LinkedIn Profile"
-                >
-                  <div className="channel-info">
-                    <Linkedin size={20} className="text-accent channel-icon" aria-hidden="true" />
-                    <div>
-                      <div className="channel-label">LinkedIn</div>
-                      <div className="channel-value">in/akshitsharmacodes</div>
-                    </div>
-                  </div>
-                  <ArrowUpRight size={18} className="text-accent channel-arrow" aria-hidden="true" />
-                </a>
-              )}
+              <a
+                href="https://cal.com/akshitsharmacodes"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-mini-item"
+                aria-label="Schedule Consultation on Cal.com"
+              >
+                <Calendar size={16} className="text-accent flex-shrink-0" />
+                <div className="mini-item-content">
+                  <span className="mini-item-label">Consultation</span>
+                  <span className="mini-item-val">Schedule on Cal.com</span>
+                </div>
+              </a>
 
-              {/* GitHub */}
-              {isValidContent(siteConfig.contact.github) && (
-                <a
-                  href={siteConfig.contact.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="channel-card interactive-hover-card"
-                  aria-label="Visit GitHub Profile"
-                >
-                  <div className="channel-info">
-                    <Github size={20} className="text-accent channel-icon" aria-hidden="true" />
-                    <div>
-                      <div className="channel-label">GitHub</div>
-                      <div className="channel-value">akshitsharmacodes</div>
-                    </div>
-                  </div>
-                  <ArrowUpRight size={18} className="text-accent channel-arrow" aria-hidden="true" />
-                </a>
-              )}
+              <div className="contact-mini-item">
+                <MapPin size={16} className="text-accent flex-shrink-0" />
+                <div className="mini-item-content">
+                  <span className="mini-item-label">Location Base</span>
+                  <span className="mini-item-val">{siteConfig.identity.location} · Remote</span>
+                </div>
+              </div>
+            </div>
 
-              {/* Resume */}
-              {isValidContent(siteConfig.identity.resume) && (
-                <a
-                  href={siteConfig.identity.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="channel-card interactive-hover-card"
-                  aria-label="View Resume PDF on Google Drive"
-                >
-                  <div className="channel-info">
-                    <FileText size={20} className="text-accent channel-icon" aria-hidden="true" />
-                    <div>
-                     
-                      <div className="channel-value">View Resume</div>
-                    </div>
-                  </div>
-                  <ArrowUpRight size={18} className="text-accent channel-arrow" aria-hidden="true" />
-                </a>
-              )}
-
-              {/* Cal.com Scheduling */}
-              {siteConfig.contact.otherLinks?.map((link) => {
-                if (!isValidContent(link.url)) return null;
-                return (
+            {/* Professional Profiles Dock */}
+            <div className="contact-social-dock">
+              <span className="contact-dock-label">Profiles:</span>
+              <div className="contact-dock-pills">
+                {isValidContent(siteConfig.contact.linkedin) && (
                   <a
-                    key={link.label}
-                    href={link.url}
+                    href={siteConfig.contact.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="channel-card interactive-hover-card"
-                    aria-label={link.label}
+                    className="contact-dock-pill"
+                    aria-label="Visit LinkedIn Profile"
                   >
-                    <div className="channel-info">
-                      <Calendar size={20} className="text-accent channel-icon" aria-hidden="true" />
-                      <div>
-                        <div className="channel-label">Direct Meeting</div>
-                        <div className="channel-value">{link.label}</div>
-                      </div>
-                    </div>
-                    <ArrowUpRight size={18} className="text-accent channel-arrow" aria-hidden="true" />
+                    <Linkedin size={14} className="text-accent" />
+                    <span>LinkedIn</span>
                   </a>
-                );
-              })}
+                )}
+
+                {isValidContent(siteConfig.contact.github) && (
+                  <a
+                    href={siteConfig.contact.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-dock-pill"
+                    aria-label="Visit GitHub Profile"
+                  >
+                    <Github size={14} className="text-accent" />
+                    <span>GitHub</span>
+                  </a>
+                )}
+
+                {isValidContent(siteConfig.contact.leetcode) && (
+                  <a
+                    href={siteConfig.contact.leetcode}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-dock-pill"
+                    aria-label="Visit LeetCode Profile"
+                  >
+                    <Code2 size={14} className="text-accent" />
+                    <span>LeetCode</span>
+                  </a>
+                )}
+
+                {isValidContent(siteConfig.identity.resume) && (
+                  <a
+                    href={siteConfig.identity.resume}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-dock-pill"
+                    aria-label="View Resume PDF"
+                  >
+                    <FileText size={14} className="text-accent" />
+                    <span>Resume PDF</span>
+                  </a>
+                )}
+              </div>
             </div>
           </MotionDiv>
 
           {/* Contact Message Composer Form */}
           {siteConfig.preferences.showContactForm && (
             <MotionDiv
-              initial={motionEnabled ? { opacity: 0, x: 24 } : undefined}
-              whileInView={motionEnabled ? { opacity: 1, x: 0 } : undefined}
-              viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              variants={motionEnabled ? fadeInRightVariant : undefined}
+              initial={motionEnabled ? "hidden" : undefined}
+              whileInView={motionEnabled ? "visible" : undefined}
+              viewport={motionEnabled ? scrollViewportEarly : undefined}
             >
               <form className="contact-form" onSubmit={handleSubmit} noValidate>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
@@ -326,10 +343,10 @@ export default function Contact({ motionEnabled = true }) {
                   >
                     <Check size={32} style={{ color: '#10b981', margin: '0 auto 12px' }} />
                     <h4 style={{ color: 'var(--text)', fontSize: '1.1rem', marginBottom: '6px' }}>
-                      Message Ready & Dispatched!
+                      Message Sent Successfully!
                     </h4>
                     <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                      Your message has been compiled for <strong>{siteConfig.contact.email}</strong>. Check your email inbox to see the thread or response!
+                      Thank you, <strong>{formData.name || 'there'}</strong>! Your message has been delivered directly to <strong>{siteConfig.contact.email}</strong>. I will get back to you shortly.
                     </p>
                     <button
                       type="button"
@@ -340,6 +357,51 @@ export default function Contact({ motionEnabled = true }) {
                       }}
                     >
                       Send Another Message
+                    </button>
+                  </div>
+                ) : submittedStatus === 'fallback' ? (
+                  <div
+                    style={{
+                      padding: '24px',
+                      background: 'rgba(227, 43, 60, 0.08)',
+                      border: '1px solid rgba(227, 43, 60, 0.3)',
+                      borderRadius: 'var(--radius-md)',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Mail size={32} style={{ color: 'var(--accent)', margin: '0 auto 12px' }} />
+                    <h4 style={{ color: 'var(--text)', fontSize: '1.1rem', marginBottom: '6px' }}>
+                      Opening in Email Application...
+                    </h4>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                      We opened your email client to send to <strong>{siteConfig.contact.email}</strong>. If your mail client did not open automatically, you can send via Gmail webmail or copy the draft:
+                    </p>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteConfig.contact.email}&su=${encodeURIComponent(formData.subject || `Inquiry from ${formData.name}`)}&body=${encodeURIComponent(`Hello Akshit,\n\nFrom: ${formData.name} (${formData.email})\n\nMessage:\n${formData.message}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                        style={{ fontSize: '0.85rem', padding: '8px 16px' }}
+                      >
+                        Open in Gmail Webmail
+                      </a>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleCopyDraft}
+                        style={{ fontSize: '0.85rem', padding: '8px 16px' }}
+                      >
+                        {copied ? 'Copied!' : 'Copy Draft'}
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-ghost"
+                      style={{ fontSize: '0.8rem', cursor: 'pointer' }}
+                      onClick={() => setSubmittedStatus(null)}
+                    >
+                      Return to Form
                     </button>
                   </div>
                 ) : (

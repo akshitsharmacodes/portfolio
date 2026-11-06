@@ -8,8 +8,16 @@ import {
   ArrowUpRight,
   Calendar,
   CheckCircle2,
+  MessageCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+  cardRevealVariant,
+  luxuryTransition,
+} from '../config/motion';
 
 export default function ClientEngine({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
@@ -57,10 +65,10 @@ export default function ClientEngine({ motionEnabled = true }) {
       <div className="container">
         {/* Section Header */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">02</span>
@@ -82,10 +90,11 @@ export default function ClientEngine({ motionEnabled = true }) {
               <MotionDiv
                 key={pillar.title}
                 className="client-pillar-card interactive-hover-card"
-                initial={motionEnabled ? { opacity: 0, y: 28 } : undefined}
-                whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-                viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-                transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                variants={motionEnabled ? cardRevealVariant : undefined}
+                custom={index * 0.08}
+                initial={motionEnabled ? "hidden" : undefined}
+                whileInView={motionEnabled ? "visible" : undefined}
+                viewport={motionEnabled ? scrollViewportEarly : undefined}
                 whileHover={motionEnabled ? { y: -6 } : undefined}
               >
                 <div className="client-pillar-top">
@@ -119,10 +128,11 @@ export default function ClientEngine({ motionEnabled = true }) {
         {/* Client Trust Card Banner - Fully Optimized for Light & Dark Theme */}
         <MotionDiv
           className="client-banner-card"
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? cardRevealVariant : undefined}
+          custom={0.12}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewportEarly : undefined}
         >
           {/* Subtle Ambient Radial Highlight */}
           <div className="client-banner-glow" />
@@ -153,6 +163,20 @@ export default function ClientEngine({ motionEnabled = true }) {
                 </a>
               )}
 
+              {isValidContent(siteConfig.contact.whatsapp) && (
+                <a
+                  href={siteConfig.contact.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{ padding: '12px 20px', fontSize: '0.94rem', borderColor: 'rgba(37, 211, 102, 0.4)' }}
+                  title="Direct WhatsApp DM (+91 7888327471)"
+                >
+                  <MessageCircle size={16} style={{ color: '#25D366' }} aria-hidden="true" />
+                  <span>WhatsApp DM</span>
+                </a>
+              )}
+
               <a
                 href="https://cal.com/akshitsharmacodes"
                 target="_blank"
@@ -168,8 +192,15 @@ export default function ClientEngine({ motionEnabled = true }) {
 
           {/* 4 Client Trust Guarantees */}
           <div className="client-trust-grid">
-            {trustBadges.map((badge) => (
-              <div key={badge.title} className="client-trust-item">
+            {trustBadges.map((badge, bIdx) => (
+              <MotionDiv
+                key={badge.title}
+                className="client-trust-item"
+                initial={motionEnabled ? { opacity: 0, y: 14 } : undefined}
+                whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
+                viewport={motionEnabled ? scrollViewportEarly : undefined}
+                transition={motionEnabled ? luxuryTransition(0.2 + bIdx * 0.06, 0.5) : undefined}
+              >
                 <CheckCircle2 size={18} className="client-trust-icon" />
                 <div>
                   <h4 className="client-trust-title">
@@ -179,7 +210,7 @@ export default function ClientEngine({ motionEnabled = true }) {
                     {badge.desc}
                   </p>
                 </div>
-              </div>
+              </MotionDiv>
             ))}
           </div>
         </MotionDiv>

@@ -1,7 +1,15 @@
 import React from 'react';
 import { experienceData, educationData } from '../data/experience';
-import { Briefcase, GraduationCap, MapPin } from 'lucide-react';
+import { Briefcase, GraduationCap, MapPin, ExternalLink, FileText } from 'lucide-react';
+import { siteConfig, isValidContent } from '../config/site';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+  fadeInLeftVariant,
+  fadeInRightVariant,
+} from '../config/motion';
 
 export default function Experience({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
@@ -11,10 +19,10 @@ export default function Experience({ motionEnabled = true }) {
       <div className="container">
         {/* Section Header */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">04</span>
@@ -49,10 +57,11 @@ export default function Experience({ motionEnabled = true }) {
                 <MotionDiv
                   key={item.id}
                   className={`timeline-card interactive-hover-card ${item.current ? 'current' : ''}`}
-                  initial={motionEnabled ? { opacity: 0, x: -20 } : undefined}
-                  whileInView={motionEnabled ? { opacity: 1, x: 0 } : undefined}
-                  viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-                  transition={{ duration: 0.55, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  variants={motionEnabled ? fadeInLeftVariant : undefined}
+                  custom={index * 0.08}
+                  initial={motionEnabled ? "hidden" : undefined}
+                  whileInView={motionEnabled ? "visible" : undefined}
+                  viewport={motionEnabled ? scrollViewportEarly : undefined}
                   whileHover={motionEnabled ? { x: 4 } : undefined}
                 >
                   <div className="timeline-dot" aria-hidden="true"></div>
@@ -89,6 +98,35 @@ export default function Experience({ motionEnabled = true }) {
                       ))}
                     </div>
                   )}
+
+                  {isValidContent(item.credentialUrl) && (
+                    <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                      <a
+                        href={item.credentialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="award-link-btn"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          color: 'var(--accent)',
+                          textDecoration: 'none',
+                          padding: '5px 12px',
+                          background: 'rgba(227, 43, 60, 0.08)',
+                          border: '1px solid var(--border-accent)',
+                          borderRadius: 'var(--radius-full)',
+                          transition: 'all 160ms ease',
+                        }}
+                      >
+                        <FileText size={13} />
+                        <span>{item.credentialLabel || 'View Document'}</span>
+                        <ExternalLink size={12} />
+                      </a>
+                    </div>
+                  )}
                 </MotionDiv>
               ))}
             </div>
@@ -115,10 +153,11 @@ export default function Experience({ motionEnabled = true }) {
               <MotionDiv
                 key={edu.institution}
                 className="education-card interactive-hover-card"
-                initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-                whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-                viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-                transition={{ duration: 0.55, delay: index * 0.14, ease: [0.22, 1, 0.36, 1] }}
+                variants={motionEnabled ? fadeInRightVariant : undefined}
+                custom={index * 0.08}
+                initial={motionEnabled ? "hidden" : undefined}
+                whileInView={motionEnabled ? "visible" : undefined}
+                viewport={motionEnabled ? scrollViewportEarly : undefined}
                 whileHover={motionEnabled ? { y: -4 } : undefined}
               >
                 <div className="edu-dates">{edu.dates}</div>

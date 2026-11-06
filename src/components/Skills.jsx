@@ -2,6 +2,12 @@ import React from 'react';
 import { skillsData } from '../data/experience';
 import { Code2, Wrench } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+  cardRevealVariant,
+} from '../config/motion';
 
 export default function Skills({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
@@ -11,10 +17,10 @@ export default function Skills({ motionEnabled = true }) {
       <div className="container">
         {/* Section Header */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">03</span>
@@ -39,10 +45,11 @@ export default function Skills({ motionEnabled = true }) {
             <MotionDiv
               key={group.group}
               className={`skill-group-card interactive-hover-card ${group.highlight ? 'highlight' : ''}`}
-              initial={motionEnabled ? { opacity: 0, y: 28 } : undefined}
-              whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-              viewport={motionEnabled ? { once: true, amount: 0.15 } : undefined}
-              transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              variants={motionEnabled ? cardRevealVariant : undefined}
+              custom={index * 0.07}
+              initial={motionEnabled ? "hidden" : undefined}
+              whileInView={motionEnabled ? "visible" : undefined}
+              viewport={motionEnabled ? scrollViewportEarly : undefined}
               whileHover={motionEnabled ? { y: -4, borderColor: 'var(--border-strong)' } : undefined}
             >
               <div className="skill-group-header">
@@ -65,7 +72,7 @@ export default function Skills({ motionEnabled = true }) {
                 {group.items.map((skill) => (
                   <span
                     key={skill}
-                    className={`tech-tag ${group.highlight ? 'accent-style' : ''}`}
+                    className="tech-tag"
                   >
                     {skill}
                   </span>
@@ -88,10 +95,11 @@ export default function Skills({ motionEnabled = true }) {
             justifyContent: 'space-between',
             gap: '16px',
           }}
-          initial={motionEnabled ? { opacity: 0, y: 20 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          custom={0.12}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewportEarly : undefined}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Wrench size={18} className="text-accent" aria-hidden="true" />

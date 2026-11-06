@@ -1,41 +1,59 @@
 import React from 'react';
 import { siteConfig, isValidContent } from '../config/site';
 import { ArrowDown, ArrowUpRight, MapPin, Sparkles, Trophy, Award, ShieldCheck, Github, FileText } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { easeCurves } from '../config/motion';
 
 export default function Hero({ motionEnabled }) {
+  const { scrollY } = useScroll();
+  const graphY = useTransform(scrollY, [0, 600], [0, 90]);
+  const graphOpacity = useTransform(scrollY, [0, 500], [0.35, 0.08]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: motionEnabled ? 0.1 : 0,
-        delayChildren: 0.1,
+        staggerChildren: motionEnabled ? 0.08 : 0,
+        delayChildren: 0.04,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: motionEnabled ? 28 : 0 },
+    hidden: {
+      opacity: 0,
+      y: motionEnabled ? 28 : 0,
+      filter: motionEnabled ? 'blur(4px)' : 'none',
+    },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+      filter: 'blur(0px)',
+      transition: {
+        duration: 0.7,
+        ease: easeCurves.luxuryDecel,
+      },
     },
   };
 
   const MotionDiv = motionEnabled ? motion.div : 'div';
   const MotionH1 = motionEnabled ? motion.h1 : 'h1';
+  const MotionSvg = motionEnabled ? motion.svg : 'svg';
 
   return (
     <section className="hero-section" id="hero" aria-label="Hero Introduction">
-      {/* Abstract Network Graph Backdrop Motif */}
-      <svg
+      {/* Abstract Network Graph Backdrop Motif with Scroll Parallax */}
+      <MotionSvg
         className="hero-graph-decor"
         viewBox="0 0 400 400"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
+        style={{
+          y: motionEnabled ? graphY : 0,
+          opacity: motionEnabled ? graphOpacity : 0.3,
+        }}
       >
         <circle cx="200" cy="200" r="160" stroke="#e32b3c" strokeWidth="1" strokeDasharray="4 6" opacity="0.3" />
         <circle cx="200" cy="200" r="90" stroke="#f2efeb" strokeWidth="1" strokeOpacity="0.15" />
@@ -48,7 +66,7 @@ export default function Hero({ motionEnabled }) {
         <circle cx="200" cy="200" r="8" fill="#e32b3c" />
         <circle cx="280" cy="300" r="4" fill="#f2efeb" />
         <circle cx="100" cy="290" r="4" fill="#f2efeb" />
-      </svg>
+      </MotionSvg>
 
       <div className="container">
         <MotionDiv
@@ -161,4 +179,3 @@ export default function Hero({ motionEnabled }) {
     </section>
   );
 }
-

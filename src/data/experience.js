@@ -78,6 +78,8 @@ export const experienceData = [
       "Trained in battle tactics, map reading and terrain navigation, weapons handling, drill and horsemanship, building structured decision-making under pressure, discipline and leadership.",
     ],
     tech: ["Leadership Under Pressure", "Tactical Decision Making", "High-Stakes Execution", "Discipline & Planning"],
+    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/overlay/Education/969402025/treasury/?profileId=ACoAAD03ZrYBE0jKVwqOPcT55T-q49VhhIIkYkI",
+    credentialLabel: "View Joining Letter / Offer",
   },
 ];
 
@@ -100,6 +102,17 @@ export const educationData = [
 
 export const awardsData = [
   {
+    id: "hack-o-octo",
+    title: "Hack-O-Octo 4.0: Top 10 National Finalist",
+    detail:
+      "Shortlisted among the Top 10 teams across India by Google Developer Groups (GDG) at Chandigarh University for Zero-Ops AutoSRE — an autonomous multi-agent system for cloud incident resolution and self-healing infrastructure.",
+    badge: "Top 10 Finalist",
+    category: "Hackathon",
+    year: "2026",
+    liveUrl: "https://landing-page-for-auto-sre.vercel.app/",
+    sourceUrl: "https://github.com/akshitsharmacodes/zero-ops-autosre",
+  },
+  {
     id: "sih-2025",
     title: "Smart India Hackathon 2025: 1st Place",
     detail:
@@ -107,6 +120,7 @@ export const awardsData = [
     badge: "1st Place · National Winner",
     category: "Hackathon",
     year: "2025",
+    sourceUrl: "https://github.com/akshitsharmacodes/SIH-Backend",
   },
   {
     id: "zinnovatio",
@@ -118,6 +132,18 @@ export const awardsData = [
     year: "2025",
   },
   {
+    id: "leetcode-50",
+    title: "LeetCode 50 Days Streak Badge",
+    detail:
+      "Awarded for continuous algorithmic problem-solving and daily consistency across data structures, algorithms, and technical challenges.",
+    badge: "50 Days Badge",
+    category: "Competitive Programming",
+    year: "2026",
+    liveUrl: "https://leetcode.com/u/akshitsharmacodes/",
+    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/overlay/Position/2369391183/treasury/?profileId=ACoAAD03ZrYBE0jKVwqOPcT55T-q49VhhIIkYkI",
+    credentialLabel: "View Badge Certificate",
+  },
+  {
     id: "ssb",
     title: "SSB Recommended (Permanent Commission)",
     detail:
@@ -125,6 +151,8 @@ export const awardsData = [
     badge: "Recommended",
     category: "Defense Selection",
     year: "2022",
+    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/overlay/Position/2369391183/treasury/?profileId=ACoAAD03ZrYBE0jKVwqOPcT55T-q49VhhIIkYkI",
+    credentialLabel: "View SSB Recommendation Photo",
   },
 ];
 

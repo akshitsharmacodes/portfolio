@@ -2,28 +2,44 @@ import React from 'react';
 import { siteConfig } from '../config/site';
 import { Shield, Brain, Terminal, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+  fadeInLeftVariant,
+  cardRevealVariant,
+} from '../config/motion';
 
 export default function About({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 24 },
-    visible: (custom) => ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.55, delay: custom * 0.12, ease: [0.22, 1, 0.36, 1] },
-    }),
-  };
+  const principles = [
+    {
+      icon: Brain,
+      title: 'Multi-Agent Orchestration',
+      desc: 'Replacing monolithic prompts with specialized LangGraph state graphs that isolate tasks, provide checkpointing, and make scoring and verification inspectable.',
+    },
+    {
+      icon: Terminal,
+      title: 'RAG & Vector Retrieval',
+      desc: 'Semantic chunking, vector indexing in ChromaDB, and hybrid relational queries in PostgreSQL to ground generation in verified enterprise truth.',
+    },
+    {
+      icon: Cpu,
+      title: 'High-Throughput Backends',
+      desc: 'FastAPI, Django REST APIs, Redis caching layers, and asynchronous Celery job queues engineered for low latency and zero data loss.',
+    },
+  ];
 
   return (
     <section className="section-padding" id="about" aria-label="About Akshit Sharma">
       <div className="container">
         {/* Section Header */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 24 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">02</span>
@@ -36,10 +52,10 @@ export default function About({ motionEnabled = true }) {
           {/* Biography text */}
           <MotionDiv
             className="about-text-column"
-            initial={motionEnabled ? { opacity: 0, x: -24 } : undefined}
-            whileInView={motionEnabled ? { opacity: 1, x: 0 } : undefined}
-            viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+            variants={motionEnabled ? fadeInLeftVariant : undefined}
+            initial={motionEnabled ? "hidden" : undefined}
+            whileInView={motionEnabled ? "visible" : undefined}
+            viewport={motionEnabled ? scrollViewportEarly : undefined}
           >
             <p className="about-paragraph">
               {siteConfig.identity.about}
@@ -54,57 +70,32 @@ export default function About({ motionEnabled = true }) {
           </MotionDiv>
 
           {/* Core Principles */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <MotionDiv
-              className="skill-group-card interactive-hover-card"
-              custom={1}
-              variants={motionEnabled ? cardVariants : undefined}
-              initial={motionEnabled ? "hidden" : undefined}
-              whileInView={motionEnabled ? "visible" : undefined}
-              viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <Brain size={20} className="text-accent" aria-hidden="true" />
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--text)' }}>Multi-Agent Orchestration</h4>
-              </div>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                Replacing monolithic prompts with specialized LangGraph state graphs that isolate tasks, provide checkpointing, and make scoring and verification inspectable.
-              </p>
-            </MotionDiv>
-
-            <MotionDiv
-              className="skill-group-card interactive-hover-card"
-              custom={2}
-              variants={motionEnabled ? cardVariants : undefined}
-              initial={motionEnabled ? "hidden" : undefined}
-              whileInView={motionEnabled ? "visible" : undefined}
-              viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <Terminal size={20} className="text-accent" aria-hidden="true" />
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--text)' }}>RAG & Vector Retrieval</h4>
-              </div>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                Semantic chunking, vector indexing in ChromaDB, and hybrid relational queries in PostgreSQL to ground generation in verified enterprise truth.
-              </p>
-            </MotionDiv>
-
-            <MotionDiv
-              className="skill-group-card interactive-hover-card"
-              custom={3}
-              variants={motionEnabled ? cardVariants : undefined}
-              initial={motionEnabled ? "hidden" : undefined}
-              whileInView={motionEnabled ? "visible" : undefined}
-              viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                <Cpu size={20} className="text-accent" aria-hidden="true" />
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--text)' }}>High-Throughput Backends</h4>
-              </div>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                FastAPI, Django REST APIs, Redis caching layers, and asynchronous Celery job queues engineered for low latency and zero data loss.
-              </p>
-            </MotionDiv>
+          <div className="about-principles-column">
+            {principles.map((p, idx) => {
+              const Icon = p.icon;
+              return (
+                <MotionDiv
+                  key={p.title}
+                  className="skill-group-card about-principle-card interactive-hover-card"
+                  variants={motionEnabled ? cardRevealVariant : undefined}
+                  custom={idx * 0.09}
+                  initial={motionEnabled ? "hidden" : undefined}
+                  whileInView={motionEnabled ? "visible" : undefined}
+                  viewport={motionEnabled ? scrollViewportEarly : undefined}
+                  whileHover={motionEnabled ? { y: -4, borderColor: 'var(--border-strong)' } : undefined}
+                >
+                  <div className="about-pillar-header">
+                    <div className="about-pillar-icon-box">
+                      <Icon size={20} className="text-accent" aria-hidden="true" />
+                    </div>
+                    <h4 className="about-pillar-title">{p.title}</h4>
+                  </div>
+                  <p className="about-pillar-desc">
+                    {p.desc}
+                  </p>
+                </MotionDiv>
+              );
+            })}
           </div>
         </div>
       </div>

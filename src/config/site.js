@@ -29,18 +29,20 @@ export const siteConfig = {
   contact: {
     email: "akshitsharmacodes@gmail.com",
     phone: "+91 7888327471",
-    whatsapp: "", // empty => no WhatsApp button
+    whatsapp: "https://wa.me/917888327471?text=Hi!%20I%20saw%20your%20developer%20portfolio%20and%20wanted%20to%20discuss%20a%20project/opportunity.",
     linkedin: "https://www.linkedin.com/in/akshitsharmacodes",
     github: "https://github.com/akshitsharmacodes",
+    leetcode: "https://leetcode.com/u/akshitsharmacodes/",
     upwork: "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1",
+    web3formsKey: "4adaa253-515d-4e65-a0df-ea4f4d7a2041",
     instagram: "",
     youtube: "",
     behance: "",
     dribbble: "",
     otherLinks: [
+      { label: "LeetCode Profile", url: "https://leetcode.com/u/akshitsharmacodes/" },
       { label: "Book a Consultation", url: "https://cal.com/akshitsharmacodes" },
       { label: "Hire on Upwork", url: "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1" },
-      { label: "LeetCode", url: "[PLACEHOLDER]" },
     ],
   },
 
@@ -83,6 +85,7 @@ export const siteConfig = {
 
   preferences: {
     showAwards: true,
+    showVentures: true,
     showEducation: true,
     showExperience: true,
     showBeforeAfter: false,

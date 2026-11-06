@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowUpRight, Zap, Github, FileText, Sun, Moon } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Zap, Github, FileText, Sun, Moon, MessageCircle } from 'lucide-react';
 
 export default function Header({
   theme,
@@ -17,7 +17,7 @@ export default function Header({
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
 
-      const sections = ['work', 'about', 'skills', 'experience', 'awards', 'contact'];
+      const sections = ['work', 'hire-me', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
       const scrollPosition = window.scrollY + 220;
 
       for (const sectionId of sections) {
@@ -67,6 +67,7 @@ export default function Header({
     { label: 'Skills', href: '#skills', id: 'skills', show: true },
     { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience },
     { label: 'Recognition', href: '#awards', id: 'awards', show: siteConfig.preferences.showAwards },
+    { label: 'Side Hustles', href: '#side-hustles', id: 'side-hustles', show: siteConfig.preferences.showVentures },
     { label: 'Contact', href: '#contact', id: 'contact', show: true },
   ].filter((item) => item.show);
 
@@ -268,6 +269,19 @@ export default function Header({
               )}
 
               <div className="mobile-quick-links">
+                {isValidContent(siteConfig.contact.whatsapp) && (
+                  <a
+                    href={siteConfig.contact.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-secondary"
+                    style={{ flex: 1, minHeight: '44px', fontSize: '0.84rem', justifyContent: 'center', color: '#25D366', borderColor: 'rgba(37, 211, 102, 0.4)' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <MessageCircle size={16} />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
                 {isValidContent(siteConfig.contact.github) && (
                   <a
                     href={siteConfig.contact.github}

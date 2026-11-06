@@ -2,6 +2,11 @@ import React, { useState, useMemo } from 'react';
 import ProjectCard from './ProjectCard';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
+import {
+  scrollViewport,
+  scrollViewportEarly,
+  fadeInUpVariant,
+} from '../config/motion';
 
 export default function ProjectGrid({ projects, onSelectProject, motionEnabled = true }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -38,10 +43,10 @@ export default function ProjectGrid({ projects, onSelectProject, motionEnabled =
       <div className="container">
         {/* Section Header with Scroll Animation */}
         <MotionDiv
-          initial={motionEnabled ? { opacity: 0, y: 28 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewport : undefined}
         >
           <div className="section-meta">
             <span className="section-num">01</span>
@@ -56,10 +61,11 @@ export default function ProjectGrid({ projects, onSelectProject, motionEnabled =
         {/* Filter and Search Controls */}
         <MotionDiv
           className="work-controls"
-          initial={motionEnabled ? { opacity: 0, y: 20 } : undefined}
-          whileInView={motionEnabled ? { opacity: 1, y: 0 } : undefined}
-          viewport={motionEnabled ? { once: true, amount: 0.2 } : undefined}
-          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          variants={motionEnabled ? fadeInUpVariant : undefined}
+          custom={0.06}
+          initial={motionEnabled ? "hidden" : undefined}
+          whileInView={motionEnabled ? "visible" : undefined}
+          viewport={motionEnabled ? scrollViewportEarly : undefined}
         >
           <div className="category-filter-list" role="tablist" aria-label="Project category filter">
             {categories.map((category) => (
