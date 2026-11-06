@@ -1,68 +1,121 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowUpRight, Zap, Github, FileText, Sun, Moon, MessageCircle } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Zap, Github, FileText, Sun, Moon, MessageCircle, Pause, Play } from 'lucide-react';
+import MagneticButton from './MagneticButton';
+
+// Page order (used for scroll-spy); nav labels/visibility come from site config
+const SECTION_IDS = ['hire-me', 'work', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
+
+function MotionToggle({ motionEnabled, onToggleMotion, size = 15 }) {
+  return (
+    <button
+      type="button"
+      className={`motion-toggle-btn${motionEnabled ? '' : ' is-paused'}`}
+      onClick={onToggleMotion}
+      aria-label="Reduce motion"
+      aria-pressed={!motionEnabled}
+      title={motionEnabled ? 'Pause animations' : 'Resume animations'}
+    >
+      {motionEnabled ? <Pause size={size} aria-hidden="true" /> : <Play size={size} aria-hidden="true" />}
+    </button>
+  );
+}
 
 export default function Header({
   theme,
   onToggleTheme,
+  motionEnabled,
+  onToggleMotion,
   onTriggerSwarm,
   swarmActive,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('work');
+  const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
+  const menuTriggerRef = useRef(null);
+  const drawerCloseRef = useRef(null);
+  const wasOpenRef = useRef(false);
 
-  // Handle active section and scrolled state
+  // Scroll state + scroll-spy (rAF-throttled)
   useEffect(() => {
-    const handleScroll = () => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
       setScrolled(window.scrollY > 30);
-
-      const sections = ['work', 'hire-me', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
-      const scrollPosition = window.scrollY + 220;
-
-      for (const sectionId of sections) {
+      const probe = window.scrollY + 220;
+      let current = '';
+      for (const sectionId of SECTION_IDS) {
         const el = document.getElementById(sectionId);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(sectionId);
-            break;
-          }
+        if (el && probe >= el.offsetTop && probe < el.offsetTop + el.offsetHeight) {
+          current = sectionId;
+          break;
         }
       }
+      setActiveSection(current);
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
-  // Close mobile menu on Escape key
+  // Escape closes the drawer; Tab traps focus inside
   useEffect(() => {
+    if (!mobileMenuOpen) return undefined;
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
+      if (e.key === 'Escape') {
         setMobileMenuOpen(false);
+        return;
+      }
+      if (e.key === 'Tab') {
+        const drawer = document.getElementById('mobile-drawer');
+        if (!drawer) return;
+        const focusables = drawer.querySelectorAll(
+          'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
-  // Lock scroll when mobile menu is open
+  // Lock scroll while the drawer is open; move focus in on open and back to the trigger on close
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
+      drawerCloseRef.current?.focus();
+      wasOpenRef.current = true;
     } else {
       document.body.style.overflow = '';
+      if (wasOpenRef.current) {
+        menuTriggerRef.current?.focus({ preventScroll: true });
+        wasOpenRef.current = false;
+      }
     }
     return () => {
       document.body.style.overflow = '';
     };
   }, [mobileMenuOpen]);
 
+  // Same order as the page, so the active pill moves left → right while scrolling down
   const navLinks = [
-    { label: 'Work', href: '#work', id: 'work', show: true },
     { label: 'Hire Me', href: '#hire-me', id: 'hire-me', show: true },
+    { label: 'Work', href: '#work', id: 'work', show: true },
     { label: 'About', href: '#about', id: 'about', show: true },
     { label: 'Skills', href: '#skills', id: 'skills', show: true },
     { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience },
@@ -75,8 +128,7 @@ export default function Header({
     <>
       <header className={`header-wrapper ${scrolled ? 'is-scrolled' : ''}`} role="banner">
         <div className="header-glass-dock">
-          {/* Brand Identity */}
-          <a href="#" className="brand-pill" aria-label="Akshit Sharma Home">
+          <a href="#" className="brand-pill" aria-label="Akshit Sharma, back to top">
             <span className="brand-initials">AS</span>
             <div className="brand-text">
               <span className="brand-name">{siteConfig.identity.displayName}</span>
@@ -84,8 +136,7 @@ export default function Header({
             </div>
           </a>
 
-          {/* Desktop Center Navigation Links */}
-          <nav className="desktop-only" aria-label="Main Navigation">
+          <nav className="desktop-only" aria-label="Main navigation">
             <ul className="nav-dock-list">
               {navLinks.map((link) => {
                 const isActive = activeSection === link.id;
@@ -94,6 +145,7 @@ export default function Header({
                     <a
                       href={link.href}
                       className={`nav-dock-link ${isActive ? 'active' : ''}`}
+                      aria-current={isActive ? 'location' : undefined}
                     >
                       {isActive && <span className="nav-active-dot" aria-hidden="true" />}
                       <span>{link.label}</span>
@@ -104,9 +156,7 @@ export default function Header({
             </ul>
           </nav>
 
-          {/* Right Actions: Theme Toggle + Swarm Motion + GitHub + Red Resume Button */}
           <div className="dock-actions">
-            {/* Theme Toggle Button */}
             <button
               type="button"
               className="theme-toggle-btn"
@@ -117,27 +167,30 @@ export default function Header({
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            {/* Swarm Motion Trigger Button */}
+            {/* Real Animation on/off: pause icon, aria-pressed, accessible on desktop and tablet */}
+            <MotionToggle motionEnabled={motionEnabled} onToggleMotion={onToggleMotion} />
+
+            {/* Agent swarm easter egg: desktop only */}
             <button
               type="button"
-              className={`motion-pill-trigger ${swarmActive ? 'active' : ''}`}
+              className={`motion-pill-trigger desktop-only ${swarmActive ? 'active' : ''}`}
               onClick={onTriggerSwarm}
-              aria-label="Toggle Interactive Agent Swarm"
-              title="Click to trigger interactive Agent Swarm animation"
+              aria-pressed={swarmActive}
+              aria-label="Toggle interactive agent swarm"
+              title="Launch the interactive AI agent swarm"
             >
               <Zap size={13} className="motion-pill-icon" aria-hidden="true" />
               <span>Motion</span>
-              {swarmActive && <span className="motion-indicator-dot" />}
+              {swarmActive && <span className="motion-indicator-dot" aria-hidden="true" />}
             </button>
 
-            {/* GitHub Icon Link */}
             {isValidContent(siteConfig.contact.github) && (
               <a
                 href={siteConfig.contact.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="dock-icon-btn desktop-only"
-                aria-label="GitHub Profile"
+                aria-label="GitHub profile"
                 title="GitHub: akshitsharmacodes"
               >
                 <Github size={16} aria-hidden="true" />
@@ -146,29 +199,32 @@ export default function Header({
 
             <span className="dock-divider desktop-only" aria-hidden="true" />
 
-            {/* Prominent Red Button: RESUME */}
             {isValidContent(siteConfig.identity.resume) && (
-              <a
+              <MagneticButton
+                as="a"
+                motionEnabled={motionEnabled}
+                strength={0.22}
                 href={siteConfig.identity.resume}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="nav-resume-btn desktop-only"
-                title="View Resume on Google Drive"
-                aria-label="View Resume PDF"
+                title="View resume on Google Drive"
+                aria-label="View resume (opens Google Drive)"
               >
                 <FileText size={14} aria-hidden="true" />
                 <span>Resume</span>
                 <ArrowUpRight size={13} aria-hidden="true" />
-              </a>
+              </MagneticButton>
             )}
 
-            {/* Mobile Hamburger Button */}
             <button
+              ref={menuTriggerRef}
               type="button"
               className="menu-trigger-sleek"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open mobile navigation"
+              aria-label="Open navigation menu"
               aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-drawer"
             >
               <Menu size={18} aria-hidden="true" />
             </button>
@@ -176,16 +232,20 @@ export default function Header({
         </div>
       </header>
 
-      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="mobile-drawer-overlay" role="dialog" aria-modal="true" aria-label="Navigation Menu">
+        <div
+          className="mobile-drawer-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          id="mobile-drawer"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setMobileMenuOpen(false);
+          }}
+        >
           <div className="mobile-drawer-card">
             <div className="mobile-drawer-top">
-              <a
-                href="#"
-                className="brand-pill"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+              <a href="#" className="brand-pill" onClick={() => setMobileMenuOpen(false)}>
                 <span className="brand-initials">AS</span>
                 <div className="brand-text">
                   <span className="brand-name">{siteConfig.identity.displayName}</span>
@@ -193,20 +253,22 @@ export default function Header({
                 </div>
               </a>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="mobile-drawer-controls">
+                <MotionToggle motionEnabled={motionEnabled} onToggleMotion={onToggleMotion} size={17} />
                 <button
                   type="button"
                   className="theme-toggle-btn"
                   onClick={onToggleTheme}
-                  aria-label="Toggle theme"
+                  aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                 </button>
                 <button
+                  ref={drawerCloseRef}
                   type="button"
                   className="menu-trigger-sleek"
                   onClick={() => setMobileMenuOpen(false)}
-                  aria-label="Close navigation"
+                  aria-label="Close navigation menu"
                 >
                   <X size={18} aria-hidden="true" />
                 </button>
@@ -215,13 +277,14 @@ export default function Header({
 
             <ul className="mobile-drawer-nav">
               {navLinks.map((link, idx) => (
-                <li key={link.href}>
+                <li key={link.href} style={{ '--i': idx }}>
                   <a
                     href={link.href}
                     className={`mobile-nav-item ${activeSection === link.id ? 'active' : ''}`}
+                    aria-current={activeSection === link.id ? 'location' : undefined}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <span className="mobile-nav-num">0{idx + 1}</span>
+                    <span className="mobile-nav-num">{String(idx + 1).padStart(2, '0')}</span>
                     <span className="mobile-nav-label">{link.label}</span>
                     <ArrowUpRight size={16} className="mobile-nav-arrow" aria-hidden="true" />
                   </a>
@@ -230,41 +293,26 @@ export default function Header({
             </ul>
 
             <div className="mobile-drawer-bottom">
-              {/* Hire on Upwork */}
-              {isValidContent(siteConfig.contact.upwork) && (
-                <a
-                  href={siteConfig.contact.upwork}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                  style={{
-                    width: '100%',
-                    minHeight: '46px',
-                    justifyContent: 'center',
-                    backgroundColor: '#14a800',
-                    boxShadow: '0 4px 16px rgba(20, 168, 0, 0.3)',
-                    fontWeight: 700,
-                  }}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span>Hire Me on Upwork</span>
-                  <ArrowUpRight size={16} />
-                </a>
-              )}
+              <a
+                href="#contact"
+                className="btn btn-primary mobile-drawer-cta"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <span>Get in Touch</span>
+                <ArrowDown size={16} aria-hidden="true" />
+              </a>
 
-              {/* Primary Mobile Red Resume Button */}
               {isValidContent(siteConfig.identity.resume) && (
                 <a
                   href={siteConfig.identity.resume}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary"
-                  style={{ width: '100%', minHeight: '44px', justifyContent: 'center' }}
+                  className="btn btn-secondary mobile-drawer-cta"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <FileText size={16} className="text-accent" />
+                  <FileText size={16} aria-hidden="true" />
                   <span>View Resume</span>
-                  <ArrowUpRight size={16} />
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </a>
               )}
 
@@ -274,11 +322,10 @@ export default function Header({
                     href={siteConfig.contact.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, minHeight: '44px', fontSize: '0.84rem', justifyContent: 'center', color: '#25D366', borderColor: 'rgba(37, 211, 102, 0.4)' }}
+                    className="btn btn-secondary mobile-quick-link"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <MessageCircle size={16} />
+                    <MessageCircle size={16} className="icon-whatsapp" aria-hidden="true" />
                     <span>WhatsApp</span>
                   </a>
                 )}
@@ -287,23 +334,21 @@ export default function Header({
                     href={siteConfig.contact.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, minHeight: '44px', fontSize: '0.84rem', justifyContent: 'center' }}
+                    className="btn btn-secondary mobile-quick-link"
                   >
-                    <Github size={16} />
+                    <Github size={16} aria-hidden="true" />
                     <span>GitHub</span>
                   </a>
                 )}
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  style={{ flex: 1, minHeight: '44px', fontSize: '0.84rem', justifyContent: 'center' }}
+                  className="btn btn-secondary mobile-quick-link"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     onTriggerSwarm();
                   }}
                 >
-                  <Zap size={15} className="text-accent" />
+                  <Zap size={15} className="text-accent" aria-hidden="true" />
                   <span>{swarmActive ? 'Stop Swarm' : 'Swarm Motion'}</span>
                 </button>
               </div>

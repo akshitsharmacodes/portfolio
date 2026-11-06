@@ -1,28 +1,24 @@
 import React from 'react';
 import { awardsData } from '../data/experience';
 import { siteConfig, isValidContent } from '../config/site';
-import { Trophy, Award, Medal, ShieldCheck, ExternalLink, Github, Linkedin, Code2 } from 'lucide-react';
+import { ExternalLink, Github, Linkedin, Code2, Medal } from 'lucide-react';
 import { motion } from 'framer-motion';
-import {
-  scrollViewport,
-  scrollViewportEarly,
-  fadeInUpVariant,
-  cardRevealVariant,
-} from '../config/motion';
+import { scrollViewportEarly, cardRevealVariant, bentoColumnIndex } from '../config/motion';
+import SectionHeader from './SectionHeader';
 
 function renderActionIcon(iconType) {
   switch (iconType) {
     case 'github':
-      return <Github size={13} aria-hidden="true" />;
+      return <Github size={12} aria-hidden="true" />;
     case 'linkedin':
-      return <Linkedin size={13} aria-hidden="true" />;
+      return <Linkedin size={12} aria-hidden="true" />;
     case 'code':
-      return <Code2 size={13} aria-hidden="true" />;
+      return <Code2 size={12} aria-hidden="true" />;
     case 'medal':
     case 'award':
-      return <Medal size={13} aria-hidden="true" />;
+      return <Medal size={12} aria-hidden="true" />;
     default:
-      return <ExternalLink size={13} aria-hidden="true" />;
+      return <ExternalLink size={12} aria-hidden="true" />;
   }
 }
 
@@ -36,7 +32,6 @@ function getAwardActionLinks(award) {
       label: award.liveLabel || 'Live Site',
       url: award.liveUrl,
       icon: 'external',
-      variant: 'primary',
     });
   }
   if (isValidContent(award.sourceUrl)) {
@@ -44,7 +39,6 @@ function getAwardActionLinks(award) {
       label: award.sourceLabel || 'Source Code',
       url: award.sourceUrl,
       icon: 'github',
-      variant: 'secondary',
     });
   }
   if (isValidContent(award.credentialUrl)) {
@@ -52,7 +46,6 @@ function getAwardActionLinks(award) {
       label: award.credentialLabel || 'View Credential',
       url: award.credentialUrl,
       icon: 'external',
-      variant: 'primary',
     });
   }
   return links;
@@ -64,44 +57,34 @@ export default function Awards({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
 
   return (
-    <section className="section-padding" id="awards" aria-label="Awards and Honors">
+    <section className="section-padding" id="awards" aria-label="Awards and honors">
       <div className="container">
-        {/* Section Header */}
-        <MotionDiv
-          variants={motionEnabled ? fadeInUpVariant : undefined}
-          initial={motionEnabled ? "hidden" : undefined}
-          whileInView={motionEnabled ? "visible" : undefined}
-          viewport={motionEnabled ? scrollViewport : undefined}
-        >
-          <div className="section-meta">
-            <span className="section-num">05</span>
-            <span className="section-tag">National Recognition</span>
-          </div>
-          <h2 className="section-title">Honors & Awards</h2>
-          <p className="section-desc" style={{ marginBottom: '40px' }}>
-            Distinctions in competitive national engineering challenges and defense officer selections.
-          </p>
-        </MotionDiv>
+        <SectionHeader
+          motionEnabled={motionEnabled}
+          tag="National Recognition"
+          title="Honors & Awards"
+          description="Distinctions in competitive national engineering challenges and defense officer selections."
+        />
 
-        <div className="awards-grid">
+        {/* Bento: the two headline wins take the first row, the rest share the second */}
+        <div className="awards-grid bento-grid">
           {awardsData.map((award, index) => {
             const actionLinks = getAwardActionLinks(award);
             return (
               <MotionDiv
                 key={award.id}
                 className="award-card interactive-hover-card"
+                data-index={String(index + 1).padStart(2, '0')}
                 variants={motionEnabled ? cardRevealVariant : undefined}
-                custom={index * 0.08}
-                initial={motionEnabled ? "hidden" : undefined}
-                whileInView={motionEnabled ? "visible" : undefined}
+                custom={bentoColumnIndex(index, awardsData.length) * 0.09}
+                initial={motionEnabled ? 'hidden' : undefined}
+                whileInView={motionEnabled ? 'visible' : undefined}
                 viewport={motionEnabled ? scrollViewportEarly : undefined}
-                whileHover={motionEnabled ? { y: -6 } : undefined}
+                whileHover={motionEnabled ? { y: -4 } : undefined}
               >
                 <div className="award-badge-row">
                   <span className="award-badge">{award.badge}</span>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 600 }}>
-                    {award.year}
-                  </span>
+                  <span className="award-year">{award.year}</span>
                 </div>
 
                 <h3 className="award-title">{award.title}</h3>
@@ -115,7 +98,7 @@ export default function Awards({ motionEnabled = true }) {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`award-link-btn ${link.variant === 'secondary' ? 'secondary' : ''}`}
+                        className="pill-link"
                       >
                         {renderActionIcon(link.icon)}
                         <span>{link.label}</span>

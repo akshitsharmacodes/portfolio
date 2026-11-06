@@ -42,14 +42,13 @@ export const siteConfig = {
     otherLinks: [
       { label: "LeetCode Profile", url: "https://leetcode.com/u/akshitsharmacodes/" },
       { label: "Book a Consultation", url: "https://cal.com/akshitsharmacodes" },
-      { label: "Hire on Upwork", url: "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1" },
     ],
   },
 
   metrics: [
     { label: "Smart India Hackathon 2025", value: "1st Place", detail: "Winner with Team Dokku among hundreds of university teams" },
     { label: "Zinnovatio 3.0", value: "Top 200", detail: "Out of 9,000+ participants across India" },
-    { label: "Services Selection Board", value: "Recommended", detail: "Cleared 5-day SSB at 18 SSB Allahabad (TES-48)" },
+    { label: "Indian Army", value: "Recommended", detail: "Cleared 5-day SSB at 18 SSB Allahabad (TES-48) for Indian Army Permanent Commission — world's most comprehensive and longest interview procedure (<0.1% final selection rate)" },
   ],
 
   specialties: [

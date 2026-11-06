@@ -1,55 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 /**
- * Ambient Cursor Spotlight
- * Subtle radial crimson glow that tracks the pointer on desktop,
- * illuminating borders and typography with cinematic depth.
+ * Ambient cursor spotlight (dark theme, fine pointers only).
+ * Writes the pointer position to CSS variables once per animation frame instead of
+ * re-rendering React on every mousemove.
  */
 export default function CursorGlow({ motionEnabled }) {
-  const [pos, setPos] = useState({ x: -500, y: -500 });
-  const [visible, setVisible] = useState(false);
+  const glowRef = useRef(null);
 
   useEffect(() => {
-    if (!motionEnabled) return;
+    if (!motionEnabled) return undefined;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return undefined;
 
-    // Only on fine pointers (desktop mouse)
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+    const el = glowRef.current;
+    if (!el) return undefined;
 
-    const handleMouseMove = (e) => {
-      setPos({ x: e.clientX, y: e.clientY });
-      if (!visible) setVisible(true);
+    let frame = 0;
+    let x = -1000;
+    let y = -1000;
+
+    const paint = () => {
+      frame = 0;
+      el.style.setProperty('--glow-x', `${x}px`);
+      el.style.setProperty('--glow-y', `${y}px`);
     };
 
-    const handleMouseLeave = () => {
-      setVisible(false);
+    const handleMove = (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      el.style.opacity = '1';
+      if (!frame) frame = requestAnimationFrame(paint);
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    document.addEventListener('mouseleave', handleMouseLeave);
+    const handleLeave = () => {
+      el.style.opacity = '0';
+    };
 
+    window.addEventListener('mousemove', handleMove, { passive: true });
+    document.documentElement.addEventListener('mouseleave', handleLeave);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mousemove', handleMove);
+      document.documentElement.removeEventListener('mouseleave', handleLeave);
+      cancelAnimationFrame(frame);
     };
-  }, [motionEnabled, visible]);
+  }, [motionEnabled]);
 
-  if (!motionEnabled || !visible) return null;
+  if (!motionEnabled) return null;
 
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        pointerEvents: 'none',
-        zIndex: 3,
-        background: `radial-gradient(650px circle at ${pos.x}px ${pos.y}px, rgba(227, 43, 60, 0.025), transparent 80%)`,
-        transition: 'background 40ms ease-out',
-      }}
-      aria-hidden="true"
-    />
-  );
+  return <div ref={glowRef} className="cursor-glow" aria-hidden="true" />;
 }
-

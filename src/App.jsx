@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ClientEngine from './components/ClientEngine';
@@ -16,156 +17,257 @@ import CursorGlow from './components/CursorGlow';
 import BackgroundGradient from './components/BackgroundGradient';
 import SwarmEffect from './components/SwarmEffect';
 import SectionDivider from './components/SectionDivider';
+import Preloader from './components/Preloader';
+import LampToggle from './components/LampToggle';
+import CalModal from './components/CalModal';
 import { siteConfig } from './config/site';
 import { projects } from './data/projects';
 
+const THEME_KEY = 'akshit-portfolio-theme';
+const MOTION_KEY = siteConfig.appearance.storageKeyMotion;
+
+function readStorage(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* storage unavailable (private mode): preference lasts for this page only */
+  }
+}
+
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export default function App() {
-  // Theme state with localStorage persistence
+  // Theme: the inline script in index.html already applied it before first paint
   const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'dark';
-    const stored = localStorage.getItem('akshit-portfolio-theme');
-    if (stored === 'light' || stored === 'dark') return stored;
-    return 'dark';
+    const applied = document.documentElement.getAttribute('data-theme');
+    if (applied === 'light' || applied === 'dark') return applied;
+    return readStorage(THEME_KEY) === 'light' ? 'light' : 'dark';
   });
 
-  // Motion preference state with localStorage persistence
+  // Motion: an explicit choice from the header toggle wins; otherwise follow the OS setting
   const [motionEnabled, setMotionEnabled] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    const stored = localStorage.getItem(siteConfig.appearance.storageKeyMotion);
-    if (stored !== null) {
-      return stored === 'on';
-    }
-    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stored = readStorage(MOTION_KEY);
+    if (stored === 'on' || stored === 'off') return stored === 'on';
+    return !prefersReducedMotion();
+  });
+
+  // Preloader: index.html marks data-boot="skip" when motion is reduced / off or already booted this session.
+  // Shows once per browser session per spec. booting → revealing (curtain lifting) → done.
+  const [bootPhase, setBootPhase] = useState(() => {
+    let booted = false;
+    try {
+      booted = sessionStorage.getItem('akshit-portfolio-booted') === '1';
+    } catch {}
+    return document.documentElement.getAttribute('data-boot') === 'skip' || booted ? 'done' : 'booting';
   });
 
   const [selectedProject, setSelectedProject] = useState(null);
+  const dialogOpenerRef = useRef(null);
   const [swarmActive, setSwarmActive] = useState(false);
 
-  // Sync theme attribute on <html> element
+  // Sync theme on <html> + browser UI color
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
     root.classList.remove('dark', 'light');
     root.classList.add(theme);
-    localStorage.setItem('akshit-portfolio-theme', theme);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', theme === 'light' ? '#f8f7f4' : '#090909');
+    writeStorage(THEME_KEY, theme);
   }, [theme]);
 
-  // Sync motion state attribute on root element
+  // Reflect motion state on <html> (CSS uses it to stop keyframe animations).
+  // Persisting happens only in toggleMotion, so an untouched OS preference is never overwritten.
   useEffect(() => {
     const root = document.documentElement;
-    if (motionEnabled) {
-      root.removeAttribute('data-motion');
-      localStorage.setItem(siteConfig.appearance.storageKeyMotion, 'on');
-    } else {
-      root.setAttribute('data-motion', 'off');
-      localStorage.setItem(siteConfig.appearance.storageKeyMotion, 'off');
-    }
+    if (motionEnabled) root.removeAttribute('data-motion');
+    else root.setAttribute('data-motion', 'off');
   }, [motionEnabled]);
 
-  const toggleTheme = () => {
+  // Follow live OS reduced-motion changes until the visitor makes an explicit choice
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (e) => {
+      if (readStorage(MOTION_KEY) === null) setMotionEnabled(!e.matches);
+    };
+    query.addEventListener?.('change', onChange);
+    return () => query.removeEventListener?.('change', onChange);
+  }, []);
+
+  // While booting, lock scroll (compensating for the scrollbar so nothing shifts on reveal)
+  useEffect(() => {
+    if (bootPhase !== 'booting') return undefined;
+    const html = document.documentElement;
+    const { body } = document;
+    const gap = window.innerWidth - html.clientWidth;
+    const previous = { overflow: html.style.overflow, paddingRight: body.style.paddingRight };
+    html.style.overflow = 'hidden';
+    if (gap > 0) body.style.paddingRight = `${gap}px`;
+    return () => {
+      html.style.overflow = previous.overflow;
+      body.style.paddingRight = previous.paddingRight;
+    };
+  }, [bootPhase]);
+
+  const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
+  }, []);
 
-  const toggleMotion = () => {
-    setMotionEnabled((prev) => !prev);
-  };
+  const toggleMotion = useCallback(() => {
+    setMotionEnabled((prev) => {
+      const next = !prev;
+      writeStorage(MOTION_KEY, next ? 'on' : 'off');
+      return next;
+    });
+  }, []);
 
-  const handleTriggerSwarm = () => {
+  const handleTriggerSwarm = useCallback(() => {
     setSwarmActive((prev) => !prev);
-  };
+  }, []);
+
+  // Remember which control opened the dialog so focus can return to it on close
+  const openProject = useCallback((project, opener) => {
+    dialogOpenerRef.current = opener || document.activeElement;
+    setSelectedProject(project);
+  }, []);
+
+  const closeProject = useCallback(() => setSelectedProject(null), []);
+
+  const [calModalOpen, setCalModalOpen] = useState(false);
+  const calOpenerRef = useRef(null);
+
+  const openCalModal = useCallback((opener) => {
+    calOpenerRef.current = opener || document.activeElement;
+    setCalModalOpen(true);
+  }, []);
+
+  const closeCalModal = useCallback(() => {
+    setCalModalOpen(false);
+  }, []);
+  const handleBootReveal = useCallback(() => setBootPhase('revealing'), []);
+  const handleBootDone = useCallback(() => {
+    try {
+      sessionStorage.setItem('akshit-portfolio-booted', '1');
+    } catch {}
+    setBootPhase('done');
+  }, []);
+
+  const introReady = bootPhase !== 'booting';
 
   return (
-    <div className={`portfolio-app theme-${theme}`}>
-      {/* Skip to Content for Keyboard Accessibility */}
-      <a href="#work" className="skip-link">
-        Skip to main content
-      </a>
+    <>
+      {/* Developer boot sequence (first visit per session, motion on) */}
+      {bootPhase !== 'done' && <Preloader onReveal={handleBootReveal} onDone={handleBootDone} />}
 
-      {/* Top Scroll Indicator */}
-      <ScrollProgress motionEnabled={motionEnabled} />
+      <div className={`portfolio-app theme-${theme}`} inert={bootPhase === 'booting'}>
+        {/* Skip to content for keyboard users */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
 
-      {/* Palette-Complementary Ambient Background Gradient */}
-      <BackgroundGradient motionEnabled={motionEnabled} />
+        <ScrollProgress motionEnabled={motionEnabled} />
 
-      {/* Subtle Ambient Mouse Spotlight (Dark mode fine-pointer) */}
-      {theme === 'dark' && <CursorGlow motionEnabled={motionEnabled} />}
+        <BackgroundGradient motionEnabled={motionEnabled} />
 
-      {/* Clean & Elegant Navbar with Theme Toggle, Motion Trigger, and Red Resume Button */}
-      <Header
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        motionEnabled={motionEnabled}
-        onToggleMotion={toggleMotion}
-        onTriggerSwarm={handleTriggerSwarm}
-        swarmActive={swarmActive}
-      />
+        {/* Subtle ambient pointer spotlight (dark theme, fine pointers) */}
+        {theme === 'dark' && <CursorGlow motionEnabled={motionEnabled} />}
 
-      {/* Main Page Content with Scroll Animations */}
-      <main id="main-content">
-        <Hero motionEnabled={motionEnabled} />
-
-        <SectionDivider motionEnabled={motionEnabled} />
-
-        {/* Client Acquisition Engine / Hire Me Solutions */}
-        <ClientEngine motionEnabled={motionEnabled} />
-
-        <SectionDivider motionEnabled={motionEnabled} />
-
-        <ProjectGrid
-          projects={projects}
+        <Header
+          theme={theme}
+          onToggleTheme={toggleTheme}
           motionEnabled={motionEnabled}
-          onSelectProject={(project) => setSelectedProject(project)}
+          onToggleMotion={toggleMotion}
+          onTriggerSwarm={handleTriggerSwarm}
+          swarmActive={swarmActive}
         />
 
-        <SectionDivider motionEnabled={motionEnabled} />
+        {/* Pull-cord theme switch ("lamp string") hanging beside the header */}
+        <LampToggle theme={theme} onToggle={toggleTheme} motionEnabled={motionEnabled} ready={introReady} />
 
-        <About motionEnabled={motionEnabled} />
+        <main id="main-content" tabIndex={-1}>
+          <Hero motionEnabled={motionEnabled} introReady={introReady} onOpenCalModal={openCalModal} />
 
-        <Skills motionEnabled={motionEnabled} />
+          <SectionDivider motionEnabled={motionEnabled} />
 
-        {siteConfig.preferences.showExperience && (
-          <>
-            <SectionDivider motionEnabled={motionEnabled} />
-            <Experience motionEnabled={motionEnabled} />
-          </>
-        )}
+          {/* Services / Hire Me */}
+          <ClientEngine motionEnabled={motionEnabled} />
 
-        {siteConfig.preferences.showAwards && (
-          <>
-            <SectionDivider motionEnabled={motionEnabled} />
-            <Awards motionEnabled={motionEnabled} />
-          </>
-        )}
+          <SectionDivider motionEnabled={motionEnabled} />
 
-        {(siteConfig.preferences.showVentures ?? true) && (
-          <>
-            <SectionDivider motionEnabled={motionEnabled} />
-            <Ventures motionEnabled={motionEnabled} />
-          </>
-        )}
+          <ProjectGrid projects={projects} motionEnabled={motionEnabled} onSelectProject={openProject} />
 
-        <SectionDivider motionEnabled={motionEnabled} />
+          <SectionDivider motionEnabled={motionEnabled} />
 
-        <Contact motionEnabled={motionEnabled} />
-      </main>
+          <About motionEnabled={motionEnabled} />
 
-      {/* Footer */}
-      <Footer />
+          <Skills motionEnabled={motionEnabled} />
 
-      {/* Project Case Study Dialog */}
-      {selectedProject && (
-        <ProjectDialog
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-      )}
+          {siteConfig.preferences.showExperience && (
+            <>
+              <SectionDivider motionEnabled={motionEnabled} />
+              <Experience motionEnabled={motionEnabled} />
+            </>
+          )}
 
-      {/* Standalone Swarm Rebuild Animation Feature */}
-      <SwarmEffect
-        isActive={swarmActive}
-        theme={theme}
-        onClose={() => setSwarmActive(false)}
-      />
-    </div>
+          {siteConfig.preferences.showAwards && (
+            <>
+              <SectionDivider motionEnabled={motionEnabled} />
+              <Awards motionEnabled={motionEnabled} />
+            </>
+          )}
+
+          {(siteConfig.preferences.showVentures ?? true) && (
+            <>
+              <SectionDivider motionEnabled={motionEnabled} />
+              <Ventures motionEnabled={motionEnabled} />
+            </>
+          )}
+
+          <SectionDivider motionEnabled={motionEnabled} />
+
+          <Contact motionEnabled={motionEnabled} onOpenCalModal={openCalModal} />
+        </main>
+
+        <Footer />
+
+        {/* Project case-study dialog (enter + exit animations) */}
+        <AnimatePresence>
+          {selectedProject && (
+            <ProjectDialog
+              key={selectedProject.id}
+              project={selectedProject}
+              onClose={closeProject}
+              returnFocusTo={dialogOpenerRef.current}
+              motionEnabled={motionEnabled}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Cal.com embedded scheduling dialog */}
+        <AnimatePresence>
+          {calModalOpen && (
+            <CalModal
+              key="cal-modal"
+              isOpen={calModalOpen}
+              onClose={closeCalModal}
+              returnFocusTo={calOpenerRef.current}
+              theme={theme}
+              motionEnabled={motionEnabled}
+            />
+          )}
+        </AnimatePresence>
+
+        <SwarmEffect isActive={swarmActive} theme={theme} onClose={() => setSwarmActive(false)} />
+      </div>
+    </>
   );
 }

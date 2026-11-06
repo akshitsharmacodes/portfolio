@@ -12,21 +12,24 @@ import {
   Github,
   FileText,
   Inbox,
-  Sparkles,
   MessageCircle,
   MapPin,
   Code2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import {
-  scrollViewport,
-  scrollViewportEarly,
-  fadeInUpVariant,
-  fadeInLeftVariant,
-  fadeInRightVariant,
-} from '../config/motion';
+import { scrollViewportEarly, fadeInLeftVariant, fadeInRightVariant } from '../config/motion';
+import SectionHeader from './SectionHeader';
+import SplitReveal from './SplitReveal';
+import MagneticButton from './MagneticButton';
 
-export default function Contact({ motionEnabled = true }) {
+const SCOPE_CHIPS = [
+  { id: 'agents', label: 'AI Agents / LangGraph', prompt: 'I want to build an autonomous AI agent system to...' },
+  { id: 'rag', label: 'Enterprise RAG', prompt: 'We need a low-latency semantic search & RAG retrieval pipeline for...' },
+  { id: 'backend', label: 'FastAPI Backend', prompt: 'We are looking to develop/scale a production FastAPI/Django REST backend for...' },
+  { id: 'consulting', label: 'Tech Consultation', prompt: 'I would like technical advisory on system design and AI feasibility for...' },
+];
+
+export default function Contact({ motionEnabled = true, onOpenCalModal }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -34,9 +37,27 @@ export default function Contact({ motionEnabled = true }) {
     message: '',
   });
 
+  const [selectedScope, setSelectedScope] = useState(null);
   const [errors, setErrors] = useState({});
   const [copied, setCopied] = useState(false);
   const [submittedStatus, setSubmittedStatus] = useState(null); // 'sending' | 'success' | null
+
+  const handleSelectScope = (chip) => {
+    if (selectedScope === chip.id) {
+      setSelectedScope(null);
+      setFormData((prev) => ({
+        ...prev,
+        subject: '',
+      }));
+      return;
+    }
+    setSelectedScope(chip.id);
+    setFormData((prev) => ({
+      ...prev,
+      subject: `[${chip.label}] Project Inquiry`,
+      message: prev.message.trim() ? prev.message : chip.prompt,
+    }));
+  };
 
   const validate = () => {
     const errs = {};
@@ -120,18 +141,7 @@ export default function Contact({ motionEnabled = true }) {
   return (
     <section className="section-padding" id="contact" aria-label="Contact Akshit Sharma">
       <div className="container">
-        {/* Section Header */}
-        <MotionDiv
-          variants={motionEnabled ? fadeInUpVariant : undefined}
-          initial={motionEnabled ? "hidden" : undefined}
-          whileInView={motionEnabled ? "visible" : undefined}
-          viewport={motionEnabled ? scrollViewport : undefined}
-        >
-          <div className="section-meta">
-            <span className="section-num">06</span>
-            <span className="section-tag">Direct Channels</span>
-          </div>
-        </MotionDiv>
+        <SectionHeader motionEnabled={motionEnabled} tag="Direct Channels" compact />
 
         <div className="contact-grid">
           {/* Contact Information & Channels */}
@@ -144,12 +154,12 @@ export default function Contact({ motionEnabled = true }) {
           >
             <div className="contact-info-header">
               <div className="contact-status-badge">
-                <span className="contact-status-dot"></span>
+                <span className="contact-status-dot" aria-hidden="true"></span>
                 <span>Available for Immediate Contracts & Full-time Roles</span>
               </div>
-              <h2 className="contact-headline">
+              <SplitReveal as="h2" className="contact-headline" motionEnabled={motionEnabled} inView stagger={0.07}>
                 Let's Build Something <span className="text-accent">Intelligent.</span>
-              </h2>
+              </SplitReveal>
               <p className="contact-intro-text">
                 Whether deploying multi-agent LLM systems, production RAG pipelines with LangGraph & ChromaDB, or high-throughput async FastAPI services, let's connect directly.
               </p>
@@ -167,37 +177,41 @@ export default function Contact({ motionEnabled = true }) {
                   aria-label="Direct WhatsApp Message to Akshit Sharma"
                 >
                   <div className="action-card-icon whatsapp-icon">
-                    <MessageCircle size={18} />
+                    <MessageCircle size={18} aria-hidden="true" />
                   </div>
                   <div className="action-card-text">
                     <div className="action-card-tag">Fastest Response</div>
                     <div className="action-card-title">WhatsApp DM</div>
                     <div className="action-card-sub">+91 7888327471</div>
                   </div>
-                  <ArrowUpRight size={18} className="action-card-arrow" />
+                  <ArrowUpRight size={18} className="action-card-arrow" aria-hidden="true" />
                 </a>
               )}
 
-              {/* Hire on Upwork */}
-              {isValidContent(siteConfig.contact.upwork) && (
-                <a
-                  href={siteConfig.contact.upwork}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="contact-action-card upwork-card"
-                  aria-label="Hire Akshit on Upwork"
-                >
-                  <div className="action-card-icon upwork-icon">
-                    Up
-                  </div>
-                  <div className="action-card-text">
-                    <div className="action-card-tag">Milestone Contracts</div>
-                    <div className="action-card-title">Hire on Upwork</div>
-                    <div className="action-card-sub">Top Rated Profile</div>
-                  </div>
-                  <ArrowUpRight size={18} className="action-card-arrow" />
-                </a>
-              )}
+              {/* Cal.com Scheduling */}
+              <a
+                href="https://cal.com/akshitsharmacodes"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (onOpenCalModal) {
+                    e.preventDefault();
+                    onOpenCalModal();
+                  }
+                }}
+                className="contact-action-card cal-card"
+                aria-label="Book a consultation with Akshit Sharma"
+              >
+                <div className="action-card-icon cal-icon" aria-hidden="true">
+                  <Calendar size={18} />
+                </div>
+                <div className="action-card-text">
+                  <div className="action-card-tag">15-Min Discovery</div>
+                  <div className="action-card-title">Book a 1:1 Call</div>
+                  <div className="action-card-sub">Instant Google Meet invite</div>
+                </div>
+                <ArrowUpRight size={18} className="action-card-arrow" aria-hidden="true" />
+              </a>
             </div>
 
             {/* Direct Channels Compact Grid */}
@@ -208,7 +222,7 @@ export default function Contact({ motionEnabled = true }) {
                   className="contact-mini-item"
                   aria-label={`Send email to ${siteConfig.contact.email}`}
                 >
-                  <Mail size={16} className="text-accent flex-shrink-0" />
+                  <Mail size={16} className="text-accent flex-shrink-0" aria-hidden="true" />
                   <div className="mini-item-content">
                     <span className="mini-item-label">Direct Email</span>
                     <span className="mini-item-val">{siteConfig.contact.email}</span>
@@ -222,7 +236,7 @@ export default function Contact({ motionEnabled = true }) {
                   className="contact-mini-item"
                   aria-label={`Call ${siteConfig.contact.phone}`}
                 >
-                  <Phone size={16} className="text-accent flex-shrink-0" />
+                  <Phone size={16} className="text-accent flex-shrink-0" aria-hidden="true" />
                   <div className="mini-item-content">
                     <span className="mini-item-label">Direct Phone</span>
                     <span className="mini-item-val">{siteConfig.contact.phone}</span>
@@ -230,22 +244,8 @@ export default function Contact({ motionEnabled = true }) {
                 </a>
               )}
 
-              <a
-                href="https://cal.com/akshitsharmacodes"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-mini-item"
-                aria-label="Schedule Consultation on Cal.com"
-              >
-                <Calendar size={16} className="text-accent flex-shrink-0" />
-                <div className="mini-item-content">
-                  <span className="mini-item-label">Consultation</span>
-                  <span className="mini-item-val">Schedule on Cal.com</span>
-                </div>
-              </a>
-
               <div className="contact-mini-item">
-                <MapPin size={16} className="text-accent flex-shrink-0" />
+                <MapPin size={16} className="text-accent flex-shrink-0" aria-hidden="true" />
                 <div className="mini-item-content">
                   <span className="mini-item-label">Location Base</span>
                   <span className="mini-item-val">{siteConfig.identity.location} · Remote</span>
@@ -265,7 +265,7 @@ export default function Contact({ motionEnabled = true }) {
                     className="contact-dock-pill"
                     aria-label="Visit LinkedIn Profile"
                   >
-                    <Linkedin size={14} className="text-accent" />
+                    <Linkedin size={14} className="text-accent" aria-hidden="true" />
                     <span>LinkedIn</span>
                   </a>
                 )}
@@ -278,7 +278,7 @@ export default function Contact({ motionEnabled = true }) {
                     className="contact-dock-pill"
                     aria-label="Visit GitHub Profile"
                   >
-                    <Github size={14} className="text-accent" />
+                    <Github size={14} className="text-accent" aria-hidden="true" />
                     <span>GitHub</span>
                   </a>
                 )}
@@ -291,7 +291,7 @@ export default function Contact({ motionEnabled = true }) {
                     className="contact-dock-pill"
                     aria-label="Visit LeetCode Profile"
                   >
-                    <Code2 size={14} className="text-accent" />
+                    <Code2 size={14} className="text-accent" aria-hidden="true" />
                     <span>LeetCode</span>
                   </a>
                 )}
@@ -304,7 +304,7 @@ export default function Contact({ motionEnabled = true }) {
                     className="contact-dock-pill"
                     aria-label="View Resume PDF"
                   >
-                    <FileText size={14} className="text-accent" />
+                    <FileText size={14} className="text-accent" aria-hidden="true" />
                     <span>Resume PDF</span>
                   </a>
                 )}
@@ -321,12 +321,10 @@ export default function Contact({ motionEnabled = true }) {
               viewport={motionEnabled ? scrollViewportEarly : undefined}
             >
               <form className="contact-form" onSubmit={handleSubmit} noValidate>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--text)' }}>
-                    SEND A MESSAGE
-                  </h3>
+                <div className="form-header">
+                  <h3 className="form-title">Send a Message</h3>
                   <div className="contact-inbox-pill">
-                    <Inbox size={13} className="text-accent" />
+                    <Inbox size={13} className="text-accent" aria-hidden="true" />
                     <span>Delivered to: <strong>akshitsharmacodes@gmail.com</strong></span>
                   </div>
                 </div>
@@ -335,13 +333,13 @@ export default function Contact({ motionEnabled = true }) {
                   <div
                     style={{
                       padding: '24px',
-                      background: 'rgba(16, 185, 129, 0.08)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      background: 'var(--signal-soft)',
+                      border: '1px solid var(--signal-border)',
                       borderRadius: 'var(--radius-md)',
                       textAlign: 'center',
                     }}
                   >
-                    <Check size={32} style={{ color: '#10b981', margin: '0 auto 12px' }} />
+                    <Check size={32} style={{ color: 'var(--signal)', margin: '0 auto 12px' }} aria-hidden="true" />
                     <h4 style={{ color: 'var(--text)', fontSize: '1.1rem', marginBottom: '6px' }}>
                       Message Sent Successfully!
                     </h4>
@@ -406,6 +404,24 @@ export default function Contact({ motionEnabled = true }) {
                   </div>
                 ) : (
                   <>
+                    <div className="contact-scope-selector">
+                      <label className="form-label" style={{ marginBottom: '8px', display: 'block' }}>
+                        Project Scope (Tap to pre-fill inquiry)
+                      </label>
+                      <div className="scope-chips-row">
+                        {SCOPE_CHIPS.map((chip) => (
+                          <button
+                            key={chip.id}
+                            type="button"
+                            className={`scope-chip-btn ${selectedScope === chip.id ? 'active' : ''}`}
+                            onClick={() => handleSelectScope(chip)}
+                          >
+                            <span>{chip.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="form-group">
                       <label htmlFor="contact-name" className="form-label">
                         Your Name *
@@ -464,16 +480,18 @@ export default function Contact({ motionEnabled = true }) {
                       {errors.message && <span className="form-error">{errors.message}</span>}
                     </div>
 
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '8px' }}>
-                      <button
+                    <div className="form-actions">
+                      <MagneticButton
+                        as="button"
+                        motionEnabled={motionEnabled}
+                        strength={0.18}
                         type="submit"
-                        className="btn btn-primary"
-                        style={{ flex: 1, minHeight: '48px' }}
+                        className="btn btn-primary form-submit"
                         disabled={submittedStatus === 'sending'}
                       >
                         <Send size={16} aria-hidden="true" />
-                        <span>{submittedStatus === 'sending' ? 'Sending...' : 'Send Message'}</span>
-                      </button>
+                        <span>{submittedStatus === 'sending' ? 'Sending…' : 'Send Message'}</span>
+                      </MagneticButton>
 
                       <button
                         type="button"
@@ -487,7 +505,7 @@ export default function Contact({ motionEnabled = true }) {
                     </div>
 
                     <p className="form-feedback-note">
-                      Submissions deliver directly to <strong>{siteConfig.contact.email}</strong>. You will receive all inquiries in your Gmail inbox.
+                      Your message is delivered straight to <strong>{siteConfig.contact.email}</strong>.
                     </p>
                   </>
                 )}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { venturesData } from '../data/ventures';
-import { siteConfig } from '../config/site';
 import {
   Building2,
   FlaskConical,
@@ -10,12 +9,8 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import {
-  scrollViewport,
-  scrollViewportEarly,
-  fadeInUpVariant,
-  cardRevealVariant,
-} from '../config/motion';
+import { scrollViewportEarly, cardRevealVariant } from '../config/motion';
+import SectionHeader from './SectionHeader';
 
 export default function Ventures({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
@@ -77,7 +72,8 @@ export default function Ventures({ motionEnabled = true }) {
           />
           <path
             d="M80 90 L80 50 L120 30 L150 45 L150 90 Z"
-            stroke="rgba(255, 255, 255, 0.2)"
+            stroke="currentColor"
+            strokeOpacity="0.2"
             strokeWidth="1.4"
           />
           <line
@@ -89,20 +85,22 @@ export default function Ventures({ motionEnabled = true }) {
             strokeWidth="2"
           />
           <circle cx="50" cy="20" r="3" fill="var(--accent)" />
-          <circle cx="120" cy="30" r="2.5" fill="#f2efeb" />
+          <circle cx="120" cy="30" r="2.5" fill="currentColor" />
           {/* Dimension indicator lines */}
           <path
             d="M10 15 L90 15"
-            stroke="rgba(255, 255, 255, 0.25)"
+            stroke="currentColor"
+            strokeOpacity="0.25"
             strokeWidth="1"
             strokeDasharray="2 2"
           />
           <text
             x="38"
             y="11"
-            fill="rgba(255, 255, 255, 0.4)"
+            fill="currentColor"
+            fillOpacity="0.4"
             fontSize="7"
-            fontFamily="monospace"
+            fontFamily="var(--font-mono)"
           >
             ESTATE_01
           </text>
@@ -122,8 +120,10 @@ export default function Ventures({ motionEnabled = true }) {
           {/* Neural state graph & agent logic network */}
           <circle cx="30" cy="50" r="12" stroke="#3b82f6" strokeWidth="1.8" />
           <circle cx="30" cy="50" r="4" fill="#3b82f6" />
-          <circle cx="85" cy="25" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
-          <circle cx="85" cy="75" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
+          <circle cx="85" cy="25" r="9" stroke="currentColor"
+            strokeOpacity="0.4" strokeWidth="1.4" />
+          <circle cx="85" cy="75" r="9" stroke="currentColor"
+            strokeOpacity="0.4" strokeWidth="1.4" />
           <circle cx="140" cy="50" r="14" stroke="#60a5fa" strokeWidth="1.8" />
           <circle cx="140" cy="50" r="5" fill="#60a5fa" />
           {/* Connectors */}
@@ -136,7 +136,7 @@ export default function Ventures({ motionEnabled = true }) {
             y="92"
             fill="rgba(59, 130, 246, 0.7)"
             fontSize="7"
-            fontFamily="monospace"
+            fontFamily="var(--font-mono)"
           >
             AUTONOMOUS_LAB
           </text>
@@ -161,10 +161,13 @@ export default function Ventures({ motionEnabled = true }) {
             strokeDasharray="4 3"
           />
           {/* Showjumping fence hurdle */}
-          <line x1="75" y1="50" x2="95" y2="50" stroke="rgba(255, 255, 255, 0.6)" strokeWidth="2.5" />
+          <line x1="75" y1="50" x2="95" y2="50" stroke="currentColor"
+            strokeOpacity="0.6" strokeWidth="2.5" />
           <line x1="75" y1="65" x2="95" y2="65" stroke="#e32b3c" strokeWidth="2.5" />
-          <line x1="75" y1="85" x2="75" y2="45" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" />
-          <line x1="95" y1="85" x2="95" y2="45" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="2" />
+          <line x1="75" y1="85" x2="75" y2="45" stroke="currentColor"
+            strokeOpacity="0.4" strokeWidth="2" />
+          <line x1="95" y1="85" x2="95" y2="45" stroke="currentColor"
+            strokeOpacity="0.4" strokeWidth="2" />
           {/* Cavalry Lance vector */}
           <line x1="25" y1="75" x2="135" y2="25" stroke="rgba(16, 185, 129, 0.35)" strokeWidth="1.2" />
           <circle cx="85" cy="20" r="3.5" fill="#10b981" />
@@ -173,7 +176,7 @@ export default function Ventures({ motionEnabled = true }) {
             y="94"
             fill="rgba(16, 185, 129, 0.75)"
             fontSize="7"
-            fontFamily="monospace"
+            fontFamily="var(--font-mono)"
           >
             CAVALRY_DISCIPLINE
           </text>
@@ -191,28 +194,18 @@ export default function Ventures({ motionEnabled = true }) {
       aria-label="Side Hustles and Leisure Passions"
     >
       <div className="container">
-        {/* Section Header */}
-        <MotionDiv
-          variants={motionEnabled ? fadeInUpVariant : undefined}
-          initial={motionEnabled ? "hidden" : undefined}
-          whileInView={motionEnabled ? "visible" : undefined}
-          viewport={motionEnabled ? scrollViewport : undefined}
-          className="section-header-block"
-        >
-          <div className="section-meta">
-            <span className="section-num">{venturesData.sectionNum}</span>
-            <span className="section-tag">{venturesData.tag}</span>
-          </div>
-          <div className="section-title-wrap">
-            <h2 className="section-title">
+        <SectionHeader
+          motionEnabled={motionEnabled}
+          tag={venturesData.tag}
+          title={
+            <>
               {venturesData.title}
               <span className="section-title-italic-accent"> — My Poison</span>
-            </h2>
-          </div>
-          <p className="section-desc" style={{ maxWidth: '780px', marginBottom: '44px' }}>
-            {venturesData.intro}
-          </p>
-        </MotionDiv>
+            </>
+          }
+          description={venturesData.intro}
+          className="section-header--wide"
+        />
 
         {/* 3-Column Ventures Grid */}
         <div className="ventures-grid">
@@ -225,7 +218,7 @@ export default function Ventures({ motionEnabled = true }) {
               initial={motionEnabled ? "hidden" : undefined}
               whileInView={motionEnabled ? "visible" : undefined}
               viewport={motionEnabled ? scrollViewportEarly : undefined}
-              whileHover={motionEnabled ? { y: -6 } : undefined}
+              whileHover={motionEnabled ? { y: -4 } : undefined}
               style={{ '--venture-accent': venture.accent }}
             >
               {/* Card Background Subtle Illustration Graphic */}
@@ -306,7 +299,7 @@ export default function Ventures({ motionEnabled = true }) {
                   className="venture-action-btn"
                   title={`Chat with Akshit on WhatsApp about ${venture.name}`}
                 >
-                  <MessageCircle size={14} style={{ color: '#25D366' }} aria-hidden="true" />
+                  <MessageCircle size={14} className="icon-whatsapp" aria-hidden="true" />
                   <span>{venture.linkText}</span>
                   <ArrowUpRight size={13} aria-hidden="true" />
                 </a>

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en" class="dark" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <!-- Primary Meta Tags -->
     <title>Akshit Sharma | AI/ML Developer · Python, GenAI & RAG, AI Agents</title>
     <meta name="title" content="Akshit Sharma | AI/ML Developer · Python, GenAI & RAG, AI Agents" />
@@ -11,6 +11,42 @@
     <meta name="author" content="Akshit Sharma" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#090909" />
+
+    <!--
+      Pre-paint bootstrap: apply the saved theme, the motion preference and the preloader
+      decision before the first frame, so light-theme visitors never see a dark flash and
+      reduced-motion visitors skip the boot sequence.
+    -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        try {
+          var stored = localStorage.getItem('akshit-portfolio-theme');
+          var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+          root.setAttribute('data-theme', theme);
+          root.className = theme;
+          if (theme === 'light') {
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f8f7f4');
+          }
+
+          var motion = localStorage.getItem('akshit-portfolio-motion');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var motionOff = motion === 'off' || (motion === null && reduce);
+          var booted = false;
+          try {
+            booted = sessionStorage.getItem('akshit-portfolio-booted') === '1';
+          } catch (e) {}
+          if (motionOff) {
+            root.setAttribute('data-motion', 'off');
+          }
+          if (motionOff || booted) {
+            root.setAttribute('data-boot', 'skip');
+          }
+        } catch (e) {
+          /* Fallback on storage errors: proceed without breaking styles */
+        }
+      })();
+    </script>
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -26,13 +62,283 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
-    <!-- Google Fonts Preconnect & Stylesheet -->
+    <!-- Google Fonts: Anton (display), Manrope (body), JetBrains Mono (code/meta), Caveat (accent) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Caveat:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+
+    <!--
+      Boot screen (preloader) styles. Inline on purpose: they must apply before the main
+      stylesheet and JS bundle arrive. The React version (src/components/Preloader.jsx)
+      renders the same markup and takes over from this static first frame.
+    -->
+    <style>
+      html[data-boot='skip'] .boot { display: none; }
+
+      .boot {
+        --b-bg: #090909;
+        --b-fg: #f2efeb;
+        --b-dim: rgba(242, 239, 235, 0.56);
+        --b-faint: rgba(242, 239, 235, 0.32);
+        --b-line: rgba(255, 255, 255, 0.09);
+        --b-panel: rgba(17, 17, 17, 0.92);
+        --b-accent: #e32b3c;
+        --b-accent-text: #ff5c69;
+        --b-ok: #34d399;
+        position: fixed;
+        inset: 0;
+        z-index: 100001;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 24px;
+        padding: clamp(18px, 3.4vw, 40px);
+        background: var(--b-bg);
+        color: var(--b-fg);
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      html[data-theme='light'] .boot {
+        --b-bg: #f8f7f4;
+        --b-fg: #171615;
+        --b-dim: rgba(23, 22, 21, 0.62);
+        --b-faint: rgba(23, 22, 21, 0.36);
+        --b-line: rgba(0, 0, 0, 0.08);
+        --b-panel: #ffffff;
+        --b-accent: #d92334;
+        --b-accent-text: #c41d2d;
+        --b-ok: #047857;
+      }
+
+      /* Blueprint grid + a faint crimson bloom behind the terminal */
+      .boot::before,
+      .boot::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .boot::before {
+        background-image:
+          linear-gradient(to right, var(--b-line) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--b-line) 1px, transparent 1px);
+        background-size: 48px 48px;
+        -webkit-mask-image: radial-gradient(ellipse at 50% 45%, #000 20%, transparent 72%);
+        mask-image: radial-gradient(ellipse at 50% 45%, #000 20%, transparent 72%);
+      }
+      .boot::after {
+        background: radial-gradient(circle at 50% 46%, rgba(227, 43, 60, 0.1), transparent 52%);
+      }
+      .boot > * { position: relative; z-index: 1; }
+
+      .boot-top,
+      .boot-bottom {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .boot-top { align-items: center; }
+      .boot-bottom { align-items: flex-end; }
+
+      .boot-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Manrope', system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .boot-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid rgba(227, 43, 60, 0.45);
+        background: rgba(227, 43, 60, 0.08);
+        color: var(--b-accent);
+        font-family: 'Anton', Impact, sans-serif;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+      }
+
+      .boot-skip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 36px;
+        padding: 6px 12px;
+        border: 1px solid var(--b-line);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--b-dim);
+        font: 500 11px/1 'JetBrains Mono', ui-monospace, monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .boot-skip:hover,
+      .boot-skip:focus-visible {
+        color: var(--b-fg);
+        border-color: var(--b-accent);
+        outline: none;
+      }
+      .boot-skip kbd {
+        font: inherit;
+        font-size: 10px;
+        padding: 2px 5px;
+        border: 1px solid var(--b-line);
+        border-radius: 4px;
+      }
+
+      .boot-center {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .boot-terminal {
+        width: min(560px, 100%);
+        border: 1px solid var(--b-line);
+        border-radius: 10px;
+        background: var(--b-panel);
+        box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      html[data-theme='light'] .boot-terminal {
+        box-shadow: 0 40px 80px -40px rgba(23, 22, 21, 0.3);
+      }
+      .boot-terminal-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 36px;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--b-line);
+        font-size: 11px;
+        color: var(--b-faint);
+      }
+      .boot-dots { display: inline-flex; gap: 6px; }
+      .boot-dots i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--b-line);
+      }
+      .boot-dots i:first-child { background: var(--b-accent); }
+      .boot-terminal-title { flex: 1; text-align: center; margin-right: 39px; }
+
+      .boot-terminal-body {
+        min-height: 196px;
+        padding: 16px 18px 18px;
+        font-size: 13px;
+        line-height: 1.95;
+      }
+      .boot-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+        animation: bootLineIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .boot-line--cmd { animation: none; }
+      .boot-prompt,
+      .boot-arrow { color: var(--b-accent-text); }
+      .boot-ok { color: var(--b-ok); }
+      .boot-step { color: var(--b-fg); opacity: 0.88; }
+      .boot-leader {
+        flex: 1;
+        min-width: 12px;
+        border-bottom: 1px dotted var(--b-faint);
+        transform: translateY(-4px);
+      }
+      .boot-value,
+      .boot-dim { color: var(--b-dim); }
+      .boot-caret {
+        display: inline-block;
+        width: 8px;
+        height: 15px;
+        margin-left: -6px;
+        background: var(--b-accent);
+        animation: bootBlink 1s steps(1) infinite;
+      }
+
+      .boot-label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--b-dim);
+      }
+      .boot-sub {
+        letter-spacing: 0.04em;
+        text-transform: none;
+        color: var(--b-faint);
+      }
+      .boot-counter {
+        display: flex;
+        align-items: flex-start;
+        font-family: 'Anton', Impact, sans-serif;
+        font-size: clamp(64px, 11vw, 140px);
+        line-height: 0.82;
+        letter-spacing: 0.01em;
+        font-variant-numeric: tabular-nums;
+      }
+      .boot-pct {
+        margin-left: 6px;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 14px;
+        line-height: 1;
+        color: var(--b-accent);
+      }
+
+      .boot-progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: var(--b-line);
+      }
+      .boot-progress-bar {
+        position: absolute;
+        inset: 0;
+        transform: scaleX(0);
+        transform-origin: left center;
+        background: linear-gradient(90deg, #d92334, #e32b3c 60%, #ff5c69);
+        box-shadow: 0 0 14px rgba(227, 43, 60, 0.6);
+      }
+
+      @keyframes bootBlink { 50% { opacity: 0; } }
+      @keyframes bootLineIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: none; }
+      }
+
+      @media (max-width: 600px) {
+        .boot-brand span:last-child { display: none; }
+        .boot-terminal-body { min-height: 172px; padding: 14px; font-size: 11.5px; line-height: 1.9; }
+        .boot-terminal-title { margin-right: 0; text-align: right; }
+        .boot-sub { display: none; }
+        .boot-caret { height: 13px; }
+      }
+    </style>
+
+    <noscript>
+      <style>.boot { display: none; }</style>
+    </noscript>
 
     <!-- JSON-LD Structured Data for Akshit Sharma -->
     <script type="application/ld+json">
@@ -86,8 +392,31 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static first frame of the boot screen; React replaces it on mount with an identical, live version -->
+      <div class="boot">
+        <div class="boot-top">
+          <div class="boot-brand"><span class="boot-mark" aria-hidden="true">AS</span><span>Akshit Sharma</span></div>
+          <button type="button" class="boot-skip" tabindex="-1">Skip intro <kbd>Esc</kbd></button>
+        </div>
+        <div class="boot-center">
+          <div class="boot-terminal" aria-hidden="true">
+            <div class="boot-terminal-bar">
+              <span class="boot-dots"><i></i><i></i><i></i></span>
+              <span class="boot-terminal-title">akshit@portfolio: ~</span>
+            </div>
+            <div class="boot-terminal-body">
+              <div class="boot-line boot-line--cmd"><span class="boot-prompt">$</span><span class="boot-typed"></span><span class="boot-caret"></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="boot-bottom">
+          <div class="boot-label"><span>Booting portfolio</span><span class="boot-sub">AI/ML Developer · Chandigarh, India</span></div>
+          <div class="boot-counter" aria-hidden="true"><span class="boot-count">000</span><span class="boot-pct">%</span></div>
+        </div>
+        <div class="boot-progress" role="progressbar" aria-label="Loading portfolio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="boot-progress-bar"></span></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
-

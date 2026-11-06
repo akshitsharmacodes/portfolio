@@ -1,0 +1,223 @@
+/* ==========================================================================
+   LAMP STRING THEME TOGGLE
+   A pull-cord hanging from the top edge of the page, in the gutter just to the
+   right of the floating header dock. Pull, click or press Enter to switch theme.
+   Kept in its own file so it can be dropped into styles.css later as one block.
+   ========================================================================== */
+
+.lamp {
+  --lamp-cord: 84px;                          /* rest length from the top edge to the bead */
+  --lamp-cord-color: rgba(242, 239, 235, 0.42);
+  --lamp-bead-top: #ff6b77;
+  --lamp-bead-mid: var(--accent, #e32b3c);
+  --lamp-bead-low: #9e1426;
+
+  position: fixed;
+  top: 0;
+  /* ~36px outside the 1280px dock on wide screens, centred in the 24px gutter below that */
+  right: max(12px, calc((100% - 1280px) / 2 - 36px));
+  z-index: 999;                               /* one below the header, so the cord runs behind its glass */
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+html[data-theme="light"] .lamp,
+html.light .lamp {
+  --lamp-cord-color: rgba(23, 22, 21, 0.38);
+}
+
+/* Everything hangs from this zero-size point and swings around it */
+.lamp-rig {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+
+.lamp-mount {
+  position: absolute;
+  top: 0;
+  left: -6px;
+  width: 12px;
+  height: 4px;
+  border-radius: 0 0 3px 3px;
+  background: var(--lamp-cord-color);
+}
+
+.lamp-cord {
+  position: absolute;
+  top: 0;
+  left: -0.75px;
+  width: 1.5px;
+  height: var(--lamp-cord);
+  background: var(--lamp-cord-color);
+  transform-origin: top center;
+}
+
+/* 44px-wide hit area; the visible bead sits 16px below its top edge */
+.lamp-pull {
+  position: absolute;
+  top: calc(var(--lamp-cord) - 16px);
+  left: -22px;
+  width: 44px;
+  height: 60px;
+  padding: 16px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: none;
+  border: 0;
+  pointer-events: auto;
+  touch-action: none;                         /* drag the cord instead of scrolling the page */
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lamp-pull:active {
+  cursor: grabbing;
+}
+
+.lamp-pull:focus-visible {
+  outline: none;
+}
+
+.lamp-bead {
+  position: relative;
+  display: block;
+}
+
+.lamp-knob {
+  position: relative;
+  display: block;
+  width: 11px;
+  height: 22px;
+  border-radius: 6px 6px 5px 5px;
+  background: linear-gradient(180deg, var(--lamp-bead-top) 0%, var(--lamp-bead-mid) 42%, var(--lamp-bead-low) 100%);
+  box-shadow:
+    inset 0 -2px 3px rgba(0, 0, 0, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease;
+}
+
+/* Metal crimp where the cord meets the bead */
+.lamp-knob::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 5px;
+  height: 6px;
+  margin-left: -2.5px;
+  border-radius: 1.5px;
+  background: var(--lamp-cord-color);
+}
+
+/* Specular highlight */
+.lamp-knob::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 2.5px;
+  width: 3px;
+  height: 8px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.lamp-pull:hover .lamp-knob,
+.lamp.is-hinting .lamp-knob {
+  transform: scale(1.1);
+}
+
+/* Lights on: the bead glows */
+.lamp.is-on .lamp-knob {
+  box-shadow:
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+    0 0 0 3px rgba(217, 35, 52, 0.12),
+    0 6px 16px rgba(217, 35, 52, 0.38);
+}
+
+.lamp-pull:focus-visible .lamp-knob {
+  outline: 2px solid var(--accent, #e32b3c);
+  outline-offset: 3px;
+}
+
+/* "Pull · lights on" chip to the left of the bead: on hover, focus and the first-visit hint */
+.lamp-label {
+  position: absolute;
+  top: 3px;
+  right: calc(100% + 14px);
+  padding: 4px 9px;
+  white-space: nowrap;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+  font-size: 0.66rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text, #f2efeb);
+  background: var(--bg-elevated, #171717);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.16));
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+html[data-theme="light"] .lamp-label,
+html.light .lamp-label {
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(23, 22, 21, 0.1);
+}
+
+.lamp-pull:hover .lamp-label,
+.lamp-pull:focus-visible .lamp-label,
+.lamp.is-hinting .lamp-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Theme reveal: the new theme grows in a circle from the bead (JS sets the clip-path) */
+html.lamp-vt::view-transition-old(root),
+html.lamp-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.lamp-vt::view-transition-old(root) {
+  z-index: 1;
+}
+
+html.lamp-vt::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Phones: header has the dedicated toggle in the dock; hide the pull cord below 800px to avoid tap collisions with the hamburger menu */
+@media (max-width: 800px) {
+  .lamp {
+    display: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .lamp-cord,
+  .lamp-mount,
+  .lamp-knob::before {
+    background: CanvasText;
+  }
+
+  .lamp-knob {
+    background: ButtonText;
+  }
+}
+
+@media print {
+  .lamp {
+    display: none;
+  }
+}
