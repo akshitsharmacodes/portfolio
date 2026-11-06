@@ -3254,6 +3254,41 @@ html.light .card-icon-btn:hover {
   border-top: 1px solid var(--border);
 }
 
+.award-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 12px;
+  background: rgba(227, 43, 60, 0.08);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast) var(--ease);
+}
+
+.award-link-btn:hover {
+  background: rgba(227, 43, 60, 0.16);
+  border-color: var(--accent);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.award-link-btn.secondary {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+}
+
+.award-link-btn.secondary:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
 /* ==========================================================================
    CONTACT SECTION
    ========================================================================== */
@@ -3688,6 +3723,9 @@ html.light .card-icon-btn:hover {
 
 @media (max-width: 800px) {
   .desktop-only {
+    display: none !important;
+  }
+  .hero-graph-decor {
     display: none !important;
   }
   .menu-trigger-sleek {

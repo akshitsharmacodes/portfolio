@@ -139,9 +139,23 @@ export const awardsData = [
     badge: "50 Days Badge",
     category: "Competitive Programming",
     year: "2026",
-    liveUrl: "https://leetcode.com/u/akshitsharmacodes/",
-    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/overlay/Position/2369391183/treasury/?profileId=ACoAAD03ZrYBE0jKVwqOPcT55T-q49VhhIIkYkI",
-    credentialLabel: "View Badge Certificate",
+    links: [
+      {
+        label: "LeetCode Profile",
+        url: "https://leetcode.com/u/akshitsharmacodes/",
+        icon: "code",
+      },
+      {
+        label: "Verify Badge",
+        url: "https://leetcode.com/medal/?showImg=0&id=10876117&isLevel=false",
+        icon: "medal",
+      },
+      {
+        label: "LinkedIn Post",
+        url: "https://www.linkedin.com/feed/update/urn:li:activity:7512828790407065600/",
+        icon: "linkedin",
+      },
+    ],
   },
   {
     id: "ssb",
