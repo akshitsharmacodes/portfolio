@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary Meta Tags -->
-    <title>Akshit Sharma | AI/ML Developer · Python, GenAI & RAG, AI Agents</title>
-    <meta name="title" content="Akshit Sharma | AI/ML Developer · Python, GenAI & RAG, AI Agents" />
-    <meta name="description" content="AI/ML developer building LLM-powered products, agentic workflows and RAG systems that turn complex business processes into reliable software. Smart India Hackathon 2025 winner, currently at LeadManch." />
+    <title>Akshit Sharma | Python & AI Developer Portfolio · GenAI, Agents & RAG</title>
+    <meta name="title" content="Akshit Sharma | Python & AI Developer Portfolio · GenAI, Agents & RAG" />
+    <meta name="description" content="Interactive developer portfolio of Akshit Sharma — Python & AI/ML engineer building autonomous agents, LangGraph systems, RAG pipelines, and production software. Winner of Smart India Hackathon 2025." />
+    <meta name="keywords" content="best developer portfolio, Python developer, Python developer portfolio, AI developer, LangGraph, LangChain, RAG systems, AI agents, FastAPI, full stack developer, Akshit Sharma" />
     <meta name="author" content="Akshit Sharma" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#090909" />
+    <link rel="canonical" href="https://akshitsharma.dev/" />
 
     <!--
       Pre-paint bootstrap: apply the saved theme, the motion preference and the preloader
@@ -45,13 +47,23 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Akshit Sharma | AI/ML Developer" />
-    <meta property="og:description" content="AI/ML developer building LLM-powered products, agentic workflows and RAG systems that turn complex business processes into reliable software." />
+    <meta property="og:url" content="https://akshitsharma.dev/" />
+    <meta property="og:site_name" content="Akshit Sharma | Developer Portfolio" />
+    <meta property="og:title" content="Akshit Sharma | Python & AI Developer Portfolio" />
+    <meta property="og:description" content="Explore the interactive developer portfolio of Akshit Sharma — Python & AI/ML engineer building autonomous agents, RAG pipelines, and full-stack systems." />
+    <meta property="og:image" content="https://akshitsharma.dev/og-preview.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Akshit Sharma - Python & AI Developer Portfolio" />
+    <meta property="og:locale" content="en_US" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Akshit Sharma | AI/ML Developer" />
-    <meta name="twitter:description" content="AI/ML developer building LLM-powered products, agentic workflows and RAG systems that turn complex business processes into reliable software." />
+    <meta name="twitter:url" content="https://akshitsharma.dev/" />
+    <meta name="twitter:title" content="Akshit Sharma | Python & AI Developer Portfolio" />
+    <meta name="twitter:description" content="Explore the interactive developer portfolio of Akshit Sharma — Python & AI/ML engineer building autonomous agents, RAG pipelines, and full-stack systems." />
+    <meta name="twitter:image" content="https://akshitsharma.dev/og-preview.png" />
+    <meta name="twitter:image:alt" content="Akshit Sharma - Python & AI Developer Portfolio" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -335,53 +347,105 @@
       <style>.boot { display: none; }</style>
     </noscript>
 
-    <!-- JSON-LD Structured Data for Akshit Sharma -->
+    <!-- JSON-LD Structured Data for Akshit Sharma (Graph Schema: WebSite + ProfilePage + Person) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Akshit Sharma",
-        "jobTitle": "AI/ML Developer",
-        "worksFor": {
-          "@type": "Organization",
-          "name": "LeadManch"
-        },
-        "alumniOf": [
+        "@graph": [
           {
-            "@type": "CollegeOrUniversity",
-            "name": "Amity University, Mohali"
+            "@type": "WebSite",
+            "@id": "https://akshitsharma.dev/#website",
+            "url": "https://akshitsharma.dev/",
+            "name": "Akshit Sharma | Python & AI Developer Portfolio",
+            "description": "Interactive developer portfolio of Akshit Sharma, AI/ML developer specializing in Python, AI agents, LangGraph, and RAG systems.",
+            "publisher": {
+              "@id": "https://akshitsharma.dev/#person"
+            },
+            "inLanguage": "en-US"
           },
           {
-            "@type": "EducationalOrganization",
-            "name": "Officers Training Academy, Gaya"
+            "@type": "ProfilePage",
+            "@id": "https://akshitsharma.dev/#profilepage",
+            "url": "https://akshitsharma.dev/",
+            "name": "Akshit Sharma - Python & AI Developer Portfolio",
+            "isPartOf": {
+              "@id": "https://akshitsharma.dev/#website"
+            },
+            "about": {
+              "@id": "https://akshitsharma.dev/#person"
+            },
+            "mainEntity": {
+              "@id": "https://akshitsharma.dev/#person"
+            }
           },
           {
-            "@type": "EducationalOrganization",
-            "name": "Sainik School Kapurthala"
+            "@type": "Person",
+            "@id": "https://akshitsharma.dev/#person",
+            "name": "Akshit Sharma",
+            "alternateName": ["akshitsharmacodes", "Akshit"],
+            "url": "https://akshitsharma.dev/",
+            "image": "https://akshitsharma.dev/og-preview.png",
+            "jobTitle": "Python & AI/ML Developer",
+            "description": "AI/ML developer building LLM-powered products, agentic workflows, and RAG systems with Python, LangGraph, FastAPI, and Django.",
+            "hasOccupation": [
+              {
+                "@type": "Occupation",
+                "name": "Python Developer",
+                "skills": "Python, FastAPI, Django, PostgreSQL, Redis, REST APIs, Microservices"
+              },
+              {
+                "@type": "Occupation",
+                "name": "AI/ML Developer",
+                "skills": "AI Agents, LangGraph, LangChain, Retrieval-Augmented Generation (RAG), Vector Databases, PyTorch"
+              }
+            ],
+            "worksFor": {
+              "@type": "Organization",
+              "name": "LeadManch"
+            },
+            "alumniOf": [
+              {
+                "@type": "CollegeOrUniversity",
+                "name": "Amity University, Mohali"
+              },
+              {
+                "@type": "EducationalOrganization",
+                "name": "Officers Training Academy, Gaya"
+              },
+              {
+                "@type": "EducationalOrganization",
+                "name": "Sainik School Kapurthala"
+              }
+            ],
+            "knowsAbout": [
+              "Python",
+              "Python Web Development",
+              "Artificial Intelligence",
+              "Machine Learning",
+              "AI Agents",
+              "LangChain",
+              "LangGraph",
+              "Retrieval-Augmented Generation (RAG)",
+              "FastAPI",
+              "Django",
+              "PostgreSQL",
+              "Redis",
+              "Vector Databases",
+              "Software Engineering"
+            ],
+            "award": [
+              "Smart India Hackathon 2025: 1st Place",
+              "Zinnovatio 3.0 Finalist",
+              "Services Selection Board (SSB) Recommended (TES-48)"
+            ],
+            "sameAs": [
+              "https://www.linkedin.com/in/akshitsharmacodes",
+              "https://github.com/akshitsharmacodes",
+              "https://leetcode.com/u/akshitsharmacodes/",
+              "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1",
+              "https://cal.com/akshitsharmacodes"
+            ]
           }
-        ],
-        "knowsAbout": [
-          "Artificial Intelligence",
-          "Machine Learning",
-          "LangChain",
-          "LangGraph",
-          "Retrieval-Augmented Generation (RAG)",
-          "AI Agents",
-          "Python",
-          "Django",
-          "FastAPI",
-          "PostgreSQL",
-          "Redis",
-          "Vector Databases"
-        ],
-        "award": [
-          "Smart India Hackathon 2025: 1st Place",
-          "Zinnovatio 3.0 Finalist",
-          "Services Selection Board (SSB) Recommended"
-        ],
-        "sameAs": [
-          "https://www.linkedin.com/in/akshitsharmacodes",
-          "https://cal.com/akshitsharmacodes"
         ]
       }
     </script>

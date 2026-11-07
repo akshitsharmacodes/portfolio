@@ -6,7 +6,7 @@
 
 export const siteConfig = {
   referenceWebsite: "https://touquirakhtar.com/",
-  websiteUrl: "[PLACEHOLDER: my own domain, e.g. https://akshitsharma.dev]",
+  websiteUrl: "https://akshitsharma.dev",
 
   identity: {
     fullName: "Akshit Sharma",
