@@ -18,7 +18,7 @@ export const siteConfig = {
     headline: "I build AI agents that eliminate repetitive work.",
     headlineAccent: "eliminate repetitive work.",
     intro:
-      "AI/ML developer building LLM-powered products, agentic workflows and RAG systems that turn complex business processes into reliable software. Smart India Hackathon 2025 winner, currently at LeadManch.",
+      "AI/ML developer building LLM-powered products, agentic workflows and RAG systems that turn complex business processes into reliable software. Winner of the Smart India Hackathon 2025 internal round at Amity University, currently at LeadManch.",
     about:
       "I work at the intersection of AI engineering and backend development: designing multi-agent workflows with LangChain and LangGraph, building RAG pipelines, and integrating LLMs into real applications. I started in the Indian Army as a Gentleman Cadet at the Officers Training Academy, Gaya (Technical Entry Scheme, TES-48, 2022-2024), after clearing the Services Selection Board. That training shaped how I make decisions under pressure and lead teams. I then moved into computer science and AI/ML at Amity University. I care about solutions that are practical, production-ready and maintainable.",
     portrait: "", // blank => strong typographic hero, no portrait
@@ -46,7 +46,7 @@ export const siteConfig = {
   },
 
   metrics: [
-    { label: "Smart India Hackathon 2025", value: "1st Place", detail: "Winner with Team Dokku among hundreds of university teams" },
+    { label: "Smart India Hackathon 2025", value: "1st Place", detail: "Won the internal-level hackathon at Amity University with Team Dokku" },
     { label: "Zinnovatio 3.0", value: "Top 200", detail: "Out of 9,000+ participants across India" },
     { label: "Indian Army", value: "Recommended", detail: "Cleared the 5-day SSB (TES-48) for an Indian Army Permanent Commission, with a final selection rate under 0.1%" },
   ],

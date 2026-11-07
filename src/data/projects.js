@@ -72,9 +72,9 @@ export const projects = [
     title: "SIMS: Smart Inventory System",
     category: "Web App / Hackathon",
     year: "2025",
-    summary: "Smart India Hackathon 2025 winning system for tracking Indian Railways fittings.",
+    summary: "Smart India Hackathon 2025 internal-round winner (Amity University): a system for tracking Indian Railways fittings.",
     description:
-      "Indian Railways had no system to track the crores of rail fittings procured every year. I led Team Dokku to 1st place at Smart India Hackathon 2025 by solving this end-to-end. Laser-marked QR codes scan on mobile to instantly surface vendor, warranty and inspection history through Django REST APIs, eliminating manual logging.",
+      "Indian Railways had no system to track the crores of rail fittings procured every year. I led Team Dokku to 1st place in the Smart India Hackathon 2025 internal round at Amity University by solving this end-to-end. Laser-marked QR codes scan on mobile to instantly surface vendor, warranty and inspection history through Django REST APIs, eliminating manual logging.",
     architecture: [
       { step: "01", name: "Laser-Marked QR System", desc: "Hardware-compatible industrial QR code indexing per fitting batch" },
       { step: "02", name: "Mobile Scan Endpoint", desc: "Sub-second camera decoding connecting to field inspection workflow" },

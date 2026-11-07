@@ -11,7 +11,7 @@ export const PROJECT_VISUALS = {
   'zero-ops-autosre': { eyebrow: 'GDG Top 10 Finalist', glyph: 'telemetry' },
   'matcha-ai': { eyebrow: 'Multi-Agent System', glyph: 'pipeline' },
   cruisecontent: { eyebrow: 'AI Workflow', glyph: 'workflow' },
-  sims: { eyebrow: 'SIH 2025 Winner', glyph: 'qr' },
+  sims: { eyebrow: 'SIH 2025 Internal Winner', glyph: 'qr' },
   'nova-sight': { eyebrow: 'Duality AI Hackathon', glyph: 'detection' },
 };
 

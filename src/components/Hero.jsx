@@ -101,6 +101,18 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
   const headlineLead = identity.headline.replace(identity.headlineAccent, '').trim();
   const ready = usePreloaderDone();
 
+  // "Scroll down to view work" cue: appears 1s after the intro starts (immediately with motion off)
+  const [showCue, setShowCue] = useState(!motionEnabled);
+  useEffect(() => {
+    if (!motionEnabled) {
+      setShowCue(true);
+      return undefined;
+    }
+    if (!ready) return undefined;
+    const timer = setTimeout(() => setShowCue(true), 1000);
+    return () => clearTimeout(timer);
+  }, [ready, motionEnabled]);
+
   const Wrap = motionEnabled ? motion.div : 'div';
   const Item = motionEnabled ? motion.div : 'div';
   const wrapProps = motionEnabled
@@ -147,10 +159,6 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
                   <Calendar size={16} aria-hidden="true" />
                   <span>Book a discovery call</span>
                 </button>
-                <a href="#work" className="btn btn-secondary">
-                  <span>View work</span>
-                  <ArrowRight size={15} aria-hidden="true" />
-                </a>
                 {isValidContent(identity.resume) && (
                   <a
                     href={identity.resume}
@@ -164,6 +172,10 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
                   </a>
                 )}
               </div>
+              <a href="#work" className={`hero-work-cue${showCue ? ' is-visible' : ''}`}>
+                <span className="hero-work-cue-line" aria-hidden="true" />
+                <span>Scroll down to view work</span>
+              </a>
             </Item>
 
             <Item {...itemProps}>

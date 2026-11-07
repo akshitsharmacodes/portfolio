@@ -820,6 +820,70 @@ html[data-theme='light'] .menu-trigger-sleek {
   margin-left: 6px;
 }
 
+/* "Scroll down to view work" cue: fades in 1s after the intro (class set in Hero.jsx) */
+.hero-work-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: -12px 0 28px;
+  padding: 4px 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-dim);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 500ms var(--ease), transform 500ms var(--ease), color 150ms ease;
+}
+
+.hero-work-cue.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.hero-work-cue:hover {
+  color: var(--text);
+}
+
+/* A short rail with a dot travelling down it */
+.hero-work-cue-line {
+  position: relative;
+  width: 1px;
+  height: 18px;
+  background: var(--border-strong);
+  overflow: hidden;
+}
+
+.hero-work-cue-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -6px;
+  width: 1px;
+  height: 6px;
+  background: var(--text);
+  animation: heroCueTravel 1.8s var(--ease) infinite;
+}
+
+@keyframes heroCueTravel {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(24px); opacity: 0; }
+}
+
+html[data-motion='off'] .hero-work-cue-line::after {
+  animation: none;
+  top: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-work-cue-line::after {
+    animation: none;
+    top: 6px;
+  }
+}
+
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1080,6 +1144,11 @@ html[data-theme='light'] .menu-trigger-sleek {
 @media (max-width: 600px) {
   .hero-backdrop {
     background-size: 44px 44px;
+  }
+  .hero-work-cue {
+    display: flex;
+    justify-content: center;
+    margin-top: -8px;
   }
   /* Keep the availability capsule on one line on phones */
   .hero-status {

@@ -47,7 +47,7 @@ const clientPillars = [
     icon: Zap,
     num: '04',
     title: 'Fast MVP to Production Execution',
-    desc: 'From initial architecture to deployable software. Smart India Hackathon 2025 1st place track record delivering maintainable, well-documented code on deadline.',
+    desc: 'From initial architecture to deployable software. Won the Smart India Hackathon 2025 internal round at Amity University; a track record of delivering maintainable, well-documented code on deadline.',
     tags: ['MVP Architecture', 'Clean Code', 'Docker', 'AWS / Linux'],
   },
 ];

@@ -114,10 +114,10 @@ export const awardsData = [
   },
   {
     id: "sih-2025",
-    title: "Smart India Hackathon 2025: 1st Place",
+    title: "Smart India Hackathon 2025: 1st Place (Internal Round)",
     detail:
-      "Won with Team Dokku for an end-to-end Smart Inventory System for Indian Railways, selected from hundreds of university teams.",
-    badge: "1st Place · National Winner",
+      "Won the internal-level hackathon at Amity University with Team Dokku, for an end-to-end Smart Inventory System for Indian Railways.",
+    badge: "1st Place · Amity Internal Round",
     category: "Hackathon",
     year: "2025",
     sourceUrl: "https://github.com/akshitsharmacodes/SIH-Backend",
