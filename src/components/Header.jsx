@@ -8,12 +8,12 @@ const PRIMARY_FOR = { skills: 'about', awards: 'experience', 'side-hustles': 'ex
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
-/** Wordmark: "akshit.dev" in mono */
+/** Wordmark: "akshitsharma.dev" in mono */
 function BrandMark({ onClick }) {
   return (
-    <a href="#" className="brand-mark" aria-label="akshit.dev, back to top" onClick={onClick}>
+    <a href="#" className="brand-mark" aria-label="akshitsharma.dev, back to top" onClick={onClick}>
       <span className="brand-word">
-        akshit<span className="brand-tld">.dev</span>
+        akshitsharma<span className="brand-tld">.dev</span>
       </span>
     </a>
   );

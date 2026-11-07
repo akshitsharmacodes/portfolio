@@ -299,7 +299,7 @@ export default function CommandMenu({
         <div className="cmdk-footer" aria-hidden="true">
           <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
           <span><kbd><CornerDownLeft size={11} /></kbd> select</span>
-          <span className="cmdk-footer-brand">akshit.dev</span>
+          <span className="cmdk-footer-brand">akshitsharma.dev</span>
         </div>
       </Panel>
     </Overlay>
