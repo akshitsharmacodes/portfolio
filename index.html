@@ -17,7 +17,7 @@
     <!--
       Pre-paint bootstrap: apply the saved theme and motion preference before the first
       frame, so light-theme visitors never see a dark flash. Also decides whether the
-      preloader plays (once per browser session, never with motion off).
+      preloader plays (on every load and refresh, never with motion off).
     -->
     <script>
       (function () {
@@ -38,9 +38,7 @@
             root.setAttribute('data-motion', 'off');
           }
 
-          var seen = false;
-          try { seen = sessionStorage.getItem('akshit-preloaded') === '1'; } catch (e) {}
-          if (motionOff || seen) root.setAttribute('data-preload', 'skip');
+          if (motionOff) root.setAttribute('data-preload', 'skip');
           else root.classList.add('is-preloading');
         } catch (e) {
           /* Fallback on storage errors: proceed without breaking styles */
@@ -288,7 +286,6 @@
           closed = true;
           el.classList.add('is-done');
           root.classList.remove('is-preloading');
-          try { sessionStorage.setItem('akshit-preloaded', '1'); } catch (e) {}
           finish();
           setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
         }
