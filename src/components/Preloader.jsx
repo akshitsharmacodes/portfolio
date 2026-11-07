@@ -32,12 +32,6 @@ const REVEAL_LEAD_MS = 340; // start the hero entrance while the curtain is stil
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-const markBooted = () => {
-  try {
-    sessionStorage.setItem('akshit-portfolio-booted', '1');
-  } catch {}
-};
-
 export default function Preloader({ onReveal, onDone }) {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState('loading'); // loading → ready → exiting
@@ -56,14 +50,12 @@ export default function Preloader({ onReveal, onDone }) {
     if (phaseRef.current === 'exiting') return;
     phaseRef.current = 'exiting';
     setPhase('exiting');
-    markBooted();
     later(() => onReveal?.(), REVEAL_LEAD_MS);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onReveal]);
 
   const skip = useCallback(() => {
     if (phaseRef.current === 'exiting') return;
-    markBooted();
     setProgress(1);
     if (readyMs === null) setReadyMs(Math.round(performance.now()));
     startExit();

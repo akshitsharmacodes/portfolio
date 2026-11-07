@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowUpRight, Zap, Github, FileText, Sun, Moon, MessageCircle, Pause, Play } from 'lucide-react';
+import { Menu, X, ArrowUpRight, ArrowDown, Zap, Github, FileText, Sun, Moon, MessageCircle, Pause, Play } from 'lucide-react';
 import MagneticButton from './MagneticButton';
 
 // Page order (used for scroll-spy); nav labels/visibility come from site config

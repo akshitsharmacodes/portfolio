@@ -16,11 +16,19 @@ import './LampToggle.css';
  *   theme, just without the swing, the first-visit hint or the reveal.
  * - `ready` is false while the boot preloader covers the page; the cord drops in
  *   once the curtain lifts, and the one-time hint waits until after that.
+ * - Phones: the cord hangs clear of the menu button, takes touch drags without
+ *   scrolling the page, tucks itself away once you scroll (so it never covers
+ *   content) and drops back when you return to the top. A short haptic tick
+ *   confirms the switch where the device supports vibration.
  */
 
 const MAX_PULL = 64;   // visual stretch limit in px
 const SWITCH_AT = 24;  // visual pull needed on release to flip the theme
 const HINT_KEY = 'akshit-portfolio-lamp-hint';
+const HIDDEN_Y = -150; // rig offset that lifts cord + bead fully above the viewport
+const PHONE_QUERY = '(max-width: 800px)';
+const TUCK_AFTER = 160; // phones: scroll distance (px) after which the cord tucks away…
+const DROP_BEFORE = 90; // …and the distance under which it drops back (gap avoids flicker)
 
 // Soft asymptote: the further you drag, the harder the cord resists
 const resist = (raw) => (raw <= 0 ? 0 : MAX_PULL * (1 - Math.exp(-raw / MAX_PULL)));
@@ -46,23 +54,64 @@ export default function LampToggle({ theme, onToggle, motionEnabled = true, read
   const knobCounter = useTransform(raw, (r) => resist(r) - r);
   const cordScale = useTransform(pull, (p) => 1 + p / cordLength.current);
   const sway = useMotionValue(0);
-  // Entrance: the whole rig starts above the viewport and drops in on a spring.
-  // Guarded by the motion value itself (not a ref) so StrictMode's double effect run still drops it.
-  const drop = useMotionValue(animated ? -160 : 0);
+  // Vertical position of the whole rig: starts above the viewport, drops in once the page is ready,
+  // and (on phones) tucks back up while the reader is scrolled down
+  const drop = useMotionValue(animated ? HIDDEN_Y : 0);
+  const hasDropped = useRef(false);
+  const [tucked, setTucked] = useState(false);
+  const tuckedRef = useRef(false);
 
+  // Phones only: tuck the cord away once the page scrolls so it never sits over content or buttons
   useEffect(() => {
-    if (!ready || drop.get() === 0) return undefined;
+    const phone = window.matchMedia(PHONE_QUERY);
+    let frameId = 0;
+    const update = () => {
+      frameId = 0;
+      const y = window.scrollY;
+      let next = tuckedRef.current;
+      if (!phone.matches) next = false;
+      else if (y > TUCK_AFTER) next = true;
+      else if (y < DROP_BEFORE) next = false;
+      if (next !== tuckedRef.current) {
+        tuckedRef.current = next;
+        setTucked(next);
+      }
+    };
+    const onScroll = () => {
+      if (!frameId) frameId = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    phone.addEventListener?.('change', update);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      phone.removeEventListener?.('change', update);
+      if (frameId) cancelAnimationFrame(frameId);
+    };
+  }, []);
+
+  // Single place that moves the rig. Keyed off the motion value itself (not a "done" ref) so
+  // StrictMode's double effect run in development still performs the first drop.
+  useEffect(() => {
+    const target = ready && !tucked ? 0 : HIDDEN_Y;
+    if (drop.get() === target) return undefined;
     if (!animated) {
-      drop.set(0);
+      drop.set(target);
       return undefined;
     }
-    // Let the preloader curtain clear the top-right corner before the cord drops
+    // The very first drop waits for the preloader curtain to clear the top-right corner
+    const delay = target === 0 && !hasDropped.current ? 650 : 0;
     const timer = setTimeout(() => {
-      animate(drop, 0, { type: 'spring', stiffness: 210, damping: 13, mass: 0.9 });
-      animate(sway, 0, { type: 'spring', stiffness: 140, damping: 7, velocity: -60 });
-    }, 650);
+      if (target === 0) {
+        hasDropped.current = true;
+        animate(drop, 0, { type: 'spring', stiffness: 210, damping: 13, mass: 0.9 });
+        animate(sway, 0, { type: 'spring', stiffness: 140, damping: 7, velocity: -60 });
+      } else {
+        animate(drop, target, { type: 'spring', stiffness: 260, damping: 30 });
+      }
+    }, delay);
     return () => clearTimeout(timer);
-  }, [ready, animated, drop, sway]);
+  }, [ready, tucked, animated, drop, sway]);
 
   // Cord length changes at breakpoints (CSS variable), so measure instead of hard-coding
   useEffect(() => {
@@ -77,6 +126,15 @@ export default function LampToggle({ theme, onToggle, motionEnabled = true, read
   const switchTheme = useCallback(() => {
     const next = theme === 'dark' ? 'light' : 'dark';
     const root = document.documentElement;
+
+    // Touch devices: a tiny haptic "click", like a real pull switch (no-op where unsupported, e.g. iOS)
+    if (animated && window.matchMedia('(pointer: coarse)').matches && typeof navigator.vibrate === 'function') {
+      try {
+        navigator.vibrate(8);
+      } catch {
+        /* vibration blocked: ignore */
+      }
+    }
 
     const commit = () => {
       flushSync(() => onToggle());
@@ -201,7 +259,8 @@ export default function LampToggle({ theme, onToggle, motionEnabled = true, read
     if (seen) return undefined;
 
     const show = setTimeout(() => {
-      if (interacted.current) return;
+      // Skip (and try again next visit) if they've already used it or the cord is tucked away
+      if (interacted.current || tuckedRef.current) return;
       try {
         sessionStorage.setItem(HINT_KEY, '1');
       } catch {
@@ -223,8 +282,9 @@ export default function LampToggle({ theme, onToggle, motionEnabled = true, read
 
   const actionLabel = isLight ? 'Switch to dark mode' : 'Switch to light mode';
 
+  // While tucked away on phones the cord is off-screen, so `inert` takes it out of tab order and hit-testing
   return (
-    <div className={`lamp ${isLight ? 'is-on' : 'is-off'} ${hinting ? 'is-hinting' : ''}`}>
+    <div className={`lamp ${isLight ? 'is-on' : 'is-off'} ${hinting ? 'is-hinting' : ''}`} inert={tucked}>
       <motion.div className="lamp-rig" style={{ rotate: sway, y: drop }}>
         <span className="lamp-mount" aria-hidden="true" />
         <motion.span ref={cordRef} className="lamp-cord" style={{ scaleY: cordScale }} aria-hidden="true" />

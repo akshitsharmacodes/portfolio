@@ -127,9 +127,15 @@ html.light .lamp {
   background: rgba(255, 255, 255, 0.5);
 }
 
-.lamp-pull:hover .lamp-knob,
 .lamp.is-hinting .lamp-knob {
   transform: scale(1.1);
+}
+
+/* Hover styles only where hover exists, so a tap on a phone doesn't leave them stuck on */
+@media (hover: hover) {
+  .lamp-pull:hover .lamp-knob {
+    transform: scale(1.1);
+  }
 }
 
 /* Lights on: the bead glows */
@@ -175,11 +181,17 @@ html.light .lamp-label {
   box-shadow: 0 8px 20px rgba(23, 22, 21, 0.1);
 }
 
-.lamp-pull:hover .lamp-label,
 .lamp-pull:focus-visible .lamp-label,
 .lamp.is-hinting .lamp-label {
   opacity: 1;
   transform: translateX(0);
+}
+
+@media (hover: hover) {
+  .lamp-pull:hover .lamp-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Theme reveal: the new theme grows in a circle from the bead (JS sets the clip-path) */
@@ -197,10 +209,25 @@ html.lamp-vt::view-transition-new(root) {
   z-index: 2;
 }
 
-/* Phones: header has the dedicated toggle in the dock; hide the pull cord below 800px to avoid tap collisions with the hamburger menu */
+/* Phones: the dock is 48px tall with a 14px gutter and the menu button at its right end.
+   The cord hangs in that gutter and the bead sits ~27px below the menu button, so a tap on
+   the hamburger can't land on the cord. Once the page scrolls, LampToggle.jsx tucks the
+   cord up out of view so it never covers content, and drops it again back at the top. */
 @media (max-width: 800px) {
   .lamp {
-    display: none !important;
+    --lamp-cord: 86px;
+    right: 7px;
+  }
+
+  /* 40 × 52px touch target that stays on-screen: it extends left of the cord instead of past
+     the screen edge, with the bead kept centred on the cord (26.5px + half the 11px bead = 32px) */
+  .lamp-pull {
+    top: calc(var(--lamp-cord) - 8px);
+    left: -32px;
+    width: 40px;
+    height: 52px;
+    padding: 8px 0 0 26.5px;
+    justify-content: flex-start;
   }
 }
 

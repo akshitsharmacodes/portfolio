@@ -2484,6 +2484,9 @@ html[data-theme="light"] .theme-toggle-btn:hover {
   display: flex;
   align-items: flex-start;
   padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mobile-drawer-card {

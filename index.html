@@ -14,8 +14,9 @@
 
     <!--
       Pre-paint bootstrap: apply the saved theme, the motion preference and the preloader
-      decision before the first frame, so light-theme visitors never see a dark flash and
-      reduced-motion visitors skip the boot sequence.
+      decision before the first frame, so light-theme visitors never see a dark flash.
+      The boot sequence plays on every load and refresh; only reduced-motion / motion-off
+      visitors skip it.
     -->
     <script>
       (function () {
@@ -32,14 +33,8 @@
           var motion = localStorage.getItem('akshit-portfolio-motion');
           var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           var motionOff = motion === 'off' || (motion === null && reduce);
-          var booted = false;
-          try {
-            booted = sessionStorage.getItem('akshit-portfolio-booted') === '1';
-          } catch (e) {}
           if (motionOff) {
             root.setAttribute('data-motion', 'off');
-          }
-          if (motionOff || booted) {
             root.setAttribute('data-boot', 'skip');
           }
         } catch (e) {

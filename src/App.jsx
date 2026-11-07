@@ -59,15 +59,11 @@ export default function App() {
     return !prefersReducedMotion();
   });
 
-  // Preloader: index.html marks data-boot="skip" when motion is reduced / off or already booted this session.
-  // Shows once per browser session per spec. booting → revealing (curtain lifting) → done.
-  const [bootPhase, setBootPhase] = useState(() => {
-    let booted = false;
-    try {
-      booted = sessionStorage.getItem('akshit-portfolio-booted') === '1';
-    } catch {}
-    return document.documentElement.getAttribute('data-boot') === 'skip' || booted ? 'done' : 'booting';
-  });
+  // Preloader: plays on every load and refresh. index.html marks data-boot="skip" only when
+  // motion is reduced / switched off. booting → revealing (curtain lifting) → done.
+  const [bootPhase, setBootPhase] = useState(() =>
+    document.documentElement.getAttribute('data-boot') === 'skip' ? 'done' : 'booting'
+  );
 
   const [selectedProject, setSelectedProject] = useState(null);
   const dialogOpenerRef = useRef(null);
@@ -154,12 +150,7 @@ export default function App() {
     setCalModalOpen(false);
   }, []);
   const handleBootReveal = useCallback(() => setBootPhase('revealing'), []);
-  const handleBootDone = useCallback(() => {
-    try {
-      sessionStorage.setItem('akshit-portfolio-booted', '1');
-    } catch {}
-    setBootPhase('done');
-  }, []);
+  const handleBootDone = useCallback(() => setBootPhase('done'), []);
 
   const introReady = bootPhase !== 'booting';
 
