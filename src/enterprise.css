@@ -726,16 +726,27 @@ html[data-theme='light'] .menu-trigger-sleek {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 30px;
-  padding: 0 12px;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 5px 12px;
   margin-bottom: 28px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg);
   font-size: var(--fs-xs);
   font-weight: 500;
+  line-height: 1.35;
   color: var(--text-muted);
   transition: border-color 150ms ease, color 150ms ease;
+}
+
+.hero-status > span:not(.status-dot) {
+  min-width: 0;
+}
+
+.hero-status .status-dot,
+.hero-status svg {
+  flex-shrink: 0;
 }
 
 .hero-status:hover {
@@ -1069,6 +1080,18 @@ html[data-theme='light'] .menu-trigger-sleek {
 @media (max-width: 600px) {
   .hero-backdrop {
     background-size: 44px 44px;
+  }
+  /* Keep the availability capsule on one line on phones */
+  .hero-status {
+    gap: 6px;
+    padding: 5px 10px;
+    font-size: clamp(0.66rem, 3vw, 0.75rem);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .hero-status > span:not(.status-dot) {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .hero-meta-item {
     padding-right: 0;
