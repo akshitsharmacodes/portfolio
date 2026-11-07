@@ -2,7 +2,7 @@ import React from 'react';
 import { siteConfig, isValidContent } from '../config/site';
 import { ArrowUp } from 'lucide-react';
 
-export default function Footer() {
+export default function Footer({ motionEnabled = true, onToggleMotion }) {
   const currentYear = new Date().getFullYear();
   const { contact, identity } = siteConfig;
 
@@ -52,11 +52,18 @@ export default function Footer() {
 
       <div className="container footer-bottom">
         <p>
-          © {currentYear} {identity.fullName}. Engineered with React &amp; Framer Motion. Built for production-grade reliability.
+          © {currentYear} {identity.fullName}. All rights reserved.
         </p>
-        <p aria-hidden="true">
-          <span className="text-accent">$</span> exit 0
-        </p>
+        {onToggleMotion && (
+          <button
+            type="button"
+            className="footer-motion-toggle"
+            onClick={onToggleMotion}
+            aria-pressed={!motionEnabled}
+          >
+            Animations: {motionEnabled ? 'On' : 'Off'}
+          </button>
+        )}
       </div>
     </footer>
   );

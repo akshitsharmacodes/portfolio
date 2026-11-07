@@ -146,7 +146,7 @@ html.light .nav-dock-link:hover {
 
 html[data-theme="light"] .nav-dock-link.active,
 html.light .nav-dock-link.active {
-  color: #171615 !important;
+  color: #171615;
   background: rgba(0, 0, 0, 0.08);
   font-weight: 700;
 }
@@ -169,7 +169,7 @@ html.light .motion-pill-trigger:hover,
 html[data-theme="light"] .motion-pill-trigger.active,
 html.light .motion-pill-trigger.active {
   background: #d92334;
-  color: #ffffff !important;
+  color: #ffffff;
   border-color: #d92334;
 }
 
@@ -177,7 +177,7 @@ html[data-theme="light"] .motion-pill-trigger:hover .motion-pill-icon,
 html.light .motion-pill-trigger:hover .motion-pill-icon,
 html[data-theme="light"] .motion-pill-trigger.active .motion-pill-icon,
 html.light .motion-pill-trigger.active .motion-pill-icon {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 html[data-theme="light"] .dock-icon-btn,
@@ -1104,7 +1104,7 @@ html.light .btn-primary:hover {
 }
 
 .interactive-hover-card:hover {
-  border-color: var(--border-accent) !important;
+  border-color: var(--border-accent);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-glow);
 }
 
@@ -4841,9 +4841,9 @@ html.light .contact-action-card.cal-card {
   }
 }
 
-/* The full desktop dock (brand + 8 links + actions) needs ~1,160px.
+/* The desktop bar (brand + 5 links + actions) needs ~880px.
    Below that, collapse to the menu instead of overflowing the viewport. */
-@media (max-width: 1199px) {
+@media (max-width: 919px) {
   .desktop-only {
     display: none !important;
   }
@@ -5188,7 +5188,7 @@ html.light .contact-action-card.cal-card {
   gap: 10px;
   min-height: 48px;
   background-color: var(--accent-fill);
-  color: #ffffff !important;
+  color: #ffffff;
   font-weight: 700;
   font-size: 0.92rem;
   padding: 12px 22px;
@@ -5211,7 +5211,7 @@ html.light .contact-action-card.cal-card {
   background-color: var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 6px 28px var(--accent-glow-strong);
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .client-banner-actions .btn-secondary {
@@ -5313,7 +5313,7 @@ html.light .icon-whatsapp {
 }
 
 .venture-card:hover {
-  border-color: var(--venture-accent, var(--border-accent)) !important;
+  border-color: var(--venture-accent, var(--border-accent));
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 24px rgba(227, 43, 60, 0.12);
 }
 

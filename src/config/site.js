@@ -48,7 +48,7 @@ export const siteConfig = {
   metrics: [
     { label: "Smart India Hackathon 2025", value: "1st Place", detail: "Winner with Team Dokku among hundreds of university teams" },
     { label: "Zinnovatio 3.0", value: "Top 200", detail: "Out of 9,000+ participants across India" },
-    { label: "Indian Army", value: "Recommended", detail: "Cleared 5-day SSB at 18 SSB Allahabad (TES-48) for Indian Army Permanent Commission — world's most comprehensive and longest interview procedure (<0.1% final selection rate)" },
+    { label: "Indian Army", value: "Recommended", detail: "Cleared the 5-day SSB (TES-48) for an Indian Army Permanent Commission, with a final selection rate under 0.1%" },
   ],
 
   specialties: [

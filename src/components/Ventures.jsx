@@ -218,7 +218,6 @@ export default function Ventures({ motionEnabled = true }) {
               initial={motionEnabled ? "hidden" : undefined}
               whileInView={motionEnabled ? "visible" : undefined}
               viewport={motionEnabled ? scrollViewportEarly : undefined}
-              whileHover={motionEnabled ? { y: -4 } : undefined}
               style={{ '--venture-accent': venture.accent }}
             >
               {/* Card Background Subtle Illustration Graphic */}

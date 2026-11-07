@@ -80,7 +80,6 @@ export default function Awards({ motionEnabled = true }) {
                 initial={motionEnabled ? 'hidden' : undefined}
                 whileInView={motionEnabled ? 'visible' : undefined}
                 viewport={motionEnabled ? scrollViewportEarly : undefined}
-                whileHover={motionEnabled ? { y: -4 } : undefined}
               >
                 <div className="award-badge-row">
                   <span className="award-badge">{award.badge}</span>

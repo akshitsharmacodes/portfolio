@@ -1,7 +1,7 @@
 import React from 'react';
 import { siteConfig, isValidContent } from '../config/site';
 import { Zap, Bot, Database, Server, ArrowUpRight, Calendar, CheckCircle2, MessageCircle } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { scrollViewportEarly, cardRevealVariant, luxuryTransition } from '../config/motion';
 import SectionHeader from './SectionHeader';
 import MagneticButton from './MagneticButton';
@@ -63,9 +63,6 @@ export default function ClientEngine({ motionEnabled = true }) {
   const MotionDiv = motionEnabled ? motion.div : 'div';
   const bannerRef = React.useRef(null);
 
-  // Oversized banner heading drifts sideways as the banner crosses the viewport
-  const { scrollYProgress } = useScroll({ target: bannerRef, offset: ['start end', 'end start'] });
-  const headingX = useTransform(scrollYProgress, [0, 1], [36, -18]);
   const HeadingTag = motionEnabled ? motion.h3 : 'h3';
 
   return (
@@ -91,7 +88,6 @@ export default function ClientEngine({ motionEnabled = true }) {
                 initial={motionEnabled ? 'hidden' : undefined}
                 whileInView={motionEnabled ? 'visible' : undefined}
                 viewport={motionEnabled ? scrollViewportEarly : undefined}
-                whileHover={motionEnabled ? { y: -4 } : undefined}
               >
                 <div className="client-pillar-top">
                   <div className="client-pillar-icon-box">
@@ -135,7 +131,7 @@ export default function ClientEngine({ motionEnabled = true }) {
               </div>
               <HeadingTag
                 className="client-banner-heading"
-                style={motionEnabled ? { x: headingX } : undefined}
+                
               >
                 Ready to build or scale your system?
               </HeadingTag>

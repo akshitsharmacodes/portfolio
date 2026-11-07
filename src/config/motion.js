@@ -49,13 +49,13 @@ export const staggerContainer = (staggerChildren = 0.08, delayChildren = 0.04) =
 export const fadeInUpVariant = {
   hidden: {
     opacity: 0,
-    y: 24,
+    y: 12,
   },
   visible: (custom = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.7,
+      duration: 0.5,
       delay: typeof custom === 'number' ? custom : 0,
       ease: easeCurves.luxuryDecel,
     },
@@ -65,13 +65,13 @@ export const fadeInUpVariant = {
 export const cardRevealVariant = {
   hidden: {
     opacity: 0,
-    y: 32,
+    y: 16,
   },
   visible: (custom = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.75,
+      duration: 0.55,
       delay: typeof custom === 'number' ? custom : 0,
       ease: easeCurves.responsive,
     },
@@ -81,13 +81,13 @@ export const cardRevealVariant = {
 export const fadeInLeftVariant = {
   hidden: {
     opacity: 0,
-    x: -24,
+    x: -12,
   },
   visible: (custom = 0) => ({
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.7,
+      duration: 0.5,
       delay: typeof custom === 'number' ? custom : 0,
       ease: easeCurves.luxuryDecel,
     },
@@ -97,13 +97,13 @@ export const fadeInLeftVariant = {
 export const fadeInRightVariant = {
   hidden: {
     opacity: 0,
-    x: 24,
+    x: 12,
   },
   visible: (custom = 0) => ({
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.7,
+      duration: 0.5,
       delay: typeof custom === 'number' ? custom : 0,
       ease: easeCurves.luxuryDecel,
     },
@@ -112,20 +112,20 @@ export const fadeInRightVariant = {
 
 // Words rising out of a mask (SplitReveal, hero headline)
 export const maskWordVariant = {
-  hidden: { y: '110%' },
+  hidden: { opacity: 0, y: '35%' },
   visible: {
+    opacity: 1,
     y: '0%',
-    transition: { duration: 0.85, ease: easeCurves.responsive },
+    transition: { duration: 0.55, ease: easeCurves.luxuryDecel },
   },
 };
 
 // Small meta rows (section index, eyebrow): slide in from the left
 export const metaVariant = {
-  hidden: { opacity: 0, x: -12 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    x: 0,
-    transition: { duration: 0.6, ease: easeCurves.luxuryDecel },
+    transition: { duration: 0.5, ease: easeCurves.luxuryDecel },
   },
 };
 

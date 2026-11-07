@@ -190,7 +190,6 @@ export default function Experience({ motionEnabled = true }) {
                 initial={motionEnabled ? 'hidden' : undefined}
                 whileInView={motionEnabled ? 'visible' : undefined}
                 viewport={motionEnabled ? scrollViewportEarly : undefined}
-                whileHover={motionEnabled ? { y: -4 } : undefined}
               >
                 <div className="edu-dates">{edu.dates}</div>
                 <h4 className="edu-inst">{edu.institution}</h4>

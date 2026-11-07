@@ -28,7 +28,6 @@ export default function Skills({ motionEnabled = true }) {
               initial={motionEnabled ? 'hidden' : undefined}
               whileInView={motionEnabled ? 'visible' : undefined}
               viewport={motionEnabled ? scrollViewportEarly : undefined}
-              whileHover={motionEnabled ? { y: -4 } : undefined}
             >
               <div className="skill-group-header">
                 <span className="skill-group-title">{group.group}</span>

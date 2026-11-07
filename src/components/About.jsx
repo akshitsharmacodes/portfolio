@@ -64,7 +64,6 @@ export default function About({ motionEnabled = true }) {
                   initial={motionEnabled ? 'hidden' : undefined}
                   whileInView={motionEnabled ? 'visible' : undefined}
                   viewport={motionEnabled ? scrollViewportEarly : undefined}
-                  whileHover={motionEnabled ? { y: -4 } : undefined}
                 >
                   <div className="about-pillar-header">
                     <div className="about-pillar-icon-box">

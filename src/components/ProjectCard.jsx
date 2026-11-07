@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { ArrowUpRight, Github, ExternalLink } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cardRevealVariant, scrollViewportEarly } from '../config/motion';
 import { isValidContent, siteConfig } from '../config/site';
 import ProjectGlyph, { PROJECT_VISUALS } from './ProjectGlyph';
@@ -11,9 +11,6 @@ export default function ProjectCard({ project, onSelect, motionEnabled, delayInd
   const githubUrl = isValidContent(project.sourceUrl) ? project.sourceUrl : siteConfig.contact.github;
   const visual = PROJECT_VISUALS[project.id] || { eyebrow: project.category, glyph: 'pipeline' };
 
-  // Cover parallax: the artwork drifts ±12px as the card crosses the viewport
-  const { scrollYProgress } = useScroll({ target: cardRef, offset: ['start end', 'end start'] });
-  const glyphY = useTransform(scrollYProgress, [0, 1], [-12, 12]);
 
   useEffect(() => () => cancelAnimationFrame(frameRef.current), []);
 
@@ -52,7 +49,7 @@ export default function ProjectCard({ project, onSelect, motionEnabled, delayInd
           <span className="project-year-badge">{project.year}</span>
         </div>
         <div className="visual-stage">
-          <GlyphLayer className="visual-glyph-layer" style={motionEnabled ? { y: glyphY } : undefined}>
+          <GlyphLayer className="visual-glyph-layer">
             <ProjectGlyph kind={visual.glyph} />
           </GlyphLayer>
           <span className="visual-ribbon">{visual.eyebrow}</span>

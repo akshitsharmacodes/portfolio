@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowUpRight, ArrowDown, Zap, Github, FileText, Sun, Moon, MessageCircle, Pause, Play } from 'lucide-react';
-import MagneticButton from './MagneticButton';
+import { Menu, X, ArrowUpRight, ArrowRight, Github, FileText, Sun, Moon, MessageCircle, Pause, Play } from 'lucide-react';
 
 // Page order (used for scroll-spy); nav labels/visibility come from site config
 const SECTION_IDS = ['hire-me', 'work', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
@@ -26,8 +25,6 @@ export default function Header({
   onToggleTheme,
   motionEnabled,
   onToggleMotion,
-  onTriggerSwarm,
-  swarmActive,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
@@ -114,15 +111,17 @@ export default function Header({
 
   // Same order as the page, so the active pill moves left → right while scrolling down
   const navLinks = [
-    { label: 'Hire Me', href: '#hire-me', id: 'hire-me', show: true },
-    { label: 'Work', href: '#work', id: 'work', show: true },
-    { label: 'About', href: '#about', id: 'about', show: true },
+    // `primary` links appear in the desktop bar; every link appears in the mobile drawer
+    { label: 'Services', href: '#hire-me', id: 'hire-me', show: true, primary: true },
+    { label: 'Work', href: '#work', id: 'work', show: true, primary: true },
+    { label: 'About', href: '#about', id: 'about', show: true, primary: true },
     { label: 'Skills', href: '#skills', id: 'skills', show: true },
-    { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience },
+    { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience, primary: true },
     { label: 'Recognition', href: '#awards', id: 'awards', show: siteConfig.preferences.showAwards },
-    { label: 'Side Hustles', href: '#side-hustles', id: 'side-hustles', show: siteConfig.preferences.showVentures },
-    { label: 'Contact', href: '#contact', id: 'contact', show: true },
+    { label: 'Ventures', href: '#side-hustles', id: 'side-hustles', show: siteConfig.preferences.showVentures },
+    { label: 'Contact', href: '#contact', id: 'contact', show: true, primary: true },
   ].filter((item) => item.show);
+  const desktopLinks = navLinks.filter((item) => item.primary);
 
   return (
     <>
@@ -138,7 +137,7 @@ export default function Header({
 
           <nav className="desktop-only" aria-label="Main navigation">
             <ul className="nav-dock-list">
-              {navLinks.map((link) => {
+              {desktopLinks.map((link) => {
                 const isActive = activeSection === link.id;
                 return (
                   <li key={link.href}>
@@ -147,7 +146,6 @@ export default function Header({
                       className={`nav-dock-link ${isActive ? 'active' : ''}`}
                       aria-current={isActive ? 'location' : undefined}
                     >
-                      {isActive && <span className="nav-active-dot" aria-hidden="true" />}
                       <span>{link.label}</span>
                     </a>
                   </li>
@@ -167,23 +165,6 @@ export default function Header({
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            {/* Real Animation on/off: pause icon, aria-pressed, accessible on desktop and tablet */}
-            <MotionToggle motionEnabled={motionEnabled} onToggleMotion={onToggleMotion} />
-
-            {/* Agent swarm easter egg: desktop only */}
-            <button
-              type="button"
-              className={`motion-pill-trigger desktop-only ${swarmActive ? 'active' : ''}`}
-              onClick={onTriggerSwarm}
-              aria-pressed={swarmActive}
-              aria-label="Toggle interactive agent swarm"
-              title="Launch the interactive AI agent swarm"
-            >
-              <Zap size={13} className="motion-pill-icon" aria-hidden="true" />
-              <span>Motion</span>
-              {swarmActive && <span className="motion-indicator-dot" aria-hidden="true" />}
-            </button>
-
             {isValidContent(siteConfig.contact.github) && (
               <a
                 href={siteConfig.contact.github}
@@ -191,31 +172,16 @@ export default function Header({
                 rel="noopener noreferrer"
                 className="dock-icon-btn desktop-only"
                 aria-label="GitHub profile"
-                title="GitHub: akshitsharmacodes"
+                title="GitHub"
               >
                 <Github size={16} aria-hidden="true" />
               </a>
             )}
 
-            <span className="dock-divider desktop-only" aria-hidden="true" />
-
-            {isValidContent(siteConfig.identity.resume) && (
-              <MagneticButton
-                as="a"
-                motionEnabled={motionEnabled}
-                strength={0.22}
-                href={siteConfig.identity.resume}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-resume-btn desktop-only"
-                title="View resume on Google Drive"
-                aria-label="View resume (opens Google Drive)"
-              >
-                <FileText size={14} aria-hidden="true" />
-                <span>Resume</span>
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </MagneticButton>
-            )}
+            <a href="#contact" className="nav-cta-btn desktop-only">
+              <span>Get in touch</span>
+              <ArrowRight size={14} aria-hidden="true" />
+            </a>
 
             <button
               ref={menuTriggerRef}
@@ -299,7 +265,7 @@ export default function Header({
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span>Get in Touch</span>
-                <ArrowDown size={16} aria-hidden="true" />
+                <ArrowRight size={16} aria-hidden="true" />
               </a>
 
               {isValidContent(siteConfig.identity.resume) && (
@@ -340,17 +306,6 @@ export default function Header({
                     <span>GitHub</span>
                   </a>
                 )}
-                <button
-                  type="button"
-                  className="btn btn-secondary mobile-quick-link"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onTriggerSwarm();
-                  }}
-                >
-                  <Zap size={15} className="text-accent" aria-hidden="true" />
-                  <span>{swarmActive ? 'Stop Swarm' : 'Swarm Motion'}</span>
-                </button>
               </div>
             </div>
           </div>
