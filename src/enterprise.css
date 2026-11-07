@@ -1246,12 +1246,12 @@ html[data-motion='off'] .hero-work-cue-line::after {
   color: var(--text-muted);
 }
 
-/* Example agent run panel */
-.agent-run {
-  --run-ok: var(--signal-text);
+/* RAG architecture diagram */
+.rag {
   position: relative;
   width: 100%;
   max-width: 460px;
+  margin: 0;
   justify-self: end;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -1261,7 +1261,7 @@ html[data-motion='off'] .hero-work-cue-line::after {
   overflow: hidden;
 }
 
-.agent-run-bar {
+.rag-bar {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1273,138 +1273,243 @@ html[data-motion='off'] .hero-work-cue-line::after {
   color: var(--text-dim);
 }
 
-.agent-run-dots {
+.rag-dots {
   display: inline-flex;
   gap: 6px;
 }
 
-.agent-run-dots i {
+.rag-dots i {
   width: 9px;
   height: 9px;
   border-radius: 50%;
   background: var(--text-faint);
 }
 
-.agent-run-title {
+.rag-title {
   flex: 1;
   color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.agent-run-tag {
+.rag-tag,
+.rag-chip {
   padding: 2px 7px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: var(--fs-2xs);
-}
-
-.agent-run-input {
-  padding: 16px 16px 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.agent-run-label {
-  display: block;
-  margin-bottom: 6px;
   font-family: var(--font-mono);
   font-size: var(--fs-2xs);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: var(--text-dim);
+  white-space: nowrap;
 }
 
-.agent-run-input p {
-  margin: 0;
-  color: var(--text);
-  line-height: 1.5;
+.rag-flow {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
 }
 
-.agent-run-steps {
-  position: relative;
-  margin: 0;
-  padding: 10px 8px;
-  list-style: none;
-}
-
-/* Connector line through the step markers */
-.agent-run-steps::before {
-  content: "";
-  position: absolute;
-  top: 26px;
-  bottom: 26px;
-  left: 25px;
-  width: 1px;
-  background: var(--border-strong);
-}
-
-.agent-run-step {
-  position: relative;
-  display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) auto auto;
-  align-items: center;
+.rag-node {
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
-  padding: 9px 10px 9px 8px;
-  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
 }
 
-.agent-run-check {
-  position: relative;
-  z-index: 1;
+.rag-node--db {
+  border-color: var(--border-strong);
+}
+
+.rag-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid var(--signal-border);
-  background: var(--bg-secondary);
-  color: var(--run-ok);
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-tint);
+  color: var(--text);
 }
 
-.agent-run-step-name {
-  color: var(--text);
+.rag-node--db .rag-icon {
+  color: var(--signal-text);
+  border-color: var(--signal-border);
+  background: var(--signal-soft);
+}
+
+.rag-node-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.rag-node-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.rag-node-name {
   font-weight: 500;
+  color: var(--text);
+}
+
+.rag-quote {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.rag-vector {
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.agent-run-step-tool,
-.agent-run-step-meta,
-.agent-run-result-meta {
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xs);
+.rag-sub {
+  font-size: var(--fs-xs);
   color: var(--text-dim);
-  white-space: nowrap;
 }
 
-.agent-run-step-tool {
-  padding: 2px 6px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-}
-
-.agent-run-step-meta {
-  min-width: 44px;
-  text-align: right;
-}
-
-.agent-run-result {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  background: var(--signal-soft);
-  color: var(--run-ok);
-  font-weight: 500;
+.rag-hits {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
   list-style: none;
 }
 
-.agent-run-result-meta {
+.rag-hit {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) 64px 32px;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-muted);
+}
+
+.rag-hit svg {
+  color: var(--text-dim);
+}
+
+.rag-hit-doc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rag-hit-bar {
+  position: relative;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.rag-hit-bar span {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--signal-text);
+  transform-origin: left center;
+  transform: scaleX(var(--score));
+  animation: ragBar 900ms var(--ease) 1.2s both;
+}
+
+.rag-hit-score {
+  text-align: right;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.rag-ingest {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: var(--text-dim);
+}
+
+/* Links between nodes, with a data dot travelling down */
+.rag-link {
+  position: relative;
+  align-self: flex-start;
+  width: 1px;
+  height: 16px;
+  margin-left: 26px;
+  background: var(--border-strong);
+  overflow: visible;
+}
+
+.rag-link i {
+  position: absolute;
+  left: -2px;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0;
+  animation: ragFlow 2.4s var(--ease) infinite;
+}
+
+.rag-flow > .rag-link:nth-of-type(2) i { animation-delay: 0.6s; }
+.rag-flow > .rag-link:nth-of-type(3) i { animation-delay: 1.2s; }
+.rag-flow > .rag-link:nth-of-type(4) i { animation-delay: 1.8s; }
+
+.rag-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border: 1px solid var(--signal-border);
+  border-radius: 10px;
+  background: var(--signal-soft);
+  color: var(--signal-text);
+  font-weight: 500;
+}
+
+.rag-result-meta {
   margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  font-weight: 400;
+}
+
+@keyframes ragFlow {
+  0% { transform: translateY(-2px); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+
+@keyframes ragBar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(var(--score)); }
+}
+
+html[data-motion='off'] .rag-link i,
+html[data-motion='off'] .rag-hit-bar span {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rag-link i,
+  .rag-hit-bar span {
+    animation: none;
+  }
 }
 
 /* Proof strip */
@@ -1463,7 +1568,7 @@ html[data-motion='off'] .hero-work-cue-line::after {
   .hero-content {
     max-width: 680px;
   }
-  .agent-run {
+  .rag {
     justify-self: start;
     max-width: 560px;
   }
@@ -1494,11 +1599,15 @@ html[data-motion='off'] .hero-work-cue-line::after {
     padding-right: 0;
     border-right: none;
   }
-  .agent-run-step {
-    grid-template-columns: 20px minmax(0, 1fr) auto;
+  .rag-flow {
+    padding: 12px;
   }
-  .agent-run-step-tool {
-    display: none;
+  .rag-node {
+    gap: 10px;
+    padding: 10px;
+  }
+  .rag-hit {
+    grid-template-columns: 12px minmax(0, 1fr) 44px 30px;
   }
 }
 

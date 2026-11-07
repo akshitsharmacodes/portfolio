@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { ArrowUpRight, ArrowRight, MapPin, Calendar, Check, CornerDownRight } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, MapPin, Calendar, MessageSquare, Binary, Database, Sparkles, CheckCircle2, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { easeCurves } from '../config/motion';
 
@@ -19,21 +19,20 @@ const panelVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, delay: 0.25, ease: easeCurves.luxuryDecel, staggerChildren: 0.16, delayChildren: 0.6 },
+    transition: { duration: 0.7, delay: 0.25, ease: easeCurves.luxuryDecel, staggerChildren: 0.14, delayChildren: 0.55 },
   },
 };
 
-const stepVariants = {
-  hidden: { opacity: 0, x: -6 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: easeCurves.luxuryDecel } },
+const nodeVariants = {
+  hidden: { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: easeCurves.luxuryDecel } },
 };
 
-// Illustrative trace of the kind of agent workflow Akshit builds (labelled "Example run" in the UI)
-const AGENT_STEPS = [
-  { name: 'Classify intent', tool: 'LLM router', meta: '0.4s' },
-  { name: 'Retrieve context', tool: 'RAG · pgvector', meta: '12 docs' },
-  { name: 'Plan & draft reply', tool: 'LangGraph', meta: '1.1s' },
-  { name: 'Policy check', tool: 'Guardrails', meta: 'pass' },
+// Illustrative semantic-search hits for the example query (the panel is labelled "Architecture")
+const RAG_HITS = [
+  { doc: 'api-keys.md', score: 0.92 },
+  { doc: 'sso-admin-guide.pdf', score: 0.87 },
+  { doc: 'ticket-4821.json', score: 0.81 },
 ];
 
 // True once the index.html preloader has lifted (or immediately when it was skipped)
@@ -49,45 +48,102 @@ function usePreloaderDone() {
   return done;
 }
 
-function AgentRunPanel({ motionEnabled, ready }) {
-  const Panel = motionEnabled ? motion.div : 'div';
-  const Step = motionEnabled ? motion.li : 'li';
+/**
+ * RAG architecture diagram: query → embedding model → vector DB (semantic search, top-k)
+ * → LLM with retrieved context → grounded answer. Data dots travel along the links (CSS).
+ */
+function RagDiagram({ motionEnabled, ready }) {
+  const Panel = motionEnabled ? motion.figure : 'figure';
+  const Node = motionEnabled ? motion.div : 'div';
   const panelProps = motionEnabled
     ? { variants: panelVariants, initial: 'hidden', animate: ready ? 'visible' : 'hidden' }
     : {};
-  const stepProps = motionEnabled ? { variants: stepVariants } : {};
+  const nodeProps = motionEnabled ? { variants: nodeVariants } : {};
+  const link = <span className="rag-link" aria-hidden="true"><i /></span>;
 
   return (
-    <Panel className="agent-run" aria-label="Example AI agent run" role="figure" {...panelProps}>
-      <div className="agent-run-bar">
-        <span className="agent-run-dots" aria-hidden="true"><i /><i /><i /></span>
-        <span className="agent-run-title">support-triage-agent</span>
-        <span className="agent-run-tag">Example run</span>
+    <Panel
+      className="rag"
+      aria-label="RAG architecture: a user query is embedded, matched by semantic search in a vector database, and the retrieved context is passed to an LLM to produce a grounded answer."
+      {...panelProps}
+    >
+      <div className="rag-bar">
+        <span className="rag-dots" aria-hidden="true"><i /><i /><i /></span>
+        <span className="rag-title">rag-pipeline</span>
+        <span className="rag-tag">Architecture</span>
       </div>
 
-      <div className="agent-run-input">
-        <span className="agent-run-label">Input</span>
-        <p>“Our invoice sync failed overnight. Can you check what happened?”</p>
+      <div className="rag-flow">
+        <Node className="rag-node" {...nodeProps}>
+          <span className="rag-icon"><MessageSquare size={14} aria-hidden="true" /></span>
+          <div className="rag-node-main">
+            <div className="rag-node-head">
+              <span className="rag-node-name">User query</span>
+            </div>
+            <p className="rag-quote">“How do I rotate API keys for my org?”</p>
+          </div>
+        </Node>
+
+        {link}
+
+        <Node className="rag-node" {...nodeProps}>
+          <span className="rag-icon"><Binary size={14} aria-hidden="true" /></span>
+          <div className="rag-node-main">
+            <div className="rag-node-head">
+              <span className="rag-node-name">Embedding model</span>
+              <span className="rag-chip">1536-d</span>
+            </div>
+            <code className="rag-vector">[0.12, −0.48, 0.91, 0.07, …]</code>
+          </div>
+        </Node>
+
+        {link}
+
+        <Node className="rag-node rag-node--db" {...nodeProps}>
+          <span className="rag-icon"><Database size={14} aria-hidden="true" /></span>
+          <div className="rag-node-main">
+            <div className="rag-node-head">
+              <span className="rag-node-name">Vector DB</span>
+              <span className="rag-chip">pgvector · cosine</span>
+            </div>
+            <div className="rag-sub">Semantic search · top-k 3</div>
+            <ul className="rag-hits">
+              {RAG_HITS.map((hit) => (
+                <li key={hit.doc} className="rag-hit">
+                  <FileText size={12} aria-hidden="true" />
+                  <span className="rag-hit-doc">{hit.doc}</span>
+                  <span className="rag-hit-bar" aria-hidden="true">
+                    <span style={{ '--score': hit.score }} />
+                  </span>
+                  <span className="rag-hit-score">{hit.score.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="rag-ingest">indexed from docs · PDFs · tickets → chunk → embed</div>
+          </div>
+        </Node>
+
+        {link}
+
+        <Node className="rag-node" {...nodeProps}>
+          <span className="rag-icon"><Sparkles size={14} aria-hidden="true" /></span>
+          <div className="rag-node-main">
+            <div className="rag-node-head">
+              <span className="rag-node-name">LLM</span>
+              <span className="rag-chip">prompt + context</span>
+            </div>
+            <div className="rag-sub">Generates an answer only from retrieved sources</div>
+          </div>
+        </Node>
+
+        {link}
+
+        <Node className="rag-result" {...nodeProps}>
+          <CheckCircle2 size={15} aria-hidden="true" />
+          <span>Grounded answer</span>
+          <span className="rag-result-meta">3 citations</span>
+        </Node>
       </div>
-
-      <ol className="agent-run-steps">
-        {AGENT_STEPS.map((step) => (
-          <Step key={step.name} className="agent-run-step" {...stepProps}>
-            <span className="agent-run-check" aria-hidden="true">
-              <Check size={11} strokeWidth={3} />
-            </span>
-            <span className="agent-run-step-name">{step.name}</span>
-            <span className="agent-run-step-tool">{step.tool}</span>
-            <span className="agent-run-step-meta">{step.meta}</span>
-          </Step>
-        ))}
-      </ol>
-
-      <Step className="agent-run-result" {...stepProps}>
-        <CornerDownRight size={14} aria-hidden="true" />
-        <span>Resolved without a human</span>
-        <span className="agent-run-result-meta">1.9s total</span>
-      </Step>
     </Panel>
   );
 }
@@ -193,7 +249,7 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
             </Item>
           </Wrap>
 
-          <AgentRunPanel motionEnabled={motionEnabled} ready={ready} />
+          <RagDiagram motionEnabled={motionEnabled} ready={ready} />
         </div>
 
         <Item
