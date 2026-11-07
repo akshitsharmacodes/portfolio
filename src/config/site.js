@@ -18,7 +18,7 @@ export const siteConfig = {
     headline: "I build AI agents that eliminate repetitive work.",
     headlineAccent: "eliminate repetitive work.",
     intro:
-      "Hi, I'm Akshit. I turn manual workflows into LLM agents and RAG search your team can trust, and I take them all the way to production, not just demos. Currently building AI products at LeadManch.",
+      "Hi, I'm Akshit Sharma from Chandigarh, India. I turn manual workflows into LLM agents and RAG search your team can trust, and I take them all the way to production, not just demos. Currently building AI products at LeadManch.",
     about:
       "I work at the intersection of AI engineering and backend development: designing multi-agent workflows with LangChain and LangGraph, building RAG pipelines, and integrating LLMs into real applications. I started in the Indian Army as a Gentleman Cadet at the Officers Training Academy, Gaya (Technical Entry Scheme, TES-48, 2022-2024), after clearing the Services Selection Board. That training shaped how I make decisions under pressure and lead teams. I then moved into computer science and AI/ML at Amity University. I care about solutions that are practical, production-ready and maintainable.",
     portrait: "", // blank => strong typographic hero, no portrait

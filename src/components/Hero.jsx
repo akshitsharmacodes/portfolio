@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { ArrowUpRight, MapPin, Calendar } from 'lucide-react';
+import { ArrowUpRight, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { easeCurves } from '../config/motion';
 
@@ -196,10 +196,6 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
 
             <Item {...itemProps}>
               <div className="hero-meta">
-                <span className="hero-meta-item">
-                  <MapPin size={13} aria-hidden="true" />
-                  {identity.location}
-                </span>
                 <ul className="hero-stack" aria-label="Core stack">
                   {specialties.slice(0, 4).map((s) => (
                     <li key={s}>{s}</li>
