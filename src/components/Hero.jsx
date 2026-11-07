@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { ArrowUpRight, ArrowRight, MapPin, Calendar, MessageSquare, Binary, Database, Sparkles, CheckCircle2, FileText } from 'lucide-react';
+import { ArrowUpRight, MapPin, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { easeCurves } from '../config/motion';
 
@@ -49,17 +49,24 @@ function usePreloaderDone() {
 }
 
 /**
- * RAG architecture diagram: query → embedding model → vector DB (semantic search, top-k)
- * → LLM with retrieved context → grounded answer. Data dots travel along the links (CSS).
+ * RAG pipeline, drawn as one slim timeline: query → embed → semantic search (top-k hits)
+ * → LLM → grounded answer. A single data dot travels down the rail (CSS, off with motion off).
  */
+const RAG_STEPS = [
+  { name: 'Query', meta: '“rotate api keys?”' },
+  { name: 'Embed', meta: '1536-d vector' },
+  { name: 'Semantic search', meta: 'pgvector · top-k 3', hits: true },
+  { name: 'LLM', meta: 'prompt + context' },
+  { name: 'Grounded answer', meta: '3 citations', done: true },
+];
+
 function RagDiagram({ motionEnabled, ready }) {
   const Panel = motionEnabled ? motion.figure : 'figure';
-  const Node = motionEnabled ? motion.div : 'div';
+  const Step = motionEnabled ? motion.li : 'li';
   const panelProps = motionEnabled
     ? { variants: panelVariants, initial: 'hidden', animate: ready ? 'visible' : 'hidden' }
     : {};
-  const nodeProps = motionEnabled ? { variants: nodeVariants } : {};
-  const link = <span className="rag-link" aria-hidden="true"><i /></span>;
+  const stepProps = motionEnabled ? { variants: nodeVariants } : {};
 
   return (
     <Panel
@@ -67,82 +74,37 @@ function RagDiagram({ motionEnabled, ready }) {
       aria-label="RAG architecture: a user query is embedded, matched by semantic search in a vector database, and the retrieved context is passed to an LLM to produce a grounded answer."
       {...panelProps}
     >
-      <div className="rag-bar">
-        <span className="rag-dots" aria-hidden="true"><i /><i /><i /></span>
-        <span className="rag-title">rag-pipeline</span>
-        <span className="rag-tag">Architecture</span>
-      </div>
+      <figcaption className="rag-head">
+        <span>RAG pipeline</span>
+        <span className="rag-head-meta">architecture</span>
+      </figcaption>
 
-      <div className="rag-flow">
-        <Node className="rag-node" {...nodeProps}>
-          <span className="rag-icon"><MessageSquare size={14} aria-hidden="true" /></span>
-          <div className="rag-node-main">
-            <div className="rag-node-head">
-              <span className="rag-node-name">User query</span>
+      <div className="rag-body">
+        <span className="rag-rail" aria-hidden="true"><i /></span>
+        <ol className="rag-steps">
+        {RAG_STEPS.map((step) => (
+          <Step key={step.name} className={`rag-step${step.done ? ' is-done' : ''}`} {...stepProps}>
+            <span className="rag-node-dot" aria-hidden="true" />
+            <div className="rag-step-row">
+              <span className="rag-step-name">{step.name}</span>
+              <span className="rag-step-meta">{step.meta}</span>
             </div>
-            <p className="rag-quote">“How do I rotate API keys for my org?”</p>
-          </div>
-        </Node>
-
-        {link}
-
-        <Node className="rag-node" {...nodeProps}>
-          <span className="rag-icon"><Binary size={14} aria-hidden="true" /></span>
-          <div className="rag-node-main">
-            <div className="rag-node-head">
-              <span className="rag-node-name">Embedding model</span>
-              <span className="rag-chip">1536-d</span>
-            </div>
-            <code className="rag-vector">[0.12, −0.48, 0.91, 0.07, …]</code>
-          </div>
-        </Node>
-
-        {link}
-
-        <Node className="rag-node rag-node--db" {...nodeProps}>
-          <span className="rag-icon"><Database size={14} aria-hidden="true" /></span>
-          <div className="rag-node-main">
-            <div className="rag-node-head">
-              <span className="rag-node-name">Vector DB</span>
-              <span className="rag-chip">pgvector · cosine</span>
-            </div>
-            <div className="rag-sub">Semantic search · top-k 3</div>
-            <ul className="rag-hits">
-              {RAG_HITS.map((hit) => (
-                <li key={hit.doc} className="rag-hit">
-                  <FileText size={12} aria-hidden="true" />
-                  <span className="rag-hit-doc">{hit.doc}</span>
-                  <span className="rag-hit-bar" aria-hidden="true">
-                    <span style={{ '--score': hit.score }} />
-                  </span>
-                  <span className="rag-hit-score">{hit.score.toFixed(2)}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="rag-ingest">indexed from docs · PDFs · tickets → chunk → embed</div>
-          </div>
-        </Node>
-
-        {link}
-
-        <Node className="rag-node" {...nodeProps}>
-          <span className="rag-icon"><Sparkles size={14} aria-hidden="true" /></span>
-          <div className="rag-node-main">
-            <div className="rag-node-head">
-              <span className="rag-node-name">LLM</span>
-              <span className="rag-chip">prompt + context</span>
-            </div>
-            <div className="rag-sub">Generates an answer only from retrieved sources</div>
-          </div>
-        </Node>
-
-        {link}
-
-        <Node className="rag-result" {...nodeProps}>
-          <CheckCircle2 size={15} aria-hidden="true" />
-          <span>Grounded answer</span>
-          <span className="rag-result-meta">3 citations</span>
-        </Node>
+            {step.hits && (
+              <ul className="rag-hits">
+                {RAG_HITS.map((hit) => (
+                  <li key={hit.doc} className="rag-hit">
+                    <span className="rag-hit-doc">{hit.doc}</span>
+                    <span className="rag-hit-bar" aria-hidden="true">
+                      <span style={{ '--score': hit.score }} />
+                    </span>
+                    <span className="rag-hit-score">{hit.score.toFixed(2)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Step>
+        ))}
+        </ol>
       </div>
     </Panel>
   );
@@ -186,7 +148,6 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
               <a href="#contact" className="hero-status">
                 <span className="status-dot" aria-hidden="true" />
                 <span>{identity.availability}</span>
-                <ArrowRight size={13} aria-hidden="true" />
               </a>
             </Item>
 
