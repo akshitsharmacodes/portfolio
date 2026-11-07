@@ -153,9 +153,8 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
 
             <Item {...itemProps}>
               <h1 className="hero-title">
-                <span className="hero-kicker">
-                  {identity.fullName} · {identity.profession}
-                </span>
+                {/* Name stays in the h1 for search and screen readers; the page already shows it in the nav */}
+                <span className="sr-only">{identity.fullName}, {identity.profession}: </span>
                 <span className="hero-headline">
                   {headlineLead} <span className="hero-headline-accent">{identity.headlineAccent}</span>
                 </span>
