@@ -1,6 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowUpRight, ArrowRight, Github, FileText, Sun, Moon, MessageCircle, Pause, Play } from 'lucide-react';
+import { Menu, X, ArrowUpRight, ArrowRight, Github, FileText, Sun, Moon, MessageCircle, Pause, Play, Search } from 'lucide-react';
+
+// Secondary sections highlight the nearest desktop link, so the active pill never disappears mid-page
+const PRIMARY_FOR = { skills: 'about', awards: 'experience', 'side-hustles': 'experience' };
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+/** Wordmark: availability dot + "akshit.dev" in mono with a blinking caret */
+function BrandMark({ onClick }) {
+  return (
+    <a href="#" className="brand-mark" aria-label="akshit.dev, back to top" onClick={onClick}>
+      <span className="brand-dot" title="Available for new projects" aria-hidden="true" />
+      <span className="brand-word">
+        akshit<span className="brand-tld">.dev</span>
+      </span>
+      <span className="brand-caret" aria-hidden="true" />
+    </a>
+  );
+}
+
+/** 1px reading-progress line along the bottom edge of the bar / pill */
+function NavProgress({ motionEnabled }) {
+  const { scrollYProgress } = useScroll();
+  const smooth = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
+  return (
+    <motion.span
+      className="nav-progress"
+      aria-hidden="true"
+      style={{ scaleX: motionEnabled ? smooth : scrollYProgress }}
+    />
+  );
+}
 
 // Page order (used for scroll-spy); nav labels/visibility come from site config
 const SECTION_IDS = ['hire-me', 'work', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
@@ -25,6 +57,7 @@ export default function Header({
   onToggleTheme,
   motionEnabled,
   onToggleMotion,
+  onOpenCommand,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
@@ -127,18 +160,12 @@ export default function Header({
     <>
       <header className={`header-wrapper ${scrolled ? 'is-scrolled' : ''}`} role="banner">
         <div className="header-glass-dock">
-          <a href="#" className="brand-pill" aria-label="Akshit Sharma, back to top">
-            <span className="brand-initials">AS</span>
-            <div className="brand-text">
-              <span className="brand-name">{siteConfig.identity.displayName}</span>
-              <span className="brand-sub">AI/ML</span>
-            </div>
-          </a>
+          <BrandMark />
 
-          <nav className="desktop-only" aria-label="Main navigation">
+          <nav className="desktop-only nav-center" aria-label="Main navigation">
             <ul className="nav-dock-list">
               {desktopLinks.map((link) => {
-                const isActive = activeSection === link.id;
+                const isActive = (PRIMARY_FOR[activeSection] || activeSection) === link.id;
                 return (
                   <li key={link.href}>
                     <a
@@ -146,7 +173,17 @@ export default function Header({
                       className={`nav-dock-link ${isActive ? 'active' : ''}`}
                       aria-current={isActive ? 'location' : undefined}
                     >
-                      <span>{link.label}</span>
+                      {isActive &&
+                        (motionEnabled ? (
+                          <motion.span
+                            layoutId="nav-active-pill"
+                            className="nav-active-pill"
+                            transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                          />
+                        ) : (
+                          <span className="nav-active-pill" />
+                        ))}
+                      <span className="nav-dock-label">{link.label}</span>
                     </a>
                   </li>
                 );
@@ -155,6 +192,20 @@ export default function Header({
           </nav>
 
           <div className="dock-actions">
+            {onOpenCommand && (
+              <button
+                type="button"
+                className="nav-command-btn desktop-only"
+                onClick={(e) => onOpenCommand(e.currentTarget)}
+                aria-label="Open command menu"
+                aria-keyshortcuts={isMac ? 'Meta+K' : 'Control+K'}
+              >
+                <Search size={14} aria-hidden="true" />
+                <kbd>{isMac ? '⌘' : 'Ctrl'}</kbd>
+                <kbd>K</kbd>
+              </button>
+            )}
+
             <button
               type="button"
               className="theme-toggle-btn"
@@ -164,19 +215,6 @@ export default function Header({
             >
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
-
-            {isValidContent(siteConfig.contact.github) && (
-              <a
-                href={siteConfig.contact.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="dock-icon-btn desktop-only"
-                aria-label="GitHub profile"
-                title="GitHub"
-              >
-                <Github size={16} aria-hidden="true" />
-              </a>
-            )}
 
             <a href="#contact" className="nav-cta-btn desktop-only">
               <span>Get in touch</span>
@@ -195,6 +233,8 @@ export default function Header({
               <Menu size={18} aria-hidden="true" />
             </button>
           </div>
+
+          <NavProgress motionEnabled={motionEnabled} />
         </div>
       </header>
 
@@ -211,13 +251,7 @@ export default function Header({
         >
           <div className="mobile-drawer-card">
             <div className="mobile-drawer-top">
-              <a href="#" className="brand-pill" onClick={() => setMobileMenuOpen(false)}>
-                <span className="brand-initials">AS</span>
-                <div className="brand-text">
-                  <span className="brand-name">{siteConfig.identity.displayName}</span>
-                  <span className="brand-sub">AI/ML</span>
-                </div>
-              </a>
+              <BrandMark onClick={() => setMobileMenuOpen(false)} />
 
               <div className="mobile-drawer-controls">
                 <MotionToggle motionEnabled={motionEnabled} onToggleMotion={onToggleMotion} size={17} />

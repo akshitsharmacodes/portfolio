@@ -13,6 +13,7 @@ import Ventures from './components/Ventures';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import CalModal from './components/CalModal';
+import CommandMenu from './components/CommandMenu';
 import { siteConfig } from './config/site';
 import { projects } from './data/projects';
 
@@ -117,6 +118,29 @@ export default function App() {
     setCalModalOpen(false);
   }, []);
 
+  // ⌘K / Ctrl+K command menu
+  const [commandOpen, setCommandOpen] = useState(false);
+  const commandOpenerRef = useRef(null);
+  const openCommand = useCallback((opener) => {
+    commandOpenerRef.current = opener || document.activeElement;
+    setCommandOpen(true);
+  }, []);
+  const closeCommand = useCallback(() => setCommandOpen(false), []);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandOpen((open) => {
+          if (!open) commandOpenerRef.current = document.activeElement;
+          return !open;
+        });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   return (
     <>
       <div className={`portfolio-app theme-${theme}`}>
@@ -130,6 +154,7 @@ export default function App() {
           onToggleTheme={toggleTheme}
           motionEnabled={motionEnabled}
           onToggleMotion={toggleMotion}
+          onOpenCommand={openCommand}
         />
 
         <main id="main-content" tabIndex={-1}>
@@ -164,6 +189,21 @@ export default function App() {
               onClose={closeProject}
               returnFocusTo={dialogOpenerRef.current}
               motionEnabled={motionEnabled}
+            />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {commandOpen && (
+            <CommandMenu
+              key="command-menu"
+              onClose={closeCommand}
+              returnFocusTo={commandOpenerRef.current}
+              theme={theme}
+              onToggleTheme={toggleTheme}
+              motionEnabled={motionEnabled}
+              onToggleMotion={toggleMotion}
+              onOpenCalModal={openCalModal}
             />
           )}
         </AnimatePresence>
