@@ -8,15 +8,13 @@ const PRIMARY_FOR = { skills: 'about', awards: 'experience', 'side-hustles': 'ex
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
-/** Wordmark: availability dot + "akshit.dev" in mono with a blinking caret */
+/** Wordmark: "akshit.dev" in mono */
 function BrandMark({ onClick }) {
   return (
     <a href="#" className="brand-mark" aria-label="akshit.dev, back to top" onClick={onClick}>
-      <span className="brand-dot" title="Available for new projects" aria-hidden="true" />
       <span className="brand-word">
         akshit<span className="brand-tld">.dev</span>
       </span>
-      <span className="brand-caret" aria-hidden="true" />
     </a>
   );
 }
