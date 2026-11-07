@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
 import { ArrowUpRight, ArrowRight, MapPin, Calendar, Check, CornerDownRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -36,10 +36,25 @@ const AGENT_STEPS = [
   { name: 'Policy check', tool: 'Guardrails', meta: 'pass' },
 ];
 
-function AgentRunPanel({ motionEnabled }) {
+// True once the index.html preloader has lifted (or immediately when it was skipped)
+function usePreloaderDone() {
+  const [done, setDone] = useState(() => typeof window === 'undefined' || Boolean(window.__preloaderDone));
+  useEffect(() => {
+    if (done) return undefined;
+    const onDone = () => setDone(true);
+    window.addEventListener('preloader:done', onDone);
+    if (window.__preloaderDone) setDone(true);
+    return () => window.removeEventListener('preloader:done', onDone);
+  }, [done]);
+  return done;
+}
+
+function AgentRunPanel({ motionEnabled, ready }) {
   const Panel = motionEnabled ? motion.div : 'div';
   const Step = motionEnabled ? motion.li : 'li';
-  const panelProps = motionEnabled ? { variants: panelVariants, initial: 'hidden', animate: 'visible' } : {};
+  const panelProps = motionEnabled
+    ? { variants: panelVariants, initial: 'hidden', animate: ready ? 'visible' : 'hidden' }
+    : {};
   const stepProps = motionEnabled ? { variants: stepVariants } : {};
 
   return (
@@ -84,10 +99,13 @@ function AgentRunPanel({ motionEnabled }) {
 export default function Hero({ motionEnabled, onOpenCalModal }) {
   const { identity, specialties, metrics } = siteConfig;
   const headlineLead = identity.headline.replace(identity.headlineAccent, '').trim();
+  const ready = usePreloaderDone();
 
   const Wrap = motionEnabled ? motion.div : 'div';
   const Item = motionEnabled ? motion.div : 'div';
-  const wrapProps = motionEnabled ? { variants: containerVariants, initial: 'hidden', animate: 'visible' } : {};
+  const wrapProps = motionEnabled
+    ? { variants: containerVariants, initial: 'hidden', animate: ready ? 'visible' : 'hidden' }
+    : {};
   const itemProps = motionEnabled ? { variants: itemVariants } : {};
 
   return (
@@ -163,15 +181,15 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
             </Item>
           </Wrap>
 
-          <AgentRunPanel motionEnabled={motionEnabled} />
+          <AgentRunPanel motionEnabled={motionEnabled} ready={ready} />
         </div>
 
         <Item
           {...(motionEnabled
             ? {
                 initial: { opacity: 0, y: 10 },
-                animate: { opacity: 1, y: 0 },
-                transition: { duration: 0.6, delay: 0.55, ease: easeCurves.luxuryDecel },
+                animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 },
+                transition: { duration: 0.6, delay: ready ? 0.55 : 0, ease: easeCurves.luxuryDecel },
               }
             : {})}
         >

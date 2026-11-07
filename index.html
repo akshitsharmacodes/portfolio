@@ -16,7 +16,8 @@
 
     <!--
       Pre-paint bootstrap: apply the saved theme and motion preference before the first
-      frame, so light-theme visitors never see a dark flash.
+      frame, so light-theme visitors never see a dark flash. Also decides whether the
+      preloader plays (once per browser session, never with motion off).
     -->
     <script>
       (function () {
@@ -36,6 +37,11 @@
           if (motionOff) {
             root.setAttribute('data-motion', 'off');
           }
+
+          var seen = false;
+          try { seen = sessionStorage.getItem('akshit-preloaded') === '1'; } catch (e) {}
+          if (motionOff || seen) root.setAttribute('data-preload', 'skip');
+          else root.classList.add('is-preloading');
         } catch (e) {
           /* Fallback on storage errors: proceed without breaking styles */
         }
@@ -74,6 +80,74 @@
       rel="stylesheet"
     />
 
+
+    <!-- Preloader styles: inline so they apply on the very first frame -->
+    <style>
+      html.is-preloading { overflow: hidden; }
+      html[data-preload='skip'] .preloader { display: none; }
+      .preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 100000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #0a0a0a;
+        color: #ededed;
+        font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        transition: opacity 450ms cubic-bezier(0.22, 1, 0.36, 1), visibility 450ms;
+      }
+      html[data-theme='light'] .preloader { background: #ffffff; color: #0a0a0a; }
+      .preloader.is-done { opacity: 0; visibility: hidden; }
+      .preloader-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        animation: preloaderIn 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .preloader.is-done .preloader-inner { transform: translateY(-6px); transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1); }
+      .preloader-brand { display: flex; align-items: center; gap: 12px; }
+      .preloader-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: currentColor;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .preloader-mark span { color: #0a0a0a; }
+      html[data-theme='light'] .preloader-mark span { color: #ffffff; }
+      .preloader-text { display: flex; flex-direction: column; gap: 2px; }
+      .preloader-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+      .preloader-role {
+        font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        opacity: 0.55;
+      }
+      .preloader-track {
+        position: relative;
+        width: 184px;
+        height: 2px;
+        border-radius: 2px;
+        background: rgba(127, 127, 127, 0.22);
+        overflow: hidden;
+      }
+      .preloader-bar {
+        position: absolute;
+        inset: 0;
+        background: currentColor;
+        transform-origin: left center;
+        animation: preloaderFill 1100ms cubic-bezier(0.65, 0, 0.35, 1) both;
+      }
+      @keyframes preloaderIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+      @keyframes preloaderFill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    </style>
+    <noscript><style>.preloader { display: none; } html.is-preloading { overflow: auto; }</style></noscript>
 
     <!-- JSON-LD Structured Data for Akshit Sharma (Graph Schema: WebSite + ProfilePage + Person) -->
     <script type="application/ld+json">
@@ -179,6 +253,51 @@
     </script>
   </head>
   <body>
+    <div class="preloader" id="preloader" aria-hidden="true">
+      <div class="preloader-inner">
+        <div class="preloader-brand">
+          <span class="preloader-mark"><span>AS</span></span>
+          <span class="preloader-text">
+            <span class="preloader-name">Akshit Sharma</span>
+            <span class="preloader-role">AI/ML Developer</span>
+          </span>
+        </div>
+        <div class="preloader-track"><span class="preloader-bar"></span></div>
+      </div>
+    </div>
+    <script>
+      /* Hide the preloader once the page has loaded and the bar has filled (max 3s). */
+      (function () {
+        var el = document.getElementById('preloader');
+        var root = document.documentElement;
+        function finish() {
+          window.__preloaderDone = true;
+          window.dispatchEvent(new Event('preloader:done'));
+        }
+        if (!el || root.getAttribute('data-preload') === 'skip') {
+          if (el) el.parentNode.removeChild(el);
+          finish();
+          return;
+        }
+        var start = Date.now();
+        var MIN_MS = 1150;
+        var MAX_MS = 3000;
+        var closed = false;
+        function close() {
+          if (closed) return;
+          closed = true;
+          el.classList.add('is-done');
+          root.classList.remove('is-preloading');
+          try { sessionStorage.setItem('akshit-preloaded', '1'); } catch (e) {}
+          finish();
+          setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
+        }
+        function onReady() { setTimeout(close, Math.max(0, MIN_MS - (Date.now() - start))); }
+        if (document.readyState === 'complete') onReady();
+        else window.addEventListener('load', onReady);
+        setTimeout(close, MAX_MS);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
