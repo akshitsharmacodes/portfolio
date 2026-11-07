@@ -22,10 +22,30 @@ import SectionHeader from './SectionHeader';
 
 // Topic chips: pick one to set the email subject and a helpful placeholder
 const TOPICS = [
-  { id: 'agents', label: 'AI agents', placeholder: 'What should the agent automate, and where does it plug in?' },
-  { id: 'rag', label: 'RAG / search', placeholder: 'What data should it search, and who will use it?' },
-  { id: 'backend', label: 'Backend / API', placeholder: 'What are you building, and what stack are you on?' },
-  { id: 'consulting', label: 'Consulting', placeholder: 'What decision or problem would you like a second opinion on?' },
+  {
+    id: 'agents',
+    label: 'AI agents',
+    placeholder:
+      'Hi Akshit, our ops team spends ~10 hours a week copying order data between our CRM and spreadsheets. Could an agent handle this for us?',
+  },
+  {
+    id: 'rag',
+    label: 'RAG / search',
+    placeholder:
+      'Hi Akshit, we have 2,000+ internal docs and our support team can never find the right answer quickly. Could you build us a search assistant?',
+  },
+  {
+    id: 'backend',
+    label: 'Backend / API',
+    placeholder:
+      'Hi Akshit, we need a FastAPI backend for our new app, ready for launch in about 6 weeks. Are you available?',
+  },
+  {
+    id: 'consulting',
+    label: 'Consulting',
+    placeholder:
+      'Hi Akshit, we are deciding whether to build our AI feature in-house or buy a tool. Could we get your take on a short call?',
+  },
 ];
 
 const tidyUrl = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').split('?')[0];
@@ -298,12 +318,12 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
                     <div className="ct-row-2">
                       <div className="ct-field">
                         <label htmlFor="ct-name">Name</label>
-                        <input id="ct-name" type="text" autoComplete="name" placeholder="Your name" {...field('name')} />
+                        <input id="ct-name" type="text" autoComplete="name" placeholder="Sarah Jenkins" {...field('name')} />
                         {errors.name && <span id="ct-err-name" className="ct-error">{errors.name}</span>}
                       </div>
                       <div className="ct-field">
                         <label htmlFor="ct-email">Email</label>
-                        <input id="ct-email" type="email" autoComplete="email" placeholder="you@company.com" {...field('email')} />
+                        <input id="ct-email" type="email" autoComplete="email" placeholder="sarah@company.com" {...field('email')} />
                         {errors.email && <span id="ct-err-email" className="ct-error">{errors.email}</span>}
                       </div>
                     </div>
@@ -330,7 +350,11 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
                       <textarea
                         id="ct-message"
                         rows={5}
-                        placeholder={activeTopic ? activeTopic.placeholder : 'A few lines about the project, timeline or role.'}
+                        placeholder={
+                          activeTopic
+                            ? activeTopic.placeholder
+                            : "Hi Akshit, I'm Sarah from Acme. We'd like to automate how we handle customer emails. What would a first version look like, and how soon could we start?"
+                        }
                         {...field('message')}
                       />
                       {errors.message && <span id="ct-err-message" className="ct-error">{errors.message}</span>}
