@@ -254,9 +254,10 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
 
           {/* Message form */}
           {siteConfig.preferences.showContactForm && (
-            <Reveal {...revealProps(0.08)}>
-              <form className="ct-form" onSubmit={handleSubmit} noValidate>
-                <h3 className="ct-form-title">Send a message</h3>
+            <Reveal className="ct-compose" {...revealProps(0.08)}>
+              {/* Same label + card rhythm as the channel groups, so both columns line up */}
+              <h3 className="ct-group-label" id="ct-form-label">Send a message</h3>
+              <form className="ct-form" onSubmit={handleSubmit} noValidate aria-labelledby="ct-form-label">
 
                 {status === 'success' ? (
                   <div className="ct-state" role="status">
@@ -324,7 +325,7 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
                       </div>
                     </fieldset>
 
-                    <div className="ct-field">
+                    <div className="ct-field ct-field--grow">
                       <label htmlFor="ct-message">Message</label>
                       <textarea
                         id="ct-message"

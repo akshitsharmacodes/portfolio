@@ -2001,9 +2001,29 @@ h3 .text-accent,
    -------------------------------------------------------------------------- */
 .ct-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  align-items: start;
-  gap: clamp(32px, 5vw, 64px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: clamp(28px, 4vw, 48px);
+}
+
+/* Both columns: label on top, card(s) below; the form stretches to the channels' height */
+.ct-channels,
+.ct-compose {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ct-compose .ct-form {
+  flex: 1;
+}
+
+.ct-field--grow {
+  flex: 1;
+}
+
+.ct-field--grow textarea {
+  flex: 1;
 }
 
 .ct-group + .ct-group {
