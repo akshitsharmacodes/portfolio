@@ -66,6 +66,7 @@ function TimelineRow({ item, index, isOpen, onToggle, motionEnabled }) {
           aria-expanded={isOpen}
           aria-controls={panelId}
           onClick={onToggle}
+          data-tooltip={isOpen ? 'Click to collapse' : 'Click to see details'}
         >
           <span className="timeline-dates">
             {item.current && <span className="timeline-current-pill">Current</span>}
@@ -80,7 +81,11 @@ function TimelineRow({ item, index, isOpen, onToggle, motionEnabled }) {
               {item.location}
             </span>
           </span>
-          <ChevronDown size={18} className="timeline-chevron" aria-hidden="true" />
+          {/* Visible cue for touch users too; the tooltip adds the same hint on hover/focus */}
+          <span className="timeline-hint">
+            <span className="timeline-hint-text">{isOpen ? 'Hide' : 'Details'}</span>
+            <ChevronDown size={16} className="timeline-chevron" aria-hidden="true" />
+          </span>
         </button>
       </h4>
 

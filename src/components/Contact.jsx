@@ -9,80 +9,113 @@ import {
   Copy,
   Check,
   ArrowUpRight,
+  ArrowRight,
   Github,
   FileText,
-  Inbox,
   MessageCircle,
-  MapPin,
   Code2,
+  Briefcase,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { scrollViewportEarly, fadeInLeftVariant, fadeInRightVariant } from '../config/motion';
+import { scrollViewportEarly, fadeInUpVariant } from '../config/motion';
 import SectionHeader from './SectionHeader';
-import SplitReveal from './SplitReveal';
-import MagneticButton from './MagneticButton';
 
-const SCOPE_CHIPS = [
-  { id: 'agents', label: 'AI Agents / LangGraph', prompt: 'I want to build an autonomous AI agent system to...' },
-  { id: 'rag', label: 'Enterprise RAG', prompt: 'We need a low-latency semantic search & RAG retrieval pipeline for...' },
-  { id: 'backend', label: 'FastAPI Backend', prompt: 'We are looking to develop/scale a production FastAPI/Django REST backend for...' },
-  { id: 'consulting', label: 'Tech Consultation', prompt: 'I would like technical advisory on system design and AI feasibility for...' },
+// Topic chips: pick one to set the email subject and a helpful placeholder
+const TOPICS = [
+  { id: 'agents', label: 'AI agents', placeholder: 'What should the agent automate, and where does it plug in?' },
+  { id: 'rag', label: 'RAG / search', placeholder: 'What data should it search, and who will use it?' },
+  { id: 'backend', label: 'Backend / API', placeholder: 'What are you building, and what stack are you on?' },
+  { id: 'consulting', label: 'Consulting', placeholder: 'What decision or problem would you like a second opinion on?' },
 ];
 
+const tidyUrl = (url) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '').split('?')[0];
+
+/**
+ * One uniform row per channel: icon · label · value · action.
+ * Rows are links (or a button for the Cal.com modal); the email row adds a copy button.
+ */
+function ChannelRow({ icon: Icon, label, value, href, external, onClick, action = 'external', children }) {
+  const ActionIcon = action === 'internal' ? ArrowRight : ArrowUpRight;
+  const content = (
+    <>
+      <span className="ct-row-icon" aria-hidden="true">
+        <Icon size={15} />
+      </span>
+      <span className="ct-row-label">{label}</span>
+      <span className="ct-row-value">{value}</span>
+      {!children && <ActionIcon size={15} className="ct-row-action" aria-hidden="true" />}
+    </>
+  );
+
+  return (
+    <li className={`ct-row${children ? ' has-extra' : ''}`}>
+      {onClick ? (
+        <button type="button" className="ct-row-main" onClick={onClick}>
+          {content}
+        </button>
+      ) : (
+        <a
+          className="ct-row-main"
+          href={href}
+          {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        >
+          {content}
+        </a>
+      )}
+      {children}
+    </li>
+  );
+}
+
 export default function Contact({ motionEnabled = true, onOpenCalModal }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-
-  const [selectedScope, setSelectedScope] = useState(null);
+  const { contact, identity } = siteConfig;
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [topic, setTopic] = useState(null);
   const [errors, setErrors] = useState({});
-  const [copied, setCopied] = useState(false);
-  const [submittedStatus, setSubmittedStatus] = useState(null); // 'sending' | 'success' | null
+  const [emailCopied, setEmailCopied] = useState(false);
+  const [draftCopied, setDraftCopied] = useState(false);
+  const [status, setStatus] = useState(null); // 'sending' | 'success' | 'fallback' | null
 
-  const handleSelectScope = (chip) => {
-    if (selectedScope === chip.id) {
-      setSelectedScope(null);
-      setFormData((prev) => ({
-        ...prev,
-        subject: '',
-      }));
-      return;
+  const activeTopic = TOPICS.find((t) => t.id === topic);
+  const subject = activeTopic
+    ? `[${activeTopic.label}] Project inquiry from ${formData.name || 'portfolio'}`
+    : `Inquiry from ${formData.name || 'portfolio'}`;
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(contact.email);
+      setEmailCopied(true);
+      setTimeout(() => setEmailCopied(false), 1800);
+    } catch {
+      window.location.href = `mailto:${contact.email}`;
     }
-    setSelectedScope(chip.id);
-    setFormData((prev) => ({
-      ...prev,
-      subject: `[${chip.label}] Project Inquiry`,
-      message: prev.message.trim() ? prev.message : chip.prompt,
-    }));
   };
 
   const validate = () => {
     const errs = {};
-    if (!formData.name.trim()) errs.name = 'Please provide your name.';
-    if (!formData.email.trim()) {
-      errs.email = 'Please provide your email address.';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errs.email = 'Please enter a valid email address.';
-    }
-    if (!formData.message.trim()) errs.message = 'Please include a message.';
+    if (!formData.name.trim()) errs.name = 'Please add your name.';
+    if (!formData.email.trim()) errs.email = 'Please add your email.';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errs.email = 'That email doesn’t look right.';
+    if (!formData.message.trim()) errs.message = 'Please add a short message.';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  // Direct submit: sends message via Web3Forms API to akshitsharmacodes@gmail.com
+  const mailBody = () =>
+    `Hello Akshit,\n\nFrom: ${formData.name} (${formData.email})\n${activeTopic ? `Topic: ${activeTopic.label}\n` : ''}\n${formData.message}\n`;
+
+  const triggerMailto = () => {
+    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody())}`;
+  };
+
+  // Sends via Web3Forms; falls back to the visitor's mail app if the request fails
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
-    setSubmittedStatus('sending');
+    setStatus('sending');
 
     const accessKey =
-      import.meta.env.VITE_WEB3FORMS_ACCESS_KEY ||
-      siteConfig.contact.web3formsKey ||
-      '4adaa253-515d-4e65-a0df-ea4f4d7a2041';
+      import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || contact.web3formsKey || '4adaa253-515d-4e65-a0df-ea4f4d7a2041';
 
     try {
       const submission = new FormData();
@@ -90,427 +123,229 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
       submission.append('name', formData.name);
       submission.append('email', formData.email);
       submission.append('from_name', formData.name);
-      submission.append('subject', formData.subject || `Inquiry from ${formData.name} via Portfolio`);
-      submission.append('message', formData.message);
+      submission.append('subject', subject);
+      submission.append('message', activeTopic ? `Topic: ${activeTopic.label}\n\n${formData.message}` : formData.message);
 
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        body: submission,
-      });
-
+      const response = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: submission });
       const data = await response.json();
-
       if (data.success) {
-        setSubmittedStatus('success');
+        setStatus('success');
       } else {
-        // Fallback directly to mailto
         triggerMailto();
-        setSubmittedStatus('fallback');
+        setStatus('fallback');
       }
-    } catch (err) {
-      // In case of offline/network block, trigger mailto directly
+    } catch {
       triggerMailto();
-      setSubmittedStatus('fallback');
+      setStatus('fallback');
     }
   };
 
-  const triggerMailto = () => {
-    const subject = encodeURIComponent(
-      formData.subject || `Inquiry from ${formData.name} via Portfolio`
-    );
-    const body = encodeURIComponent(
-      `Hello Akshit,\n\nFrom: ${formData.name} (${formData.email})\n\nMessage:\n${formData.message}\n`
-    );
-    window.location.href = `mailto:${siteConfig.contact.email}?subject=${subject}&body=${body}`;
-  };
-
-  const handleCopyDraft = () => {
-    if (!validate()) return;
-    const text = `To: ${siteConfig.contact.email}\nSubject: ${
-      formData.subject || `Inquiry from ${formData.name}`
-    }\n\nName: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`;
-
+  const copyDraft = () => {
+    const text = `To: ${contact.email}\nSubject: ${subject}\n\n${mailBody()}`;
     navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
+      setDraftCopied(true);
+      setTimeout(() => setDraftCopied(false), 2500);
     });
   };
 
-  const MotionDiv = motionEnabled ? motion.div : 'div';
+  const resetForm = () => {
+    setStatus(null);
+    setTopic(null);
+    setFormData({ name: '', email: '', message: '' });
+  };
+
+  const field = (key) => ({
+    value: formData[key],
+    onChange: (e) => setFormData({ ...formData, [key]: e.target.value }),
+    'aria-invalid': errors[key] ? 'true' : undefined,
+    'aria-describedby': errors[key] ? `ct-err-${key}` : undefined,
+  });
+
+  const Reveal = motionEnabled ? motion.div : 'div';
+  const revealProps = (delay = 0) =>
+    motionEnabled
+      ? { variants: fadeInUpVariant, custom: delay, initial: 'hidden', whileInView: 'visible', viewport: scrollViewportEarly }
+      : {};
+
+  const direct = [
+    {
+      key: 'call',
+      icon: Calendar,
+      label: 'Book a call',
+      value: '15-min intro on Google Meet',
+      action: 'internal',
+      onClick: onOpenCalModal ? (e) => onOpenCalModal(e.currentTarget) : undefined,
+      href: 'https://cal.com/akshitsharmacodes',
+      external: true,
+    },
+    isValidContent(contact.whatsapp) && {
+      key: 'whatsapp',
+      icon: MessageCircle,
+      label: 'WhatsApp',
+      value: contact.phone || 'Message me',
+      href: contact.whatsapp,
+      external: true,
+    },
+    isValidContent(contact.email) && { key: 'email', icon: Mail, label: 'Email', value: contact.email, href: `mailto:${contact.email}` },
+    isValidContent(contact.phone) && {
+      key: 'phone',
+      icon: Phone,
+      label: 'Phone',
+      value: contact.phone,
+      href: `tel:${contact.phone.replace(/\s+/g, '')}`,
+    },
+  ].filter(Boolean);
+
+  const profiles = [
+    isValidContent(contact.linkedin) && { key: 'linkedin', icon: Linkedin, label: 'LinkedIn', value: tidyUrl(contact.linkedin), href: contact.linkedin },
+    isValidContent(contact.github) && { key: 'github', icon: Github, label: 'GitHub', value: tidyUrl(contact.github), href: contact.github },
+    isValidContent(contact.leetcode) && { key: 'leetcode', icon: Code2, label: 'LeetCode', value: tidyUrl(contact.leetcode), href: contact.leetcode },
+    isValidContent(contact.upwork) && { key: 'upwork', icon: Briefcase, label: 'Upwork', value: 'Hire me on Upwork', href: contact.upwork },
+    isValidContent(identity.resume) && { key: 'resume', icon: FileText, label: 'Resume', value: 'View on Google Drive', href: identity.resume },
+  ]
+    .filter(Boolean)
+    .map((p) => ({ ...p, external: true }));
 
   return (
     <section className="section-padding" id="contact" aria-label="Contact Akshit Sharma">
       <div className="container">
-        <SectionHeader motionEnabled={motionEnabled} tag="Direct Channels" compact />
+        <SectionHeader
+          motionEnabled={motionEnabled}
+          tag="Contact"
+          title="Let’s build something."
+          description="Tell me what you’re working on, or pick the channel that suits you. I usually reply within 24 hours."
+        />
 
-        <div className="contact-grid">
-          {/* Contact Information & Channels */}
-          <MotionDiv
-            className="contact-info-column"
-            variants={motionEnabled ? fadeInLeftVariant : undefined}
-            initial={motionEnabled ? "hidden" : undefined}
-            whileInView={motionEnabled ? "visible" : undefined}
-            viewport={motionEnabled ? scrollViewportEarly : undefined}
-          >
-            <div className="contact-info-header">
-              <div className="contact-status-badge">
-                <span className="contact-status-dot" aria-hidden="true"></span>
-                <span>Available for Immediate Contracts & Full-time Roles</span>
-              </div>
-              <SplitReveal as="h2" className="contact-headline" motionEnabled={motionEnabled} inView stagger={0.07}>
-                Let's Build Something <span className="text-accent">Intelligent.</span>
-              </SplitReveal>
-              <p className="contact-intro-text">
-                Whether deploying multi-agent LLM systems, production RAG pipelines with LangGraph & ChromaDB, or high-throughput async FastAPI services, let's connect directly.
-              </p>
+        <div className="ct-grid">
+          {/* Channels: one format for every row */}
+          <Reveal className="ct-channels" {...revealProps(0)}>
+            <div className="ct-group">
+              <h3 className="ct-group-label">Direct</h3>
+              <ul className="ct-list">
+                {direct.map(({ key, ...row }) =>
+                  key === 'email' ? (
+                    <ChannelRow key={key} {...row}>
+                      <button
+                        type="button"
+                        className="ct-row-copy"
+                        onClick={copyEmail}
+                        aria-label={emailCopied ? 'Email copied' : 'Copy email address'}
+                        title={emailCopied ? 'Copied' : 'Copy email'}
+                      >
+                        {emailCopied ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />}
+                      </button>
+                    </ChannelRow>
+                  ) : (
+                    <ChannelRow key={key} {...row} />
+                  )
+                )}
+              </ul>
             </div>
 
-            {/* Direct Priority Action Cards */}
-            <div className="contact-priority-actions">
-              {/* WhatsApp DM */}
-              {isValidContent(siteConfig.contact.whatsapp) && (
-                <a
-                  href={siteConfig.contact.whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="contact-action-card whatsapp-card"
-                  aria-label="Direct WhatsApp Message to Akshit Sharma"
-                >
-                  <div className="action-card-icon whatsapp-icon">
-                    <MessageCircle size={18} aria-hidden="true" />
-                  </div>
-                  <div className="action-card-text">
-                    <div className="action-card-tag">Fastest Response</div>
-                    <div className="action-card-title">WhatsApp DM</div>
-                    <div className="action-card-sub">+91 7888327471</div>
-                  </div>
-                  <ArrowUpRight size={18} className="action-card-arrow" aria-hidden="true" />
-                </a>
-              )}
-
-              {/* Cal.com Scheduling */}
-              <a
-                href="https://cal.com/akshitsharmacodes"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => {
-                  if (onOpenCalModal) {
-                    e.preventDefault();
-                    onOpenCalModal();
-                  }
-                }}
-                className="contact-action-card cal-card"
-                aria-label="Book a consultation with Akshit Sharma"
-              >
-                <div className="action-card-icon cal-icon" aria-hidden="true">
-                  <Calendar size={18} />
-                </div>
-                <div className="action-card-text">
-                  <div className="action-card-tag">15-Min Discovery</div>
-                  <div className="action-card-title">Book a 1:1 Call</div>
-                  <div className="action-card-sub">Instant Google Meet invite</div>
-                </div>
-                <ArrowUpRight size={18} className="action-card-arrow" aria-hidden="true" />
-              </a>
+            <div className="ct-group">
+              <h3 className="ct-group-label">Profiles</h3>
+              <ul className="ct-list">
+                {profiles.map(({ key, ...row }) => (
+                  <ChannelRow key={key} {...row} />
+                ))}
+              </ul>
             </div>
+          </Reveal>
 
-            {/* Direct Channels Compact Grid */}
-            <div className="contact-details-grid">
-              {isValidContent(siteConfig.contact.email) && (
-                <a
-                  href={`mailto:${siteConfig.contact.email}`}
-                  className="contact-mini-item"
-                  aria-label={`Send email to ${siteConfig.contact.email}`}
-                >
-                  <Mail size={16} className="text-accent flex-shrink-0" aria-hidden="true" />
-                  <div className="mini-item-content">
-                    <span className="mini-item-label">Direct Email</span>
-                    <span className="mini-item-val">{siteConfig.contact.email}</span>
-                  </div>
-                </a>
-              )}
-
-              {isValidContent(siteConfig.contact.phone) && (
-                <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
-                  className="contact-mini-item"
-                  aria-label={`Call ${siteConfig.contact.phone}`}
-                >
-                  <Phone size={16} className="text-accent flex-shrink-0" aria-hidden="true" />
-                  <div className="mini-item-content">
-                    <span className="mini-item-label">Direct Phone</span>
-                    <span className="mini-item-val">{siteConfig.contact.phone}</span>
-                  </div>
-                </a>
-              )}
-
-              <div className="contact-mini-item">
-                <MapPin size={16} className="text-accent flex-shrink-0" aria-hidden="true" />
-                <div className="mini-item-content">
-                  <span className="mini-item-label">Location Base</span>
-                  <span className="mini-item-val">{siteConfig.identity.location} · Remote</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Professional Profiles Dock */}
-            <div className="contact-social-dock">
-              <span className="contact-dock-label">Profiles:</span>
-              <div className="contact-dock-pills">
-                {isValidContent(siteConfig.contact.linkedin) && (
-                  <a
-                    href={siteConfig.contact.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-dock-pill"
-                    aria-label="Visit LinkedIn Profile"
-                  >
-                    <Linkedin size={14} className="text-accent" aria-hidden="true" />
-                    <span>LinkedIn</span>
-                  </a>
-                )}
-
-                {isValidContent(siteConfig.contact.github) && (
-                  <a
-                    href={siteConfig.contact.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-dock-pill"
-                    aria-label="Visit GitHub Profile"
-                  >
-                    <Github size={14} className="text-accent" aria-hidden="true" />
-                    <span>GitHub</span>
-                  </a>
-                )}
-
-                {isValidContent(siteConfig.contact.leetcode) && (
-                  <a
-                    href={siteConfig.contact.leetcode}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-dock-pill"
-                    aria-label="Visit LeetCode Profile"
-                  >
-                    <Code2 size={14} className="text-accent" aria-hidden="true" />
-                    <span>LeetCode</span>
-                  </a>
-                )}
-
-                {isValidContent(siteConfig.identity.resume) && (
-                  <a
-                    href={siteConfig.identity.resume}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="contact-dock-pill"
-                    aria-label="View Resume PDF"
-                  >
-                    <FileText size={14} className="text-accent" aria-hidden="true" />
-                    <span>Resume PDF</span>
-                  </a>
-                )}
-              </div>
-            </div>
-          </MotionDiv>
-
-          {/* Contact Message Composer Form */}
+          {/* Message form */}
           {siteConfig.preferences.showContactForm && (
-            <MotionDiv
-              variants={motionEnabled ? fadeInRightVariant : undefined}
-              initial={motionEnabled ? "hidden" : undefined}
-              whileInView={motionEnabled ? "visible" : undefined}
-              viewport={motionEnabled ? scrollViewportEarly : undefined}
-            >
-              <form className="contact-form" onSubmit={handleSubmit} noValidate>
-                <div className="form-header">
-                  <h3 className="form-title">Send a Message</h3>
-                  <div className="contact-inbox-pill">
-                    <Inbox size={13} className="text-accent" aria-hidden="true" />
-                    <span>Delivered to: <strong>akshitsharmacodes@gmail.com</strong></span>
-                  </div>
-                </div>
+            <Reveal {...revealProps(0.08)}>
+              <form className="ct-form" onSubmit={handleSubmit} noValidate>
+                <h3 className="ct-form-title">Send a message</h3>
 
-                {submittedStatus === 'success' ? (
-                  <div
-                    style={{
-                      padding: '24px',
-                      background: 'var(--signal-soft)',
-                      border: '1px solid var(--signal-border)',
-                      borderRadius: 'var(--radius-md)',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Check size={32} style={{ color: 'var(--signal)', margin: '0 auto 12px' }} aria-hidden="true" />
-                    <h4 style={{ color: 'var(--text)', fontSize: '1.1rem', marginBottom: '6px' }}>
-                      Message Sent Successfully!
-                    </h4>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                      Thank you, <strong>{formData.name || 'there'}</strong>! Your message has been delivered directly to <strong>{siteConfig.contact.email}</strong>. I will get back to you shortly.
-                    </p>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        setSubmittedStatus(null);
-                        setFormData({ name: '', email: '', subject: '', message: '' });
-                      }}
-                    >
-                      Send Another Message
+                {status === 'success' ? (
+                  <div className="ct-state" role="status">
+                    <span className="ct-state-icon is-ok"><Check size={18} aria-hidden="true" /></span>
+                    <h4>Message sent</h4>
+                    <p>Thanks{formData.name ? `, ${formData.name}` : ''}. It’s in my inbox and I’ll get back to you soon.</p>
+                    <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                      Send another message
                     </button>
                   </div>
-                ) : submittedStatus === 'fallback' ? (
-                  <div
-                    style={{
-                      padding: '24px',
-                      background: 'rgba(227, 43, 60, 0.08)',
-                      border: '1px solid rgba(227, 43, 60, 0.3)',
-                      borderRadius: 'var(--radius-md)',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Mail size={32} style={{ color: 'var(--accent)', margin: '0 auto 12px' }} />
-                    <h4 style={{ color: 'var(--text)', fontSize: '1.1rem', marginBottom: '6px' }}>
-                      Opening in Email Application...
-                    </h4>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                      We opened your email client to send to <strong>{siteConfig.contact.email}</strong>. If your mail client did not open automatically, you can send via Gmail webmail or copy the draft:
+                ) : status === 'fallback' ? (
+                  <div className="ct-state" role="status">
+                    <span className="ct-state-icon"><Mail size={18} aria-hidden="true" /></span>
+                    <h4>Opening your email app</h4>
+                    <p>
+                      The form couldn’t send right now, so I’ve opened a pre-filled email to {contact.email}. If nothing
+                      opened, use Gmail or copy the draft.
                     </p>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '16px' }}>
+                    <div className="ct-state-actions">
                       <a
-                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteConfig.contact.email}&su=${encodeURIComponent(formData.subject || `Inquiry from ${formData.name}`)}&body=${encodeURIComponent(`Hello Akshit,\n\nFrom: ${formData.name} (${formData.email})\n\nMessage:\n${formData.message}`)}`}
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody())}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-primary"
-                        style={{ fontSize: '0.85rem', padding: '8px 16px' }}
                       >
-                        Open in Gmail Webmail
+                        Open in Gmail
                       </a>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={handleCopyDraft}
-                        style={{ fontSize: '0.85rem', padding: '8px 16px' }}
-                      >
-                        {copied ? 'Copied!' : 'Copy Draft'}
+                      <button type="button" className="btn btn-secondary" onClick={copyDraft}>
+                        {draftCopied ? 'Copied' : 'Copy draft'}
                       </button>
                     </div>
-                    <button
-                      type="button"
-                      className="btn-ghost"
-                      style={{ fontSize: '0.8rem', cursor: 'pointer' }}
-                      onClick={() => setSubmittedStatus(null)}
-                    >
-                      Return to Form
+                    <button type="button" className="btn-link" onClick={() => setStatus(null)}>
+                      Back to the form
                     </button>
                   </div>
                 ) : (
                   <>
-                    <div className="contact-scope-selector">
-                      <label className="form-label" style={{ marginBottom: '8px', display: 'block' }}>
-                        Project Scope (Tap to pre-fill inquiry)
-                      </label>
-                      <div className="scope-chips-row">
-                        {SCOPE_CHIPS.map((chip) => (
-                          <button
-                            key={chip.id}
-                            type="button"
-                            className={`scope-chip-btn ${selectedScope === chip.id ? 'active' : ''}`}
-                            onClick={() => handleSelectScope(chip)}
-                          >
-                            <span>{chip.label}</span>
-                          </button>
-                        ))}
+                    <div className="ct-row-2">
+                      <div className="ct-field">
+                        <label htmlFor="ct-name">Name</label>
+                        <input id="ct-name" type="text" autoComplete="name" placeholder="Your name" {...field('name')} />
+                        {errors.name && <span id="ct-err-name" className="ct-error">{errors.name}</span>}
+                      </div>
+                      <div className="ct-field">
+                        <label htmlFor="ct-email">Email</label>
+                        <input id="ct-email" type="email" autoComplete="email" placeholder="you@company.com" {...field('email')} />
+                        {errors.email && <span id="ct-err-email" className="ct-error">{errors.email}</span>}
                       </div>
                     </div>
 
-                    <div className="form-group">
-                      <label htmlFor="contact-name" className="form-label">
-                        Your Name *
-                      </label>
-                      <input
-                        id="contact-name"
-                        type="text"
-                        className="form-input"
-                        placeholder="e.g. Sarah Jenkins"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      />
-                      {errors.name && <span className="form-error">{errors.name}</span>}
-                    </div>
+                    <fieldset className="ct-field ct-topics">
+                      <legend>What do you need?</legend>
+                      <div className="ct-chips">
+                        {TOPICS.map((t) => (
+                          <button
+                            key={t.id}
+                            type="button"
+                            className={`ct-chip${topic === t.id ? ' is-active' : ''}`}
+                            aria-pressed={topic === t.id}
+                            onClick={() => setTopic(topic === t.id ? null : t.id)}
+                          >
+                            {t.label}
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
 
-                    <div className="form-group">
-                      <label htmlFor="contact-email" className="form-label">
-                        Your Email *
-                      </label>
-                      <input
-                        id="contact-email"
-                        type="email"
-                        className="form-input"
-                        placeholder="e.g. sarah@company.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      />
-                      {errors.email && <span className="form-error">{errors.email}</span>}
-                    </div>
-
-                    <div className="form-group">
-                      <label htmlFor="contact-subject" className="form-label">
-                        Subject (Optional)
-                      </label>
-                      <input
-                        id="contact-subject"
-                        type="text"
-                        className="form-input"
-                        placeholder="e.g. AI Engineering Collaboration"
-                        value={formData.subject}
-                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label htmlFor="contact-message" className="form-label">
-                        Project or Opportunity Details *
-                      </label>
+                    <div className="ct-field">
+                      <label htmlFor="ct-message">Message</label>
                       <textarea
-                        id="contact-message"
-                        className="form-textarea"
-                        placeholder="Describe your requirements, timeline, or engineering role..."
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      ></textarea>
-                      {errors.message && <span className="form-error">{errors.message}</span>}
+                        id="ct-message"
+                        rows={5}
+                        placeholder={activeTopic ? activeTopic.placeholder : 'A few lines about the project, timeline or role.'}
+                        {...field('message')}
+                      />
+                      {errors.message && <span id="ct-err-message" className="ct-error">{errors.message}</span>}
                     </div>
 
-                    <div className="form-actions">
-                      <MagneticButton
-                        as="button"
-                        motionEnabled={motionEnabled}
-                        strength={0.18}
-                        type="submit"
-                        className="btn btn-primary form-submit"
-                        disabled={submittedStatus === 'sending'}
-                      >
-                        <Send size={16} aria-hidden="true" />
-                        <span>{submittedStatus === 'sending' ? 'Sending…' : 'Send Message'}</span>
-                      </MagneticButton>
-
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={handleCopyDraft}
-                        title="Copy drafted message to clipboard"
-                      >
-                        {copied ? <Check size={16} className="text-accent" /> : <Copy size={16} />}
-                        <span>{copied ? 'Copied!' : 'Copy Draft'}</span>
+                    <div className="ct-submit">
+                      <button type="submit" className="btn btn-primary" disabled={status === 'sending'}>
+                        <Send size={15} aria-hidden="true" />
+                        <span>{status === 'sending' ? 'Sending…' : 'Send message'}</span>
                       </button>
+                      <span className="ct-note">Goes straight to my inbox.</span>
                     </div>
-
-                    <p className="form-feedback-note">
-                      Your message is delivered straight to <strong>{siteConfig.contact.email}</strong>.
-                    </p>
                   </>
                 )}
               </form>
-            </MotionDiv>
+            </Reveal>
           )}
         </div>
       </div>
