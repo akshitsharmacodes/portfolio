@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import ClientEngine from './components/ClientEngine';
 import ProjectGrid from './components/ProjectGrid';
-import ProjectDialog from './components/ProjectDialog';
 import About from './components/About';
 import Skills from './components/Skills';
 import Experience from './components/Experience';
@@ -12,12 +11,17 @@ import Awards from './components/Awards';
 import Ventures from './components/Ventures';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import CalModal from './components/CalModal';
-import CommandMenu from './components/CommandMenu';
 import { siteConfig } from './config/site';
 import { projects } from './data/projects';
+import CtaBand from './components/CtaBand';
+import Process from './components/Process';
+import { DEFAULT_PALETTE, PALETTE_KEY, THEME_CHOICE_KEY, isPalette } from './config/palettes';
+import { Analytics } from '@vercel/analytics/react';
 
-const THEME_KEY = 'akshit-portfolio-theme';
+// Lazily load heavy modals to keep the initial page bundle lean and fast
+const ProjectDialog = lazy(() => import('./components/ProjectDialog'));
+const CommandMenu = lazy(() => import('./components/CommandMenu'));
+const CalModal = lazy(() => import('./components/CalModal'));
 const MOTION_KEY = siteConfig.appearance.storageKeyMotion;
 
 function readStorage(key) {
@@ -39,11 +43,17 @@ function writeStorage(key, value) {
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export default function App() {
-  // Theme: the inline script in index.html already applied it before first paint
+  // Theme: the inline script in index.html already applied it before first paint.
+  // Without an explicit choice it follows the OS colour scheme (live).
   const [theme, setTheme] = useState(() => {
     const applied = document.documentElement.getAttribute('data-theme');
     if (applied === 'light' || applied === 'dark') return applied;
-    return readStorage(THEME_KEY) === 'light' ? 'light' : 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  const [palette, setPaletteState] = useState(() => {
+    const applied = document.documentElement.getAttribute('data-palette');
+    return isPalette(applied) ? applied : DEFAULT_PALETTE;
   });
 
   // Motion: an explicit choice from the header toggle wins; otherwise follow the OS setting
@@ -56,17 +66,26 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const dialogOpenerRef = useRef(null);
 
-  // Sync theme on <html> + browser UI color
+  // Sync theme + palette on <html> and the browser UI colour
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
+    root.setAttribute('data-palette', palette);
     root.classList.remove('dark', 'light');
     root.classList.add(theme);
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', theme === 'light' ? '#ffffff' : '#0a0a0a');
-    writeStorage(THEME_KEY, theme);
-  }, [theme]);
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    if (bg) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bg);
+  }, [theme, palette]);
+
+  // Follow live OS colour-scheme changes until the visitor picks a theme
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (e) => {
+      if (readStorage(THEME_CHOICE_KEY) === null) setTheme(e.matches ? 'dark' : 'light');
+    };
+    query.addEventListener?.('change', onChange);
+    return () => query.removeEventListener?.('change', onChange);
+  }, []);
 
   // Reflect motion state on <html> (CSS uses it to stop keyframe animations).
   // Persisting happens only in toggleMotion, so an untouched OS preference is never overwritten.
@@ -87,7 +106,17 @@ export default function App() {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      writeStorage(THEME_CHOICE_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const setPalette = useCallback((id) => {
+    if (!isPalette(id)) return;
+    setPaletteState(id);
+    writeStorage(PALETTE_KEY, id);
   }, []);
 
   const toggleMotion = useCallback(() => {
@@ -155,15 +184,30 @@ export default function App() {
           motionEnabled={motionEnabled}
           onToggleMotion={toggleMotion}
           onOpenCommand={openCommand}
+          palette={palette}
+          onSetPalette={setPalette}
+          onOpenCalModal={openCalModal}
         />
 
         <main id="main-content" tabIndex={-1}>
-          <Hero motionEnabled={motionEnabled} onOpenCalModal={openCalModal} />
+          <Hero
+            motionEnabled={motionEnabled}
+            onOpenCalModal={openCalModal}
+            onOpenCommand={openCommand}
+            onToggleTheme={toggleTheme}
+            onToggleMotion={toggleMotion}
+            palette={palette}
+            theme={theme}
+          />
 
           {/* Services / Hire Me */}
           <ClientEngine motionEnabled={motionEnabled} />
 
+          <Process motionEnabled={motionEnabled} />
+
           <ProjectGrid projects={projects} motionEnabled={motionEnabled} onSelectProject={openProject} />
+
+          <CtaBand onOpenCalModal={openCalModal} />
 
           <About motionEnabled={motionEnabled} />
 
@@ -178,49 +222,56 @@ export default function App() {
           <Contact motionEnabled={motionEnabled} onOpenCalModal={openCalModal} />
         </main>
 
-        <Footer motionEnabled={motionEnabled} onToggleMotion={toggleMotion} />
+        <Footer motionEnabled={motionEnabled} onToggleMotion={toggleMotion} onOpenCalModal={openCalModal} />
 
         {/* Project case-study dialog (enter + exit animations) */}
-        <AnimatePresence>
-          {selectedProject && (
-            <ProjectDialog
-              key={selectedProject.id}
-              project={selectedProject}
-              onClose={closeProject}
-              returnFocusTo={dialogOpenerRef.current}
-              motionEnabled={motionEnabled}
-            />
-          )}
-        </AnimatePresence>
+        <Suspense fallback={null}>
+          <AnimatePresence>
+            {selectedProject && (
+              <ProjectDialog
+                key={selectedProject.id}
+                project={selectedProject}
+                onClose={closeProject}
+                returnFocusTo={dialogOpenerRef.current}
+                motionEnabled={motionEnabled}
+              />
+            )}
+          </AnimatePresence>
 
-        <AnimatePresence>
-          {commandOpen && (
-            <CommandMenu
-              key="command-menu"
-              onClose={closeCommand}
-              returnFocusTo={commandOpenerRef.current}
-              theme={theme}
-              onToggleTheme={toggleTheme}
-              motionEnabled={motionEnabled}
-              onToggleMotion={toggleMotion}
-              onOpenCalModal={openCalModal}
-            />
-          )}
-        </AnimatePresence>
+          <AnimatePresence>
+            {commandOpen && (
+              <CommandMenu
+                key="command-menu"
+                onClose={closeCommand}
+                returnFocusTo={commandOpenerRef.current}
+                theme={theme}
+                onToggleTheme={toggleTheme}
+                motionEnabled={motionEnabled}
+                onToggleMotion={toggleMotion}
+                onOpenCalModal={openCalModal}
+                palette={palette}
+                onSetPalette={setPalette}
+              />
+            )}
+          </AnimatePresence>
 
-        {/* Cal.com embedded scheduling dialog */}
-        <AnimatePresence>
-          {calModalOpen && (
-            <CalModal
-              key="cal-modal"
-              isOpen={calModalOpen}
-              onClose={closeCalModal}
-              returnFocusTo={calOpenerRef.current}
-              theme={theme}
-              motionEnabled={motionEnabled}
-            />
-          )}
-        </AnimatePresence>
+          {/* Cal.com embedded scheduling dialog */}
+          <AnimatePresence>
+            {calModalOpen && (
+              <CalModal
+                key="cal-modal"
+                isOpen={calModalOpen}
+                onClose={closeCalModal}
+                returnFocusTo={calOpenerRef.current}
+                theme={theme}
+                motionEnabled={motionEnabled}
+              />
+            )}
+          </AnimatePresence>
+        </Suspense>
+
+        {/* Vercel Web Analytics */}
+        <Analytics />
       </div>
     </>
   );

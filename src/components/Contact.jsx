@@ -5,7 +5,7 @@ import {
   Phone,
   Linkedin,
   Calendar,
-  Send,
+  ArrowUp,
   Copy,
   Check,
   ArrowUpRight,
@@ -95,6 +95,12 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
   const [emailCopied, setEmailCopied] = useState(false);
   const [draftCopied, setDraftCopied] = useState(false);
   const [status, setStatus] = useState(null); // 'sending' | 'success' | 'fallback' | null
+
+  // 0 → 1 as the form fills: name, a valid email, and a message of a sentence or so
+  const readiness =
+    (formData.name.trim() ? 0.25 : 0) +
+    (/\S+@\S+\.\S+/.test(formData.email) ? 0.25 : 0) +
+    Math.min(formData.message.trim().length / 60, 1) * 0.5;
 
   const activeTopic = TOPICS.find((t) => t.id === topic);
   const subject = activeTopic
@@ -284,7 +290,7 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
                     <span className="ct-state-icon is-ok"><Check size={18} aria-hidden="true" /></span>
                     <h4>Message sent</h4>
                     <p>Thanks{formData.name ? `, ${formData.name}` : ''}. It’s in my inbox and I’ll get back to you soon.</p>
-                    <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                    <button type="button" className="btn btn-secondary btn-liquid-glass" onClick={resetForm}>
                       Send another message
                     </button>
                   </div>
@@ -301,11 +307,14 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
                         href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody())}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-primary"
+                        className="btn btn-primary glow-ring-btn"
                       >
-                        Open in Gmail
+                        <span className="glow-ring-disc" aria-hidden="true">
+                          <Mail size={14} />
+                        </span>
+                        <span>Open in Gmail</span>
                       </a>
-                      <button type="button" className="btn btn-secondary" onClick={copyDraft}>
+                      <button type="button" className="btn btn-secondary btn-liquid-glass" onClick={copyDraft}>
                         {draftCopied ? 'Copied' : 'Copy draft'}
                       </button>
                     </div>
@@ -361,8 +370,16 @@ export default function Contact({ motionEnabled = true, onOpenCalModal }) {
                     </div>
 
                     <div className="ct-submit">
-                      <button type="submit" className="btn btn-primary" disabled={status === 'sending'}>
-                        <Send size={15} aria-hidden="true" />
+                      {/* Send Halo: the halo brightens as the form fills, so the button shows it's ready */}
+                      <button
+                        type="submit"
+                        className={`btn btn-primary glow-ring-btn send-halo${readiness >= 1 ? ' is-ready' : ''}`}
+                        style={{ '--ready': readiness }}
+                        disabled={status === 'sending'}
+                      >
+                        <span className="glow-ring-disc send-halo-disc" aria-hidden="true">
+                          <ArrowUp size={15} strokeWidth={2.4} />
+                        </span>
                         <span>{status === 'sending' ? 'Sending…' : 'Send message'}</span>
                       </button>
                       <span className="ct-note">Goes straight to my inbox.</span>

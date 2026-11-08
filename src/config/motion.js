@@ -16,16 +16,16 @@ export const easeCurves = {
   curtain: [0.76, 0, 0.24, 1],
 };
 
-// Section-level reveals: fire once ~20% of the element is on screen
+// Section-level reveals: play when ~20% is on screen, and reverse when it scrolls back out
 export const scrollViewport = {
-  once: true,
+  once: false,
   amount: 0.2,
   margin: '0px 0px -8% 0px',
 };
 
 // Cards and grids: fire a little earlier so rows don't feel late
 export const scrollViewportEarly = {
-  once: true,
+  once: false,
   amount: 0.12,
   margin: '0px 0px -4% 0px',
 };

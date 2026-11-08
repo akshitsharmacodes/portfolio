@@ -33,7 +33,7 @@ export default function ProjectCard({ project, onSelect, motionEnabled, delayInd
   return (
     <CardWrapper
       ref={cardRef}
-      className="project-card"
+      className="project-card showcase-card"
       onMouseMove={handleMouseMove}
       variants={motionEnabled ? cardRevealVariant : undefined}
       custom={delayIndex * 0.09}
@@ -53,6 +53,20 @@ export default function ProjectCard({ project, onSelect, motionEnabled, delayInd
             <ProjectGlyph kind={visual.glyph} />
           </GlyphLayer>
           <span className="visual-ribbon">{visual.eyebrow}</span>
+
+          {/* Showcase: title over a progressively blurred foot; hover / focus opens the case-study summary */}
+          <div className="showcase-blur" aria-hidden="true" />
+          <div className="showcase-panel">
+            <span className="showcase-kicker">Overview</span>
+            <p className="showcase-summary">{project.summary}</p>
+            <div className="showcase-chips" aria-label="Technologies used">
+              {project.tools.map((tool) => (
+                <span key={tool} className="tech-tag">
+                  {tool}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="visual-accent-line" aria-hidden="true"></div>
       </div>
@@ -82,20 +96,10 @@ export default function ProjectCard({ project, onSelect, motionEnabled, delayInd
           <span className="project-card-role">{project.role}</span>
         </div>
 
-        <p className="project-card-summary">{project.summary}</p>
-
-        <div className="project-card-tags" aria-label="Technologies used">
-          {project.tools.map((tool) => (
-            <span key={tool} className="tech-tag">
-              {tool}
-            </span>
-          ))}
-        </div>
-
         <div className="project-card-footer">
           <button
             type="button"
-            className="btn btn-secondary card-action-btn"
+            className="btn btn-secondary btn-liquid-glass card-action-btn"
             onClick={(e) => onSelect(project, e.currentTarget)}
             aria-label={`View architecture and details for ${project.title}`}
             aria-haspopup="dialog"

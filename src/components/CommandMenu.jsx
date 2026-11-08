@@ -14,12 +14,14 @@ import {
   Briefcase,
   Sun,
   Moon,
+  Palette,
   Pause,
   Play,
   Search,
   CornerDownLeft,
 } from 'lucide-react';
 import { siteConfig, isValidContent } from '../config/site';
+import { PALETTES } from '../config/palettes';
 
 const SECTIONS = [
   { id: 'hire-me', label: 'Services', show: true },
@@ -42,6 +44,8 @@ export default function CommandMenu({
   returnFocusTo,
   theme,
   onToggleTheme,
+  palette,
+  onSetPalette,
   motionEnabled,
   onToggleMotion,
   onOpenCalModal,
@@ -114,6 +118,16 @@ export default function CommandMenu({
             keepOpen: true,
             run: onToggleTheme,
           },
+          ...(onSetPalette
+            ? PALETTES.map((p) => ({
+                id: `palette-${p.id}`,
+                label: `Palette: ${p.label}${palette === p.id ? ' (current)' : ''}`,
+                icon: Palette,
+                keywords: `palette colour color theme ${p.id} ${p.label}`,
+                keepOpen: true,
+                run: () => onSetPalette(p.id),
+              }))
+            : []),
           {
             id: 'motion',
             label: motionEnabled ? 'Turn animations off' : 'Turn animations on',
@@ -151,7 +165,7 @@ export default function CommandMenu({
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, motionEnabled, copied]);
+  }, [theme, motionEnabled, copied, palette, onSetPalette]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

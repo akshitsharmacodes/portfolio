@@ -17,6 +17,9 @@ export const siteConfig = {
     availability: "Available for Hire · Contract & Freelance Projects",
     headline: "I build AI agents that eliminate repetitive work.",
     headlineAccent: "eliminate repetitive work.",
+    // One-line version of the intro for the centred eclipse hero
+    heroLine:
+      "Bring me the process that eats your team's time. I'll turn it into an AI agent or RAG system that runs in production, with code you fully own.",
     intro:
       "Hi, I'm Akshit Sharma, an AI engineer from Chandigarh, India. Bring me the process that eats up your team's time, and I'll turn it into an AI agent or RAG system that works in production, with a clear plan, weekly progress updates and code you fully own. Currently building AI products at LeadManch.",
     about:

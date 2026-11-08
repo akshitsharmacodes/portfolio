@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "check": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vite build && surge ./dist akshit-sharma.surge.sh"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
@@ -19,6 +21,7 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "surge": "^0.56.0",
     "vite": "^6.1.0"
   }
 }

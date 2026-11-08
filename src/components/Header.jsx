@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { siteConfig, isValidContent } from '../config/site';
-import { Menu, X, ArrowUpRight, ArrowRight, Github, FileText, Sun, Moon, MessageCircle, Pause, Play, Search } from 'lucide-react';
+import PalettePicker, { PaletteRow } from './PalettePicker';
+import MorphMenu, { MORPH_PANELS } from './MorphMenu';
+import { Menu, X, ArrowUpRight, ArrowRight, Calendar, Github, FileText, Sun, Moon, MessageCircle } from 'lucide-react';
 
 // Secondary sections highlight the nearest desktop link, so the active pill never disappears mid-page
-const PRIMARY_FOR = { skills: 'about', awards: 'experience', 'side-hustles': 'experience' };
+const PRIMARY_FOR = { process: 'hire-me', skills: 'about', awards: 'about', experience: 'about', 'side-hustles': 'about' };
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
@@ -33,22 +35,7 @@ function NavProgress({ motionEnabled }) {
 }
 
 // Page order (used for scroll-spy); nav labels/visibility come from site config
-const SECTION_IDS = ['hire-me', 'work', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
-
-function MotionToggle({ motionEnabled, onToggleMotion, size = 15 }) {
-  return (
-    <button
-      type="button"
-      className={`motion-toggle-btn${motionEnabled ? '' : ' is-paused'}`}
-      onClick={onToggleMotion}
-      aria-label="Reduce motion"
-      aria-pressed={!motionEnabled}
-      title={motionEnabled ? 'Pause animations' : 'Resume animations'}
-    >
-      {motionEnabled ? <Pause size={size} aria-hidden="true" /> : <Play size={size} aria-hidden="true" />}
-    </button>
-  );
-}
+const SECTION_IDS = ['hire-me', 'process', 'work', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
 
 export default function Header({
   theme,
@@ -56,21 +43,45 @@ export default function Header({
   motionEnabled,
   onToggleMotion,
   onOpenCommand,
+  palette,
+  onSetPalette,
+  onOpenCalModal,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
+  // Morph dropdown: which panel is open, with a short grace period so the pointer can travel to it
+  const [morphId, setMorphId] = useState(null);
+  const morphTimer = useRef(0);
+  const openMorph = (id) => {
+    clearTimeout(morphTimer.current);
+    setMorphId(MORPH_PANELS.includes(id) ? id : null);
+  };
+  const keepMorph = () => clearTimeout(morphTimer.current);
+  const closeMorph = (delay = 180) => {
+    clearTimeout(morphTimer.current);
+    morphTimer.current = setTimeout(() => setMorphId(null), delay);
+  };
+  useEffect(() => () => clearTimeout(morphTimer.current), []);
+  useEffect(() => {
+    if (!morphId) return undefined;
+    const onKey = (e) => e.key === 'Escape' && setMorphId(null);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [morphId]);
   const menuTriggerRef = useRef(null);
   const drawerCloseRef = useRef(null);
   const wasOpenRef = useRef(false);
 
-  // Scroll state + scroll-spy (rAF-throttled)
+  // Scroll state + scroll-spy (rAF-throttled) with smooth hysteresis
   useEffect(() => {
     let frame = 0;
     const update = () => {
       frame = 0;
-      setScrolled(window.scrollY > 30);
-      const probe = window.scrollY + 220;
+      const y = window.scrollY;
+      // Hysteresis: morph to capsule at > 24px, seamlessly return to top bar at <= 8px
+      setScrolled((prev) => (prev ? y > 8 : y > 24));
+      const probe = y + 220;
       let current = '';
       for (const sectionId of SECTION_IDS) {
         const el = document.getElementById(sectionId);
@@ -144,10 +155,11 @@ export default function Header({
   const navLinks = [
     // `primary` links appear in the desktop bar; every link appears in the mobile drawer
     { label: 'Services', href: '#hire-me', id: 'hire-me', show: true, primary: true },
+    { label: 'Process', href: '#process', id: 'process', show: true },
     { label: 'Work', href: '#work', id: 'work', show: true, primary: true },
     { label: 'About', href: '#about', id: 'about', show: true, primary: true },
     { label: 'Skills', href: '#skills', id: 'skills', show: true },
-    { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience, primary: true },
+    { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience },
     { label: 'Recognition', href: '#awards', id: 'awards', show: siteConfig.preferences.showAwards },
     { label: 'Ventures', href: '#side-hustles', id: 'side-hustles', show: siteConfig.preferences.showVentures },
     { label: 'Contact', href: '#contact', id: 'contact', show: true, primary: true },
@@ -160,7 +172,14 @@ export default function Header({
         <div className="header-glass-dock">
           <BrandMark />
 
-          <nav className="desktop-only nav-center" aria-label="Main navigation">
+          <nav
+            className="desktop-only nav-center"
+            aria-label="Main navigation"
+            onMouseLeave={() => closeMorph()}
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget)) closeMorph(0);
+            }}
+          >
             <ul className="nav-dock-list">
               {desktopLinks.map((link) => {
                 const isActive = (PRIMARY_FOR[activeSection] || activeSection) === link.id;
@@ -168,8 +187,11 @@ export default function Header({
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className={`nav-dock-link ${isActive ? 'active' : ''}`}
+                      className={`nav-dock-link ${isActive ? 'active' : ''}${morphId === link.id ? ' is-morph' : ''}`}
                       aria-current={isActive ? 'location' : undefined}
+                      onMouseEnter={() => openMorph(link.id)}
+                      onFocus={() => openMorph(link.id)}
+                      onClick={() => setMorphId(null)}
                     >
                       {isActive &&
                         (motionEnabled ? (
@@ -187,21 +209,19 @@ export default function Header({
                 );
               })}
             </ul>
+            <MorphMenu
+              openId={morphId}
+              motionEnabled={motionEnabled}
+              onPointerEnter={keepMorph}
+              onPointerLeave={() => closeMorph()}
+              onNavigate={() => setMorphId(null)}
+              onOpenCalModal={onOpenCalModal}
+            />
           </nav>
 
           <div className="dock-actions">
-            {onOpenCommand && (
-              <button
-                type="button"
-                className="nav-command-btn desktop-only"
-                onClick={(e) => onOpenCommand(e.currentTarget)}
-                aria-label="Open command menu"
-                aria-keyshortcuts={isMac ? 'Meta+K' : 'Control+K'}
-              >
-                <Search size={14} aria-hidden="true" />
-                <kbd>{isMac ? '⌘' : 'Ctrl'}</kbd>
-                <kbd>K</kbd>
-              </button>
+            {onSetPalette && (
+              <PalettePicker palette={palette} onSetPalette={onSetPalette} motionEnabled={motionEnabled} />
             )}
 
             <button
@@ -214,10 +234,17 @@ export default function Header({
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
-            <a href="#contact" className="nav-cta-btn desktop-only">
-              <span>Get in touch</span>
-              <ArrowRight size={14} aria-hidden="true" />
-            </a>
+            {/* Glow Ring: an iridescent ring orbits the icon disc and settles on hover */}
+            <button
+              type="button"
+              className="nav-cta-btn glow-ring-btn desktop-only"
+              onClick={(e) => (onOpenCalModal ? onOpenCalModal(e.currentTarget) : (window.location.hash = '#contact'))}
+            >
+              <span className="glow-ring-disc" aria-hidden="true">
+                <Calendar size={13} />
+              </span>
+              <span>Book a call</span>
+            </button>
 
             <button
               ref={menuTriggerRef}
@@ -252,7 +279,6 @@ export default function Header({
               <BrandMark onClick={() => setMobileMenuOpen(false)} />
 
               <div className="mobile-drawer-controls">
-                <MotionToggle motionEnabled={motionEnabled} onToggleMotion={onToggleMotion} size={17} />
                 <button
                   type="button"
                   className="theme-toggle-btn"
@@ -291,13 +317,17 @@ export default function Header({
             </ul>
 
             <div className="mobile-drawer-bottom">
+              {onSetPalette && <PaletteRow palette={palette} onSetPalette={onSetPalette} />}
+
               <a
                 href="#contact"
-                className="btn btn-primary mobile-drawer-cta"
+                className="btn btn-primary glow-ring-btn mobile-drawer-cta"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <span className="glow-ring-disc" aria-hidden="true">
+                  <ArrowRight size={14} />
+                </span>
                 <span>Get in Touch</span>
-                <ArrowRight size={16} aria-hidden="true" />
               </a>
 
               {isValidContent(siteConfig.identity.resume) && (
@@ -305,7 +335,7 @@ export default function Header({
                   href={siteConfig.identity.resume}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary mobile-drawer-cta"
+                  className="btn btn-secondary btn-liquid-glass mobile-drawer-cta"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <FileText size={16} aria-hidden="true" />

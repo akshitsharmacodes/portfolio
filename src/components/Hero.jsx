@@ -1,41 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { ArrowUpRight, Calendar } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Calendar, Sun, Moon, Pause, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { easeCurves } from '../config/motion';
+import MeshFlow from './MeshFlow';
+import FocusHeadline from './FocusHeadline';
+import EclipseArc from './EclipseArc';
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+// Tech marquee under the hero (✦ separators come from CSS)
+const STACK = ['Python', 'LangGraph', 'LangChain', 'RAG', 'FastAPI', 'Django', 'PostgreSQL', 'pgvector', 'Redis', 'OpenAI', 'Claude', 'Docker'];
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: easeCurves.luxuryDecel } },
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeCurves.luxuryDecel } },
 };
 
-const panelVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay: 0.25, ease: easeCurves.luxuryDecel, staggerChildren: 0.14, delayChildren: 0.55 },
-  },
-};
-
-const nodeVariants = {
-  hidden: { opacity: 0, y: 6 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: easeCurves.luxuryDecel } },
-};
-
-// Illustrative semantic-search hits for the example query (the panel is labelled "Architecture")
-const RAG_HITS = [
-  { doc: 'api-keys.md', score: 0.92 },
-  { doc: 'sso-admin-guide.pdf', score: 0.87 },
-  { doc: 'ticket-4821.json', score: 0.81 },
-];
-
-// True once the index.html preloader has lifted (or immediately when it was skipped)
+// True once the index.html intro loader has lifted (or immediately when it was skipped)
 function usePreloaderDone() {
   const [done, setDone] = useState(() => typeof window === 'undefined' || Boolean(window.__preloaderDone));
   useEffect(() => {
@@ -49,87 +36,25 @@ function usePreloaderDone() {
 }
 
 /**
- * RAG pipeline, drawn as one slim timeline: query → embed → semantic search (top-k hits)
- * → LLM → grounded answer. A single data dot travels down the rail (CSS, off with motion off).
+ * Eclipse hero (after the reel's "ZYNO" layout): a glowing palette-coloured arc rises
+ * behind one giant centred headline, a single line of copy and two buttons; proof
+ * metrics and the tech marquee sit underneath. Mesh Flow grid behind everything.
  */
-const RAG_STEPS = [
-  { name: 'Query', meta: '“rotate api keys?”' },
-  { name: 'Embed', meta: '1536-d vector' },
-  { name: 'Semantic search', meta: 'pgvector · top-k 3', hits: true },
-  { name: 'LLM', meta: 'prompt + context' },
-  { name: 'Grounded answer', meta: '3 citations', done: true },
-];
-
-function RagDiagram({ motionEnabled, ready }) {
-  const Panel = motionEnabled ? motion.figure : 'figure';
-  const Step = motionEnabled ? motion.li : 'li';
-  const panelProps = motionEnabled
-    ? { variants: panelVariants, initial: 'hidden', animate: ready ? 'visible' : 'hidden' }
-    : {};
-  const stepProps = motionEnabled ? { variants: nodeVariants } : {};
-
-  return (
-    <Panel
-      className="rag"
-      aria-label="RAG architecture: a user query is embedded, matched by semantic search in a vector database, and the retrieved context is passed to an LLM to produce a grounded answer."
-      {...panelProps}
-    >
-      <figcaption className="rag-head">
-        <span>RAG pipeline</span>
-        <span className="rag-head-meta">architecture</span>
-      </figcaption>
-
-      <div className="rag-body">
-        <span className="rag-rail" aria-hidden="true"><i /></span>
-        <ol className="rag-steps">
-        {RAG_STEPS.map((step) => (
-          <Step key={step.name} className={`rag-step${step.done ? ' is-done' : ''}`} {...stepProps}>
-            <span className="rag-node-dot" aria-hidden="true" />
-            <div className="rag-step-row">
-              <span className="rag-step-name">{step.name}</span>
-              <span className="rag-step-meta">{step.meta}</span>
-            </div>
-            {step.hits && (
-              <ul className="rag-hits">
-                {RAG_HITS.map((hit) => (
-                  <li key={hit.doc} className="rag-hit">
-                    <span className="rag-hit-doc">{hit.doc}</span>
-                    <span className="rag-hit-bar" aria-hidden="true">
-                      <span style={{ '--score': hit.score }} />
-                    </span>
-                    <span className="rag-hit-score">{hit.score.toFixed(2)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Step>
-        ))}
-        </ol>
-      </div>
-    </Panel>
-  );
-}
-
-/**
- * Hero: message + actions on the left, a concrete "what I build" visual on the right,
- * proof strip across the full width below.
- */
-export default function Hero({ motionEnabled, onOpenCalModal }) {
-  const { identity, specialties, metrics } = siteConfig;
+export default function Hero({
+  motionEnabled,
+  onOpenCalModal,
+  onOpenCommand,
+  onToggleTheme,
+  onToggleMotion,
+  theme,
+  palette,
+}) {
+  const { identity, metrics } = siteConfig;
   const headlineLead = identity.headline.replace(identity.headlineAccent, '').trim();
   const ready = usePreloaderDone();
-
-  // "Scroll down to view work" cue: appears 1s after the intro starts (immediately with motion off)
-  const [showCue, setShowCue] = useState(!motionEnabled);
-  useEffect(() => {
-    if (!motionEnabled) {
-      setShowCue(true);
-      return undefined;
-    }
-    if (!ready) return undefined;
-    const timer = setTimeout(() => setShowCue(true), 1000);
-    return () => clearTimeout(timer);
-  }, [ready, motionEnabled]);
+  // "Available for Hire · Contract & Freelance Projects": the second half hides on phones
+  const [availMain, ...rest] = identity.availability.split(' · ');
+  const availMore = rest.join(' · ');
 
   const Wrap = motionEnabled ? motion.div : 'div';
   const Item = motionEnabled ? motion.div : 'div';
@@ -139,81 +64,149 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
   const itemProps = motionEnabled ? { variants: itemVariants } : {};
 
   return (
-    <section className="hero-section" id="hero" aria-label="Introduction">
-      <div className="hero-backdrop" aria-hidden="true" />
-      <div className="container">
-        <div className="hero-grid">
-          <Wrap className="hero-content" {...wrapProps}>
-            <Item {...itemProps}>
-              <a href="#contact" className="hero-status">
-                <span className="status-dot" aria-hidden="true" />
-                <span>{identity.availability}</span>
-              </a>
-            </Item>
+    <section className="hero-section hero--eclipse" id="hero" aria-label="Introduction">
+      <MeshFlow motionEnabled={motionEnabled} />
+      <EclipseArc motionEnabled={motionEnabled} ready={ready} />
 
-            <Item {...itemProps}>
-              <h1 className="hero-title">
-                {/* Name stays in the h1 for search and screen readers; the page already shows it in the nav */}
-                <span className="sr-only">{identity.fullName}, {identity.profession}: </span>
-                <span className="hero-headline">
-                  {headlineLead} <span className="hero-headline-accent">{identity.headlineAccent}</span>
+      <div className="container hero-eclipse-inner">
+        <Wrap className="hero-eclipse-content" {...wrapProps}>
+          <Item {...itemProps}>
+            <a href="#contact" className="hero-status">
+              <span className="status-dot" aria-hidden="true" />
+              <span>
+                {availMain}
+                {availMore && <span className="hero-status-more"> · {availMore}</span>}
+              </span>
+            </a>
+          </Item>
+
+          <Item {...itemProps}>
+            <h1 className="hero-title">
+              {/* Name stays in the h1 for search and screen readers; the nav already shows it */}
+              <span className="sr-only">{identity.fullName}, {identity.profession}: </span>
+              <FocusHeadline
+                lead={headlineLead}
+                accent={identity.headlineAccent}
+                motionEnabled={motionEnabled}
+                ready={ready}
+              />
+            </h1>
+          </Item>
+
+          <Item {...itemProps}>
+            <p className="hero-intro">{identity.heroLine || identity.intro}</p>
+          </Item>
+
+          <Item {...itemProps}>
+            <div className="hero-actions">
+              <button
+                type="button"
+                onClick={(e) => onOpenCalModal?.(e.currentTarget)}
+                className="btn btn-primary glow-ring-btn"
+              >
+                <span className="glow-ring-disc" aria-hidden="true">
+                  <Calendar size={15} />
                 </span>
-              </h1>
-            </Item>
+                <span>Book a discovery call</span>
+              </button>
+              <a href="#work" className="btn btn-secondary btn-liquid-glass">
+                <span>See my work</span>
+                <ArrowDown size={15} aria-hidden="true" />
+              </a>
+            </div>
+            {isValidContent(identity.resume) && (
+              <a
+                href={identity.resume}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-link hero-resume"
+                aria-label="View resume (opens Google Drive)"
+              >
+                <span>or view my resume</span>
+                <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            )}
+          </Item>
 
-            <Item {...itemProps}>
-              <p className="hero-intro">{identity.intro}</p>
-            </Item>
+          {/* Elegant Prompt Ribbon (Revealed after preloader finishes & home screen loads) */}
+          <Item
+            {...(motionEnabled
+              ? {
+                  variants: {
+                    hidden: { opacity: 0, y: 10 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.6, delay: 0.35, ease: easeCurves.luxuryDecel },
+                    },
+                  },
+                }
+              : {})}
+          >
+            <div className="hero-quick-tips" role="region" aria-label="Quick navigation and shortcuts">
+              <span className="hero-quick-tip-hint">
+                <span className="hero-tip-spark" aria-hidden="true">✦</span>
+                <span className="hero-tip-text">Quick actions:</span>
+              </span>
 
-            <Item {...itemProps}>
-              <div className="hero-actions">
+              {onOpenCommand && (
                 <button
                   type="button"
-                  onClick={(e) => onOpenCalModal?.(e.currentTarget)}
-                  className="btn btn-primary"
+                  className="hero-quick-tip-btn"
+                  onClick={(e) => onOpenCommand(e.currentTarget)}
+                  title="Open command palette (Ctrl+K / ⌘K)"
+                  aria-label="Open command palette"
                 >
-                  <Calendar size={16} aria-hidden="true" />
-                  <span>Book a discovery call</span>
+                  <kbd className="hero-tip-kbd">{isMac ? '⌘K' : 'Ctrl+K'}</kbd>
+                  <span>to navigate</span>
                 </button>
-                {isValidContent(identity.resume) && (
-                  <a
-                    href={identity.resume}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-link"
-                    aria-label="View resume (opens Google Drive)"
+              )}
+
+              {onToggleTheme && (
+                <>
+                  <span className="hero-quick-tip-divider" aria-hidden="true">·</span>
+                  <button
+                    type="button"
+                    className="hero-quick-tip-btn"
+                    onClick={onToggleTheme}
+                    title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                    aria-label="Toggle theme"
                   >
-                    <span>Resume</span>
-                    <ArrowUpRight size={14} aria-hidden="true" />
-                  </a>
-                )}
-              </div>
-              <a href="#work" className={`hero-work-cue${showCue ? ' is-visible' : ''}`}>
-                <span className="hero-work-cue-line" aria-hidden="true" />
-                <span>Scroll down to view work</span>
-              </a>
-            </Item>
+                    <span className="hero-tip-icon" aria-hidden="true">
+                      {theme === 'dark' ? <Sun size={12} /> : <Moon size={12} />}
+                    </span>
+                    <span>toggle theme</span>
+                  </button>
+                </>
+              )}
 
-            <Item {...itemProps}>
-              <div className="hero-meta">
-                <ul className="hero-stack" aria-label="Core stack">
-                  {specialties.slice(0, 4).map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-            </Item>
-          </Wrap>
-
-          <RagDiagram motionEnabled={motionEnabled} ready={ready} />
-        </div>
+              {onToggleMotion && (
+                <>
+                  <span className="hero-quick-tip-divider desktop-only" aria-hidden="true">·</span>
+                  <button
+                    type="button"
+                    className="hero-quick-tip-btn desktop-only"
+                    onClick={onToggleMotion}
+                    title={motionEnabled ? 'Pause animations & motion' : 'Resume animations & motion'}
+                    aria-label="Toggle motion on/off"
+                  >
+                    <span className="hero-tip-icon" aria-hidden="true">
+                      {motionEnabled ? <Pause size={12} /> : <Play size={12} />}
+                    </span>
+                    <span>motion {motionEnabled ? 'on' : 'off'}</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </Item>
+        </Wrap>
 
         <Item
           {...(motionEnabled
             ? {
-                initial: { opacity: 0, y: 10 },
-                animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 },
-                transition: { duration: 0.6, delay: ready ? 0.55 : 0, ease: easeCurves.luxuryDecel },
+                initial: { opacity: 0, y: 14 },
+                animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
+                transition: { duration: 0.7, delay: ready ? 0.75 : 0, ease: easeCurves.luxuryDecel },
               }
             : {})}
         >
@@ -227,6 +220,22 @@ export default function Hero({ motionEnabled, onOpenCalModal }) {
             ))}
           </dl>
         </Item>
+
+        <div className="stack-marquee" role="group" aria-label="Core stack">
+          <div className="stack-marquee-track">
+            <ul>
+              {STACK.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+            {/* Second copy makes the loop seamless; hidden from assistive tech */}
+            <ul aria-hidden="true">
+              {STACK.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   );

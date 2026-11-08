@@ -2,6 +2,7 @@ import React from 'react';
 import { siteConfig, isValidContent } from '../config/site';
 import { Zap, Bot, Database, Server, ArrowUpRight, Calendar, CheckCircle2, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ServiceTabs from './ServiceTabs';
 import { scrollViewportEarly, cardRevealVariant, luxuryTransition } from '../config/motion';
 import SectionHeader from './SectionHeader';
 import MagneticButton from './MagneticButton';
@@ -75,41 +76,8 @@ export default function ClientEngine({ motionEnabled = true }) {
           description="I help founders, tech leaders, and fast-growing businesses turn technical bottlenecks into scalable AI products, automated workflows, and robust backends."
         />
 
-        {/* 4 service pillars: 4-up / 2×2 / stacked, never 3+1 */}
-        <div className="client-pillars-grid">
-          {clientPillars.map((pillar, index) => {
-            const Icon = pillar.icon;
-            return (
-              <MotionDiv
-                key={pillar.title}
-                className="client-pillar-card interactive-hover-card"
-                variants={motionEnabled ? cardRevealVariant : undefined}
-                custom={index * 0.08}
-                initial={motionEnabled ? 'hidden' : undefined}
-                whileInView={motionEnabled ? 'visible' : undefined}
-                viewport={motionEnabled ? scrollViewportEarly : undefined}
-              >
-                <div className="client-pillar-top">
-                  <div className="client-pillar-icon-box">
-                    <Icon size={20} aria-hidden="true" />
-                  </div>
-                  <span className="client-pillar-num" aria-hidden="true">{pillar.num}</span>
-                </div>
-
-                <h3 className="client-pillar-title">{pillar.title}</h3>
-                <p className="client-pillar-desc">{pillar.desc}</p>
-
-                <div className="client-pillar-tags">
-                  {pillar.tags.map((tag) => (
-                    <span key={tag} className="tech-tag">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </MotionDiv>
-            );
-          })}
-        </div>
+        {/* Interactive service tabs with live architecture scenes */}
+        <ServiceTabs items={clientPillars} motionEnabled={motionEnabled} />
 
         {/* Hire banner */}
         <MotionDiv
@@ -159,7 +127,7 @@ export default function ClientEngine({ motionEnabled = true }) {
                   href={siteConfig.contact.whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-secondary"
+                  className="btn btn-secondary btn-liquid-glass"
                   title="Direct WhatsApp message"
                 >
                   <MessageCircle size={16} className="icon-whatsapp" aria-hidden="true" />
@@ -171,7 +139,7 @@ export default function ClientEngine({ motionEnabled = true }) {
                 href="https://cal.com/akshitsharmacodes"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-secondary"
+                className="btn btn-secondary btn-liquid-glass"
               >
                 <Calendar size={16} aria-hidden="true" />
                 <span>Book 15-Min Call</span>

@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en" class="dark" data-theme="dark">
+<html lang="en" class="light" data-theme="light" data-palette="crimson">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary Meta Tags -->
-    <title>Akshit Sharma | Python & AI Developer Portfolio · GenAI, Agents & RAG</title>
-    <meta name="title" content="Akshit Sharma | Python & AI Developer Portfolio · GenAI, Agents & RAG" />
-    <meta name="description" content="Interactive developer portfolio of Akshit Sharma — Python & AI/ML engineer building autonomous agents, LangGraph systems, RAG pipelines, and production software. Winner of the Smart India Hackathon 2025 internal round at Amity University." />
+    <title>Akshit Sharma | AI Agent &amp; RAG Developer for Hire</title>
+    <meta name="title" content="Akshit Sharma | AI Agent &amp; RAG Developer for Hire" />
+    <meta name="description" content="AI engineer building production AI agents, RAG pipelines and LangGraph workflows in Python and FastAPI. Book a free scoping call with Akshit Sharma." />
     <meta name="keywords" content="best developer portfolio, Python developer, Python developer portfolio, AI developer, LangGraph, LangChain, RAG systems, AI agents, FastAPI, full stack developer, Akshit Sharma" />
     <meta name="author" content="Akshit Sharma" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -23,13 +23,27 @@
       (function () {
         var root = document.documentElement;
         try {
-          var stored = localStorage.getItem('akshit-portfolio-theme');
-          var theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+          // Theme follows the OS until the visitor picks one with the toggle
+          var stored = localStorage.getItem('akshit-portfolio-theme-choice');
+          var osDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored === 'light' || stored === 'dark' ? stored : osDark ? 'dark' : 'light';
           root.setAttribute('data-theme', theme);
           root.className = theme;
-          if (theme === 'light') {
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
-          }
+
+          var palette = localStorage.getItem('akshit-portfolio-palette');
+          if (!/^(crimson|cobalt|lime|orange)$/.test(palette || '')) palette = 'crimson';
+          root.setAttribute('data-palette', palette);
+
+          var bgs = {
+            'crimson-light': '#faf8f5', 'crimson-dark': '#0b0a0a',
+            'cobalt-light': '#f7f8fa', 'cobalt-dark': '#070a14',
+            'lime-light': '#f4f4ef', 'lime-dark': '#0b0b0a',
+            'orange-light': '#fbf7f2', 'orange-dark': '#0d0a08'
+          };
+          root.style.setProperty('--pl-page', bgs[palette + '-' + theme]);
+          var accents = { crimson: '#d7263d', cobalt: '#2f5bff', lime: '#7da30a', orange: '#ff5a1f' };
+          root.style.setProperty('--pl-accent', accents[palette]);
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', bgs[palette + '-' + theme]);
 
           var motion = localStorage.getItem('akshit-portfolio-motion');
           var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -50,8 +64,8 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://akshitsharma.dev/" />
     <meta property="og:site_name" content="Akshit Sharma | Developer Portfolio" />
-    <meta property="og:title" content="Akshit Sharma | Python & AI Developer Portfolio" />
-    <meta property="og:description" content="Explore the interactive developer portfolio of Akshit Sharma — Python & AI/ML engineer building autonomous agents, RAG pipelines, and full-stack systems." />
+    <meta property="og:title" content="Akshit Sharma | AI Agent &amp; RAG Developer for Hire" />
+    <meta property="og:description" content="AI engineer building production AI agents, RAG pipelines and LangGraph workflows in Python and FastAPI. Book a free scoping call with Akshit Sharma." />
     <meta property="og:image" content="https://akshitsharma.dev/og-preview.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -61,8 +75,8 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://akshitsharma.dev/" />
-    <meta name="twitter:title" content="Akshit Sharma | Python & AI Developer Portfolio" />
-    <meta name="twitter:description" content="Explore the interactive developer portfolio of Akshit Sharma — Python & AI/ML engineer building autonomous agents, RAG pipelines, and full-stack systems." />
+    <meta name="twitter:title" content="Akshit Sharma | AI Agent &amp; RAG Developer for Hire" />
+    <meta name="twitter:description" content="AI engineer building production AI agents, RAG pipelines and LangGraph workflows in Python and FastAPI. Book a free scoping call with Akshit Sharma." />
     <meta name="twitter:image" content="https://akshitsharma.dev/og-preview.png" />
     <meta name="twitter:image:alt" content="Akshit Sharma - Python & AI Developer Portfolio" />
 
@@ -70,125 +84,167 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
-    <!-- Google Fonts: Geist (UI + display), Geist Mono (meta) -->
+    <!-- Google Fonts: Geist (UI + display), Geist Mono (meta), Caveat (accent) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
 
-    <!-- Preloader ("counter + curtain") styles: inline so they apply on the very first frame -->
+    <!-- Intro loader styles: inline so they apply on the very first frame -->
     <style>
       html.is-preloading { overflow: hidden; }
       html[data-preload='skip'] .preloader { display: none; }
       .preloader {
-        --pl-bg: #0a0a0a;
+        --pl-bg: var(--pl-page, #0a0a0a);
         --pl-fg: #ededed;
         --pl-dim: rgba(237, 237, 237, 0.5);
-        --pl-line: rgba(237, 237, 237, 0.14);
+        --pl-card: rgba(237, 237, 237, 0.06);
+        --pl-line: rgba(237, 237, 237, 0.12);
         --pl-ease: cubic-bezier(0.76, 0, 0.24, 1);
         position: fixed;
         inset: 0;
         z-index: 100000;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: clamp(20px, 4vw, 48px);
-        background: var(--pl-bg);
+        overflow: hidden;
         color: var(--pl-fg);
         font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         -webkit-font-smoothing: antialiased;
-        will-change: transform;
-        transition: transform 850ms var(--pl-ease);
       }
       html[data-theme='light'] .preloader {
-        --pl-bg: #ffffff;
-        --pl-fg: #0a0a0a;
-        --pl-dim: rgba(10, 10, 10, 0.5);
-        --pl-line: rgba(10, 10, 10, 0.12);
+        --pl-fg: #141414;
+        --pl-dim: rgba(20, 20, 20, 0.5);
+        --pl-card: rgba(20, 20, 20, 0.045);
+        --pl-line: rgba(20, 20, 20, 0.1);
       }
-      /* Curtain: the whole screen slides up */
-      .preloader.is-leaving { transform: translateY(-100%); }
+      /* The two halves the screen splits into */
+      .pl-half {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 50.5%;
+        background: var(--pl-bg);
+        transition: transform 900ms var(--pl-ease);
+      }
+      .pl-half.top { top: 0; }
+      .pl-half.bottom { bottom: 0; }
+      .preloader.is-leaving .pl-half.top { transform: translateY(-100%); }
+      .preloader.is-leaving .pl-half.bottom { transform: translateY(100%); }
 
-      .pl-top,
-      .pl-bottom {
-        display: flex;
-        justify-content: space-between;
-        gap: 24px;
-        transition: opacity 400ms ease, transform 600ms var(--pl-ease);
-      }
-      .pl-top { align-items: flex-start; }
-      .pl-bottom { align-items: flex-end; }
-      .preloader.is-leaving .pl-top,
-      .preloader.is-leaving .pl-bottom { opacity: 0; transform: translateY(-24px); }
-
-      .pl-mask { display: block; overflow: hidden; }
-      .pl-mask > span {
-        display: block;
-        animation: plRise 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
-      }
-      .pl-name { font-size: clamp(15px, 1.5vw, 18px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.35; }
-      .pl-role { font-size: clamp(13px, 1.2vw, 15px); color: var(--pl-dim); line-height: 1.4; }
-      .pl-role > span { animation-delay: 80ms; }
-      .pl-meta {
-        font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 12px;
-        color: var(--pl-dim);
-        text-align: right;
-        line-height: 1.6;
-      }
-      .pl-meta > span { animation-delay: 140ms; }
-
-      .pl-bottom-left { display: flex; flex-direction: column; gap: 14px; flex: 1; min-width: 0; padding-bottom: 0.6em; }
-      .pl-track { position: relative; width: min(420px, 100%); height: 1px; background: var(--pl-line); overflow: hidden; }
-      .pl-fill {
+      .pl-stage {
         position: absolute;
         inset: 0;
-        background: var(--pl-fg);
-        transform: scaleX(0);
-        transform-origin: left center;
+        display: grid;
+        place-items: center;
+        transition: opacity 260ms ease;
       }
-      .pl-place .pl-mask > span { animation-delay: 200ms; }
+      .preloader.is-leaving .pl-stage,
+      .preloader.is-leaving .pl-col,
+      .preloader.is-leaving .pl-hint { opacity: 0; transition: opacity 220ms ease; }
 
-      .pl-count {
+      /* Title card: name builds in word by word, then the role line ticks in under it */
+      .pl-tagline {
         display: flex;
-        align-items: flex-start;
-        font-size: clamp(88px, 17vw, 220px);
-        font-weight: 500;
-        line-height: 0.78;
-        letter-spacing: -0.065em;
-        font-variant-numeric: tabular-nums;
-        overflow: hidden;
-        padding-top: 0.04em;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(14px, 2vw, 22px);
+        max-width: 92vw;
+        text-align: center;
+        transition: opacity 380ms ease, transform 600ms var(--pl-ease), filter 400ms ease;
       }
-      .pl-count > span { animation: plRise 900ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both; }
-      .pl-pct {
-        margin: 0.12em 0 0 0.08em;
-        font-size: 0.16em;
-        letter-spacing: 0;
+      .pl-name {
+        margin: 0;
+        font-size: clamp(44px, 9vw, 120px);
+        font-weight: 700;
+        line-height: 0.95;
+        letter-spacing: -0.055em;
+        white-space: nowrap;
+      }
+      .pl-role {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin: 0;
+        font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: clamp(11px, 1.2vw, 13px);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .pl-role > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border: 1px solid var(--pl-line);
+        border-radius: 999px;
         color: var(--pl-dim);
       }
+      .pl-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--pl-accent, #e5484d);
+      }
+      .pl-name > span,
+      .pl-role > span {
+        display: inline-block;
+        opacity: 0;
+        transform: translateY(0.35em);
+        filter: blur(6px);
+        animation: plWord 560ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: calc(var(--i) * 110ms + 120ms);
+      }
+      .pl-role > span { display: inline-flex; transform: translateY(8px); }
+
+      /* Cards stream up both sides */
+      .pl-col {
+        position: absolute;
+        top: 0;
+        width: clamp(96px, 12vw, 150px);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        transform: translateY(100vh);
+        animation: plStream 2600ms cubic-bezier(0.3, 0.1, 0.3, 1) forwards;
+      }
+      .pl-col.left { left: clamp(16px, 4vw, 56px); }
+      .pl-col.right { right: clamp(16px, 4vw, 56px); animation-delay: 160ms; }
+      .pl-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        aspect-ratio: 4 / 5;
+        padding: 10px;
+        border: 1px solid var(--pl-line);
+        border-radius: 14px;
+        background: var(--pl-card);
+        font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 11px;
+        color: var(--pl-dim);
+      }
+      .pl-card b { font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 600; color: var(--pl-fg); }
+      .pl-card.hot { background: var(--pl-accent, #e5484d); border-color: transparent; color: rgba(255, 255, 255, 0.8); }
+      .pl-card.hot b { color: #fff; }
       .pl-hint {
         position: absolute;
         left: 50%;
-        bottom: clamp(20px, 4vw, 48px);
+        bottom: clamp(20px, 4vw, 40px);
         transform: translateX(-50%);
+        margin: 0;
         font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-size: 11px;
         color: var(--pl-dim);
         opacity: 0;
-        animation: plFade 600ms ease 700ms forwards;
+        animation: plFade 600ms ease 900ms forwards;
         white-space: nowrap;
       }
-      @keyframes plRise { from { transform: translateY(105%); } to { transform: none; } }
+      @keyframes plWord { to { opacity: 1; transform: none; filter: none; } }
+      @keyframes plStream { to { transform: translateY(-110%); } }
       @keyframes plFade { to { opacity: 0.8; } }
-      @media (max-width: 600px) {
-        .pl-meta, .pl-hint { display: none; }
-        .pl-bottom { flex-direction: column-reverse; align-items: flex-start; gap: 20px; }
-        .pl-bottom-left { width: 100%; padding-bottom: 0; }
-        .pl-track { width: 100%; }
+      @media (max-width: 640px) {
+        .pl-col, .pl-hint { display: none; }
       }
     </style>
     <noscript><style>.preloader { display: none; } html.is-preloading { overflow: auto; }</style></noscript>
@@ -225,13 +281,36 @@
             }
           },
           {
+            "@type": "ProfessionalService",
+            "@id": "https://akshitsharma.dev/#service",
+            "name": "Akshit Sharma: AI agent and RAG development",
+            "url": "https://akshitsharma.dev/",
+            "image": "https://akshitsharma.dev/og-preview.png",
+            "provider": { "@id": "https://akshitsharma.dev/#person" },
+            "founder": { "@id": "https://akshitsharma.dev/#person" },
+            "areaServed": "Worldwide",
+            "address": { "@type": "PostalAddress", "addressLocality": "Chandigarh", "addressCountry": "IN" },
+            "email": "akshitsharmacodes@gmail.com",
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "AI engineering services",
+              "itemListElement": [
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Autonomous AI agents and workflows", "description": "Multi-agent systems with LangGraph and LangChain that automate repetitive business processes." } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Enterprise RAG and semantic retrieval", "description": "Retrieval-augmented generation pipelines over company documents with vector search and cited answers." } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Production backend engineering", "description": "FastAPI and Django backends with PostgreSQL and Redis." } },
+                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "MVP to production delivery", "description": "Taking an AI prototype to a maintainable production system." } }
+              ]
+            }
+          },
+          {
             "@type": "Person",
             "@id": "https://akshitsharma.dev/#person",
             "name": "Akshit Sharma",
             "alternateName": ["akshitsharmacodes", "Akshit"],
             "url": "https://akshitsharma.dev/",
             "image": "https://akshitsharma.dev/og-preview.png",
-            "jobTitle": "Python & AI/ML Developer",
+            "jobTitle": "AI Engineer (AI Agents & RAG)",
+            "address": { "@type": "PostalAddress", "addressLocality": "Chandigarh", "addressCountry": "IN" },
             "description": "AI/ML developer building LLM-powered products, agentic workflows, and RAG systems with Python, LangGraph, FastAPI, and Django.",
             "hasOccupation": [
               {
@@ -295,31 +374,56 @@
         ]
       }
     </script>
+
+    <!-- Google Tag Manager & Google Analytics 4 (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C03K4ZTYVD"></script>
+    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KDH7KZ88"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      function gtag(){ window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', 'G-C03K4ZTYVD', { page_path: window.location.pathname });
+    </script>
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDH7KZ88" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="preloader" id="preloader" aria-hidden="true">
-      <div class="pl-top">
-        <div>
-          <span class="pl-mask pl-name"><span>Akshit Sharma</span></span>
-          <span class="pl-mask pl-role"><span>AI/ML Developer</span></span>
-        </div>
-        <div class="pl-mask pl-meta"><span>Portfolio<br />© 2026</span></div>
+      <div class="pl-half top"></div>
+      <div class="pl-half bottom"></div>
+      <div class="pl-col left">
+        <div class="pl-card"><span>01</span><b>Agents</b></div>
+        <div class="pl-card hot"><span>rag</span><b>Retrieval</b></div>
+        <div class="pl-card"><span>py</span><b>FastAPI</b></div>
+        <div class="pl-card"><span>db</span><b>pgvector</b></div>
+        <div class="pl-card"><span>05</span><b>Evals</b></div>
       </div>
-      <div class="pl-bottom">
-        <div class="pl-bottom-left">
-          <span class="pl-track"><span class="pl-fill" id="pl-fill"></span></span>
-          <span class="pl-place pl-meta" style="text-align: left"><span class="pl-mask"><span>Chandigarh, IN</span></span></span>
+      <div class="pl-col right">
+        <div class="pl-card"><span>graph</span><b>LangGraph</b></div>
+        <div class="pl-card"><span>llm</span><b>Claude</b></div>
+        <div class="pl-card hot"><span>ship</span><b>Production</b></div>
+        <div class="pl-card"><span>cache</span><b>Redis</b></div>
+        <div class="pl-card"><span>ops</span><b>Docker</b></div>
+      </div>
+      <div class="pl-stage">
+        <div class="pl-tagline">
+          <p class="pl-name"><span style="--i: 0">Akshit</span> <span style="--i: 1">Sharma</span></p>
+          <p class="pl-role">
+            <span style="--i: 3"><i class="pl-dot"></i>AI Engineer</span>
+            <span style="--i: 4">Agents &amp; RAG</span>
+            <span style="--i: 5">Chandigarh, IN</span>
+          </p>
         </div>
-        <div class="pl-count"><span id="pl-count">0</span><span class="pl-pct">%</span></div>
       </div>
       <p class="pl-hint">press any key to skip</p>
     </div>
     <script>
       /*
-        Counter + curtain preloader: a 0→100 counter and a hairline progress line run for ~1.6s
-        (holding near the end until the page has loaded), then the screen slides up like a
-        curtain and the hero animates in underneath. Plays on every load; skipped with motion
-        off (see the pre-paint script). Any key / click / tap jumps straight to the curtain.
+        Intro loader: a name + role title card builds in word by word (CSS) while cards
+        stream up both sides, then the screen splits open onto the page. About 2.1s; waits for
+        the page load if needed; skipped with motion off; any key / click / tap jumps to the split.
       */
       (function () {
         var el = document.getElementById('preloader');
@@ -335,59 +439,51 @@
           return;
         }
 
-        var countEl = document.getElementById('pl-count');
-        var fillEl = document.getElementById('pl-fill');
-        var DURATION = 1450;   // counter run time (ms); the curtain adds ~0.85s on top, mostly overlapping the hero entrance
-        var HOLD_AT = 0.9;     // if the page is still loading, the counter waits here
         var loaded = document.readyState === 'complete';
-        var start = null;
+        var minDone = false;
         var leaving = false;
-        var raf = 0;
-
-        if (!loaded) window.addEventListener('load', function () { loaded = true; });
-
-        // easeInOutCubic: slow start, quick middle, gentle landing on 100
-        function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-
-        function render(p) {
-          countEl.textContent = String(Math.round(p * 100));
-          fillEl.style.transform = 'scaleX(' + p + ')';
-        }
 
         function leave() {
           if (leaving) return;
           leaving = true;
-          cancelAnimationFrame(raf);
           window.removeEventListener('keydown', leave, true);
           window.removeEventListener('pointerdown', leave, true);
-          render(1);
           el.classList.add('is-leaving');
           root.classList.remove('is-preloading');
-          // Start the hero entrance as the curtain begins to lift, so they overlap
-          setTimeout(finish, 180);
-          setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 950);
+          // Start the hero entrance as the halves part, so they overlap
+          setTimeout(finish, 220);
+          setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1000);
         }
+        function maybeLeave() { if (minDone && loaded) leave(); }
+        if (!loaded) window.addEventListener('load', function () { loaded = true; maybeLeave(); });
 
-        function tick(now) {
-          if (start === null) start = now;
-          var t = Math.min((now - start) / DURATION, 1);
-          var p = ease(t);
-          if (!loaded && p > HOLD_AT) p = HOLD_AT;
-          render(p);
-          if (p >= 1) {
-            setTimeout(leave, 160);
-            return;
-          }
-          raf = requestAnimationFrame(tick);
-        }
-
-        raf = requestAnimationFrame(tick);
+        setTimeout(function () { minDone = true; maybeLeave(); }, 2050);
         window.addEventListener('keydown', leave, true);
         window.addEventListener('pointerdown', leave, true);
         setTimeout(leave, 4500);
       })();
     </script>
     <div id="root"></div>
+    <noscript>
+      <main style="max-width: 680px; margin: 48px auto; padding: 0 16px; font-family: Geist, system-ui, sans-serif">
+        <h1>Akshit Sharma, AI engineer: I build AI agents that eliminate repetitive work.</h1>
+        <p>AI engineer from Chandigarh, India, building production AI agents, RAG pipelines and LangGraph workflows with Python, FastAPI and Django.</p>
+        <h2>Services</h2>
+        <ul>
+          <li>Autonomous AI agents and workflows</li>
+          <li>Enterprise RAG and semantic retrieval</li>
+          <li>Production backend engineering</li>
+          <li>MVP to production delivery</li>
+        </ul>
+        <h2>Contact</h2>
+        <p>
+          <a href="mailto:akshitsharmacodes@gmail.com">akshitsharmacodes@gmail.com</a> ·
+          <a href="https://cal.com/akshitsharmacodes">Book a call</a> ·
+          <a href="https://www.linkedin.com/in/akshitsharmacodes">LinkedIn</a> ·
+          <a href="https://github.com/akshitsharmacodes">GitHub</a>
+        </p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
