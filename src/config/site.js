@@ -25,7 +25,7 @@ export const siteConfig = {
     about:
       "I work at the intersection of AI engineering and backend development: designing multi-agent workflows with LangChain and LangGraph, building RAG pipelines, and integrating LLMs into real applications. I started in the Indian Army as a Gentleman Cadet at the Officers Training Academy, Gaya (Technical Entry Scheme, TES-48, 2022-2024), after clearing the Services Selection Board. That training shaped how I make decisions under pressure and lead teams. I then moved into computer science and AI/ML at Amity University. I care about solutions that are practical, production-ready and maintainable.",
     portrait: "", // blank => strong typographic hero, no portrait
-    resume: "https://drive.google.com/file/d/1Mh6jHs3Itk818LOrLuyLDyQyHJsScBcZ/view",
+    resume: "https://drive.google.com/file/d/1UMoXOqMcGk80ot_mm0m3MTga9wvjo-j_/view",
     favicon: "Generate a simple 'AS' initials icon (accent colour on near-black)",
   },
 
