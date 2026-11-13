@@ -20,6 +20,8 @@ export const siteConfig = {
     headlineAccent: "grow your business.",
     heroLine:
       "Gentle Tech Labs is a founder-led studio from Chandigarh. We design and ship AI agents, chatbots, fast websites, SEO and AI-search (AEO) for clients across India and worldwide, with weekly demos and code you own.",
+    heroLineMobile:
+      "We build production AI agents, fast websites and search visibility. Weekly demos, zero lock-in.",
     founderNote: "Led by Akshit Sharma, AI engineer and founder. Specialists join per project.",
     // Working hours note for overseas clients
     timezoneNote:

@@ -95,7 +95,10 @@ export default function Hero({
           </Item>
 
           <Item {...itemProps}>
-            <p className="hero-intro">{agency.heroLine}</p>
+            <p className="hero-intro">
+              <span className="hero-intro-desktop">{agency.heroLine}</span>
+              <span className="hero-intro-mobile">{agency.heroLineMobile || agency.heroLine}</span>
+            </p>
           </Item>
 
           <Item {...itemProps}>
@@ -116,7 +119,8 @@ export default function Hero({
               </Link>
             </div>
             <Link to="/recruiters" className="btn-link hero-resume">
-              <span>Hiring for a role? See Akshit's resume</span>
+              <span className="hero-resume-desktop">Hiring for a role? See Akshit's resume</span>
+              <span className="hero-resume-mobile">For recruiters & hiring</span>
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           </Item>

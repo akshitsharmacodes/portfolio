@@ -1523,6 +1523,11 @@ html[data-theme='light'] .cmdk-overlay {
   text-wrap: pretty;
 }
 
+.hero-intro-mobile,
+.hero-resume-mobile {
+  display: none;
+}
+
 .hero-actions {
   gap: 10px;
   margin: 0 0 32px;
@@ -1916,7 +1921,7 @@ html[data-motion='off'] .rag-hit-bar span {
 /* Proof strip */
 .metrics-strip {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   margin: 0;
   padding: 0;
@@ -2407,12 +2412,78 @@ html[data-motion='off'] .rag-hit-bar span {
    -------------------------------------------------------------------------- */
 @media (max-width: 800px) {
   .metrics-strip {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     padding: 0;
   }
   .metric-item + .metric-item {
     border-left: none;
-    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-intro-desktop,
+  .hero-resume-desktop {
+    display: none;
+  }
+  .hero-intro-mobile,
+  .hero-resume-mobile {
+    display: inline;
+  }
+  .hero-intro {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 420px;
+    margin: 14px auto 0;
+  }
+  .metrics-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0 !important;
+    margin-top: 22px;
+    padding: 0 !important;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .metrics-strip .metric-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 13px 14px !important;
+    gap: 3px;
+    border: none !important;
+    border-top: none !important;
+    border-left: none !important;
+    margin: 0;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  .metrics-strip .metric-item:nth-child(1),
+  .metrics-strip .metric-item:nth-child(2) {
+    border-bottom: 1px solid var(--border) !important;
+  }
+  .metrics-strip .metric-item:nth-child(odd) {
+    border-right: 1px solid var(--border) !important;
+  }
+  .metrics-strip .metric-detail {
+    display: none !important;
+  }
+  .metrics-strip .metric-value {
+    font-size: clamp(1.35rem, 5vw, 1.55rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+    order: 0;
+  }
+  .metrics-strip .metric-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    line-height: 1.25;
+    order: 1;
+    margin: 0;
   }
 }
 
@@ -2427,10 +2498,6 @@ html[data-motion='off'] .rag-hit-bar span {
   }
   .hero-headline {
     font-size: clamp(2.1rem, 9.5vw, 2.6rem);
-  }
-  .hero-intro {
-    font-size: 0.98rem;
-    line-height: 1.5;
   }
   .hero-quick-tips {
     border-radius: 14px;
