@@ -4,6 +4,7 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import FrostTransition from './components/FrostTransition';
+import ScrollSpeedDial from './components/ScrollSpeedDial';
 import Seo from './components/Seo';
 import HomePage from './pages/HomePage';
 import ServicePage from './pages/ServicePage';
@@ -262,6 +263,8 @@ export default function App() {
         </main>
 
         <Footer motionEnabled={motionEnabled} onToggleMotion={toggleMotion} onOpenCalModal={openCalModal} />
+
+        <ScrollSpeedDial motionEnabled={motionEnabled} />
 
         {/* Project case-study dialog (enter + exit animations) */}
         <Suspense fallback={null}>

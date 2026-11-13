@@ -244,7 +244,7 @@ export default function Header({
               className="theme-toggle-btn"
               onClick={onToggleTheme}
               aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              data-tooltip={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
@@ -254,6 +254,7 @@ export default function Header({
               href="/recruiters"
               className={`nav-recruiter-link desktop-only${pathname === '/recruiters' ? ' is-active' : ''}`}
               aria-current={pathname === '/recruiters' ? 'page' : undefined}
+              data-tooltip="For recruiters & hiring managers"
             >
               <BriefcaseBusiness size={14} aria-hidden="true" />
               <span>For recruiters</span>
@@ -264,6 +265,7 @@ export default function Header({
               type="button"
               className="nav-cta-btn glow-ring-btn desktop-only"
               onClick={(e) => (onOpenCalModal ? onOpenCalModal(e.currentTarget) : (window.location.href = '/contact'))}
+              data-tooltip="Book a 30-min discovery call"
             >
               <span className="glow-ring-disc" aria-hidden="true">
                 <Calendar size={13} />

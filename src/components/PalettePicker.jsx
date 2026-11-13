@@ -116,7 +116,7 @@ export default function PalettePicker({ palette, onSetPalette, motionEnabled }) 
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Colour palette: ${current.label}`}
-        title="Change colour palette"
+        data-tooltip="Color palettes"
         onClick={() => setOpen((o) => !o)}
       >
         <span className="palette-dots" aria-hidden="true">

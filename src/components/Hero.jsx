@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from '../config/site';
-import { ArrowRight, ArrowUpRight, Calendar, Sun, Moon, Pause, Play } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { easeCurves } from '../config/motion';
 import MeshFlow from './MeshFlow';
@@ -121,7 +121,7 @@ export default function Hero({
             </Link>
           </Item>
 
-          {/* Elegant Prompt Ribbon (Revealed after preloader finishes & home screen loads) */}
+          {/* Subtle elegant mouse scroll animation */}
           <Item
             {...(motionEnabled
               ? {
@@ -130,66 +130,23 @@ export default function Hero({
                     visible: {
                       opacity: 1,
                       y: 0,
-                      transition: { duration: 0.6, delay: 0.35, ease: easeCurves.luxuryDecel },
+                      transition: { duration: 0.7, delay: 0.4, ease: easeCurves.luxuryDecel },
                     },
                   },
                 }
               : {})}
           >
-            <div className="hero-quick-tips" role="region" aria-label="Quick navigation and shortcuts">
-              <span className="hero-quick-tip-hint">
-                <span className="hero-tip-spark" aria-hidden="true">✦</span>
-                <span className="hero-tip-text">Quick actions:</span>
-              </span>
-
-              {onOpenCommand && (
-                <button
-                  type="button"
-                  className="hero-quick-tip-btn"
-                  onClick={(e) => onOpenCommand(e.currentTarget)}
-                  title="Open command palette (Ctrl+K / ⌘K)"
-                  aria-label="Open command palette"
-                >
-                  <kbd className="hero-tip-kbd">{isMac ? '⌘K' : 'Ctrl+K'}</kbd>
-                  <span>to navigate</span>
-                </button>
-              )}
-
-              {onToggleTheme && (
-                <>
-                  <span className="hero-quick-tip-divider" aria-hidden="true">·</span>
-                  <button
-                    type="button"
-                    className="hero-quick-tip-btn"
-                    onClick={onToggleTheme}
-                    title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                    aria-label="Toggle theme"
-                  >
-                    <span className="hero-tip-icon" aria-hidden="true">
-                      {theme === 'dark' ? <Sun size={12} /> : <Moon size={12} />}
-                    </span>
-                    <span>toggle theme</span>
-                  </button>
-                </>
-              )}
-
-              {onToggleMotion && (
-                <>
-                  <span className="hero-quick-tip-divider desktop-only" aria-hidden="true">·</span>
-                  <button
-                    type="button"
-                    className="hero-quick-tip-btn desktop-only"
-                    onClick={onToggleMotion}
-                    title={motionEnabled ? 'Pause animations & motion' : 'Resume animations & motion'}
-                    aria-label="Toggle motion on/off"
-                  >
-                    <span className="hero-tip-icon" aria-hidden="true">
-                      {motionEnabled ? <Pause size={12} /> : <Play size={12} />}
-                    </span>
-                    <span>motion {motionEnabled ? 'on' : 'off'}</span>
-                  </button>
-                </>
-              )}
+            <div className="hero-scroll-cue-wrapper">
+              <a
+                href="#hire-me"
+                className="hero-scroll-cue"
+                aria-label="Scroll down"
+                data-tooltip="Scroll down"
+              >
+                <span className="hero-scroll-mouse" aria-hidden="true">
+                  <span className="hero-scroll-wheel" />
+                </span>
+              </a>
             </div>
           </Item>
         </Wrap>
