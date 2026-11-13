@@ -1,22 +1,22 @@
 import React, { useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { siteConfig, isValidContent } from '../config/site';
-import { ArrowUp, ArrowUpRight, Calendar } from 'lucide-react';
+import { ArrowUp, ArrowUpRight, Calendar, Download } from 'lucide-react';
 import GridWarpHeadline from './GridWarpHeadline';
 import VisitorCounter from './VisitorCounter';
 
 /**
  * Full-bleed CTA footer: a palette-coloured block with an oversized headline that
- * rises and settles as it scrolls into view (scroll-driven), then the primary actions
- * and a quiet row of links / legal underneath.
+ * rises and settles as it scrolls into view (scroll-driven), dynamically adapting
+ * between client studio pages and the recruiter career view.
  */
-function Headline({ motionEnabled }) {
+function Headline({ motionEnabled, lines }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end 75%'] });
   const y = useTransform(scrollYProgress, [0, 1], ['40%', '0%']);
   const o = useTransform(scrollYProgress, [0, 0.6], [0.15, 1]);
   const s = useTransform(scrollYProgress, [0, 1], [0.94, 1]);
-  const lines = ["Let's build", 'your agent.'];
 
   // Scroll-driven rise on the wrapper; Grid Warp handles the pointer inside it
   if (!motionEnabled) {
@@ -34,8 +34,14 @@ function Headline({ motionEnabled }) {
 }
 
 export default function Footer({ motionEnabled = true, onToggleMotion, onOpenCalModal }) {
+  const location = useLocation();
+  const isRecruiter = location.pathname.startsWith('/recruiters');
   const currentYear = new Date().getFullYear();
-  const { contact, identity } = siteConfig;
+  const { contact, identity, career } = siteConfig;
+
+  const headlineLines = isRecruiter
+    ? ['Ready to ship', 'from day one.']
+    : ['Engineering software', 'that moves business forward.'];
 
   // Primary links first, then extra links, with duplicate URLs dropped
   const links = [];
@@ -60,28 +66,76 @@ export default function Footer({ motionEnabled = true, onToggleMotion, onOpenCal
   return (
     <footer className="footer footer-block" role="contentinfo">
       <div className="footer-block-inner">
-        <span className="footer-eyebrow">
-          <span className="status-dot" aria-hidden="true" />
-          Taking on new projects
-        </span>
+        {isRecruiter ? (
+          <span className="footer-eyebrow">
+            <span className="status-dot" aria-hidden="true" />
+            Open to engineering roles · Available immediately
+          </span>
+        ) : (
+          <span className="footer-eyebrow">
+            <span className="status-dot" aria-hidden="true" />
+            Taking on new projects
+          </span>
+        )}
 
-        <Headline motionEnabled={motionEnabled} />
+        <Headline motionEnabled={motionEnabled} lines={headlineLines} />
 
-        <p className="footer-sub">
-          Bring the process that eats your team's week. I'll turn it into an AI agent or RAG system that runs in
-          production, with weekly updates and code you own.
-        </p>
+        {isRecruiter ? (
+          <p className="footer-sub">
+            AI & full-stack software engineer ready to deploy production agents, backends, and high-performance apps.
+            Available for remote (India or international) and on-site roles.
+          </p>
+        ) : (
+          <p className="footer-sub">
+            Custom AI agents, high-converting web apps, and automated workflows built with transparent pricing and weekly production updates.
+          </p>
+        )}
 
         <div className="footer-cta-row">
-          <button type="button" className="footer-cta-primary" onClick={(e) => onOpenCalModal?.(e.currentTarget)}>
-            <Calendar size={18} aria-hidden="true" />
-            <span>Book a discovery call</span>
-          </button>
-          {isValidContent(contact.email) && (
-            <a className="footer-cta-secondary" href={`mailto:${contact.email}`}>
-              <span>{contact.email}</span>
-              <ArrowUpRight size={16} aria-hidden="true" />
-            </a>
+          {isRecruiter ? (
+            <>
+              {isValidContent(career?.interviewUrl) ? (
+                <a
+                  className="footer-cta-primary"
+                  href={career.interviewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Calendar size={18} aria-hidden="true" />
+                  <span>Schedule an interview</span>
+                </a>
+              ) : (
+                <button type="button" className="footer-cta-primary" onClick={(e) => onOpenCalModal?.(e.currentTarget)}>
+                  <Calendar size={18} aria-hidden="true" />
+                  <span>Schedule an interview</span>
+                </button>
+              )}
+              {isValidContent(identity.resume) && (
+                <a
+                  className="footer-cta-secondary"
+                  href={identity.resume}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Download resume PDF"
+                >
+                  <span>Download Resume</span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </a>
+              )}
+            </>
+          ) : (
+            <>
+              <button type="button" className="footer-cta-primary" onClick={(e) => onOpenCalModal?.(e.currentTarget)}>
+                <Calendar size={18} aria-hidden="true" />
+                <span>Book a discovery call</span>
+              </button>
+              {isValidContent(contact.email) && (
+                <a className="footer-cta-secondary" href={`mailto:${contact.email}`}>
+                  <span>{contact.email}</span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </a>
+              )}
+            </>
           )}
         </div>
 

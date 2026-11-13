@@ -50,26 +50,30 @@ function Panel({ id, onNavigate, onOpenCalModal }) {
   const { preferences } = siteConfig;
 
   if (id === 'services') {
+    const serviceCapabilities = {
+      'ai-agents-chatbots': 'Custom agents, RAG & LangGraph automation',
+      'web-design-development': 'Full-stack apps, React & high-converting UX',
+      'seo': 'Technical audit, crawlability & schema graph',
+      'aeo-ai-search': 'AI search citations in Perplexity & Claude',
+    };
     return (
       <div className="morph-panel morph-panel--services" onMouseLeave={() => setHl(null)}>
-        <span className="morph-kicker">What we do</span>
+        <span className="morph-kicker">Core capabilities & deliverables</span>
         <div className="morph-grid">
           {SERVICE_DATA.map((s) => (
             <Item key={s.slug} id={s.slug} href={`/services/${s.slug}`} {...common}>
               <span className="morph-num">{s.num}</span>
               <span className="morph-text">
                 <b>{s.name}</b>
-                <small>
-                  From {s.from.inr} / {s.from.usd}
-                </small>
+                <small>{serviceCapabilities[s.slug] || s.short}</small>
               </span>
             </Item>
           ))}
         </div>
-        <Item id="pricing" href="/pricing" className="morph-foot" {...common}>
+        <Item id="pricing" href="/services/ai-agents-chatbots" className="morph-foot" {...common}>
           <span className="morph-text">
-            <b>Pricing & how we work</b>
-            <small>Starting prices in INR and USD · fixed quotes</small>
+            <b>Explore capabilities & engineering stack</b>
+            <small>Production LangGraph, Python backends, Next.js & AI search</small>
           </span>
           <ArrowUpRight size={15} aria-hidden="true" />
         </Item>
@@ -104,16 +108,22 @@ function Panel({ id, onNavigate, onOpenCalModal }) {
   }
 
   if (id === 'pricing') {
+    const pricingTiers = {
+      'ai-agents-chatbots': 'Starts at ₹60,000 / $900 · Fixed scope',
+      'web-design-development': 'Starts at ₹45,000 / $650 · 2–4 wk sprint',
+      'seo': 'Starts at ₹30,000 / $450 · Audit & ongoing',
+      'aeo-ai-search': 'Starts at ₹35,000 / $500 · AI crawler ready',
+    };
     return (
       <div className="morph-panel morph-panel--pricing" onMouseLeave={() => setHl(null)}>
-        <span className="morph-kicker">Pricing & deliverables</span>
+        <span className="morph-kicker">Transparent starting rates</span>
         <div className="morph-grid">
           {SERVICE_DATA.map((s) => (
             <Item key={s.slug} id={`price-${s.slug}`} href={`/services/${s.slug}`} {...common}>
               <span className="morph-num">{s.num}</span>
               <span className="morph-text">
                 <b>{s.name}</b>
-                <small>From {s.from.inr} / {s.from.usd}</small>
+                <small>{pricingTiers[s.slug] || `From ${s.from.inr} / ${s.from.usd}`}</small>
               </span>
             </Item>
           ))}

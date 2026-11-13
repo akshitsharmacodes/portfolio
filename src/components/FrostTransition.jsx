@@ -76,3 +76,4 @@ export default function FrostTransition({ motionEnabled = true }) {
     </AnimatePresence>
   );
 }
+
