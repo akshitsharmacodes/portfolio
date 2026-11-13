@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import gsap from 'gsap';
+import { useGsapContext } from '../hooks/useScrollAnimation';
 import SectionHeader from './SectionHeader';
 
 /**
@@ -136,14 +138,53 @@ function Pic({ kind }) {
 export default function Process({ motionEnabled = true }) {
   const [active, setActive] = useState(0);
   const timer = useRef(0);
+  const processRef = useRef(null);
+
   useEffect(() => () => clearTimeout(timer.current), []);
   const hoverTo = (i) => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setActive(i), 110);
   };
 
+  useGsapContext(
+    processRef,
+    (ctx, mm) => {
+      mm.add('(min-width: 769px)', () => {
+        gsap.from('.hl-row-item', {
+          y: 28,
+          opacity: 0,
+          stagger: 0.1,
+          duration: 0.75,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.hl-list',
+            start: 'top 82%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      mm.add('(max-width: 768px)', () => {
+        gsap.from('.hl-row-item', {
+          y: 16,
+          opacity: 0,
+          stagger: 0.08,
+          duration: 0.55,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.hl-list',
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+    },
+    [],
+    motionEnabled
+  );
+
   return (
-    <section className="section-padding process-section" id="process" aria-label="How I work">
+    <section ref={processRef} className="section-padding process-section" id="process" aria-label="How I work">
       <div className="container">
         <SectionHeader
           motionEnabled={motionEnabled}

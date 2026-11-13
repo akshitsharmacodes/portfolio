@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import gsap from 'gsap';
+import { useGsapContext } from '../hooks/useScrollAnimation';
 import ProjectGlyph, { PROJECT_VISUALS } from './ProjectGlyph';
 import { isValidContent } from '../config/site';
 
@@ -16,12 +18,50 @@ const DRIFT = 0.1; // slots per second while idle
 const tileSize = (W) => Math.max(118, Math.min(210, W * 0.15));
 
 export default function ProjectGrid({ projects, onSelectProject, motionEnabled = true }) {
+  const sectionRef = useRef(null);
   const stageRef = useRef(null);
   const tileRefs = useRef([]);
   const state = useRef({ off: 0, vel: 0, dragging: false, hover: false, lastX: 0, lastT: 0, moved: 0, snap: undefined });
   const [focus, setFocus] = useState(0);
   const n = projects.length;
   const slots = Math.max(SLOTS, Math.ceil(SLOTS / n) * n);
+
+  useGsapContext(
+    sectionRef,
+    (ctx, mm) => {
+      mm.add('(min-width: 769px)', () => {
+        gsap.from(['.halo-title', '.halo-caption', '.halo-focus'], {
+          y: 30,
+          opacity: 0,
+          stagger: 0.1,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      mm.add('(max-width: 768px)', () => {
+        gsap.from(['.halo-title', '.halo-caption', '.halo-focus'], {
+          y: 18,
+          opacity: 0,
+          stagger: 0.08,
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 82%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+    },
+    [],
+    motionEnabled
+  );
 
   const layout = useCallback(() => {
     const stage = stageRef.current;
@@ -142,7 +182,7 @@ export default function ProjectGrid({ projects, onSelectProject, motionEnabled =
   const visual = PROJECT_VISUALS[current.id] || { eyebrow: current.category };
 
   return (
-    <section className="section-padding halo-section" id="work" aria-label="Selected projects">
+    <section ref={sectionRef} className="section-padding halo-section" id="work" aria-label="Selected projects">
       <div
         className="halo-stage"
         ref={stageRef}

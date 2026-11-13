@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import FrostTransition from './components/FrostTransition';
 import ScrollSpeedDial from './components/ScrollSpeedDial';
+import SmoothScroll from './components/SmoothScroll';
 import Seo from './components/Seo';
 import HomePage from './pages/HomePage';
 import ServicePage from './pages/ServicePage';
@@ -228,7 +229,7 @@ export default function App() {
   };
 
   return (
-    <>
+    <SmoothScroll motionEnabled={motionEnabled}>
       <Seo />
       <FrostTransition motionEnabled={motionEnabled} />
       <div className={`portfolio-app theme-${theme}`}>
@@ -315,6 +316,6 @@ export default function App() {
         {/* Vercel Web Analytics */}
         <Analytics />
       </div>
-    </>
+    </SmoothScroll>
   );
 }

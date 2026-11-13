@@ -3,7 +3,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { siteConfig, isValidContent } from '../config/site';
 import PalettePicker, { PaletteRow } from './PalettePicker';
 import MorphMenu, { MORPH_PANELS } from './MorphMenu';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ArrowUpRight, ArrowRight, Calendar, Github, FileText, Sun, Moon, MessageCircle, BriefcaseBusiness } from 'lucide-react';
 
 // On the homepage, sections highlight the matching nav item while scrolling
@@ -60,10 +60,34 @@ export default function Header({
   onOpenCalModal,
 }) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const isHome = pathname === '/';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
+
+  const handleBrandClick = (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    setMobileMenuOpen(false);
+
+    if (isHome) {
+      if (typeof window !== 'undefined' && window.location.hash) {
+        window.history.replaceState(null, '', '/');
+      }
+      const lenis = typeof window !== 'undefined' ? window.__lenis : null;
+      const reduce = !motionEnabled || (typeof document !== 'undefined' && document.documentElement.getAttribute('data-motion') === 'off');
+      if (lenis && !reduce) {
+        lenis.scrollTo(0, { duration: 1.2 });
+      } else if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      }
+    } else {
+      navigate('/');
+    }
+  };
   // Morph dropdown: which panel is open, with a short grace period so the pointer can travel to it
   const [morphId, setMorphId] = useState(null);
   const morphTimer = useRef(0);
@@ -185,7 +209,7 @@ export default function Header({
     <>
       <header className={`header-wrapper ${scrolled ? 'is-scrolled' : ''}`} role="banner">
         <div className="header-glass-dock">
-          <BrandMark />
+          <BrandMark onClick={handleBrandClick} />
 
           <nav
             className="desktop-only nav-center"
@@ -304,7 +328,7 @@ export default function Header({
         >
           <div className="mobile-drawer-card">
             <div className="mobile-drawer-top">
-              <BrandMark onClick={() => setMobileMenuOpen(false)} />
+              <BrandMark onClick={handleBrandClick} />
 
               <div className="mobile-drawer-controls">
                 <button

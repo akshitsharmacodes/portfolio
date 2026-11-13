@@ -31,15 +31,28 @@ export default function ScrollSpeedDial({ motionEnabled = true }) {
   const handleClick = () => {
     const reduce = !motionEnabled || document.documentElement.getAttribute('data-motion') === 'off';
     const behavior = reduce ? 'auto' : 'smooth';
+    const lenis = window.__lenis;
 
     if (isScrolled) {
-      window.scrollTo({ top: 0, behavior });
+      if (lenis && !reduce) {
+        lenis.scrollTo(0, { duration: 1.2 });
+      } else {
+        window.scrollTo({ top: 0, behavior });
+      }
     } else {
       const contactEl = document.getElementById('contact') || document.querySelector('footer');
       if (contactEl) {
-        contactEl.scrollIntoView({ behavior, block: 'start' });
+        if (lenis && !reduce) {
+          lenis.scrollTo(contactEl, { offset: -64, duration: 1.2 });
+        } else {
+          contactEl.scrollIntoView({ behavior, block: 'start' });
+        }
       } else {
-        window.scrollTo({ top: document.documentElement.scrollHeight, behavior });
+        if (lenis && !reduce) {
+          lenis.scrollTo(document.documentElement.scrollHeight, { duration: 1.2 });
+        } else {
+          window.scrollTo({ top: document.documentElement.scrollHeight, behavior });
+        }
       }
     }
   };

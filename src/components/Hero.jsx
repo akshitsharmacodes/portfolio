@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import gsap from 'gsap';
+import { useGsapContext } from '../hooks/useScrollAnimation';
 import { siteConfig } from '../config/site';
 import { ArrowRight, ArrowUpRight, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -57,6 +59,53 @@ export default function Hero({
   const [availMain, ...rest] = agency.availability.split(' · ');
   const availMore = rest.join(' · ');
 
+  const heroRef = useRef(null);
+
+  useGsapContext(
+    heroRef,
+    (ctx, mm) => {
+      mm.add('(min-width: 769px)', () => {
+        gsap.to('.hero-eclipse-content', {
+          y: -45,
+          opacity: 0.15,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom 20%',
+            scrub: 0.5,
+          },
+        });
+        gsap.to('.metrics-strip', {
+          y: -20,
+          opacity: 0.35,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom 20%',
+            scrub: 0.5,
+          },
+        });
+      });
+
+      mm.add('(max-width: 768px)', () => {
+        gsap.to('.hero-eclipse-content', {
+          opacity: 0.25,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom 40%',
+            scrub: true,
+          },
+        });
+      });
+    },
+    [ready],
+    motionEnabled && ready
+  );
+
   const Wrap = motionEnabled ? motion.div : 'div';
   const Item = motionEnabled ? motion.div : 'div';
   const wrapProps = motionEnabled
@@ -65,7 +114,7 @@ export default function Hero({
   const itemProps = motionEnabled ? { variants: itemVariants } : {};
 
   return (
-    <section className="hero-section hero--eclipse" id="hero" aria-label="Introduction">
+    <section ref={heroRef} className="hero-section hero--eclipse" id="hero" aria-label="Introduction">
       <MeshFlow motionEnabled={motionEnabled} />
       <EclipseArc motionEnabled={motionEnabled} ready={ready} />
 
