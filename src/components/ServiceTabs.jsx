@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
 
 /**
  * Hover Tabs (after Scrolltide's component of the same name): a services list beside one
@@ -148,7 +150,95 @@ function MvpScene() {
   );
 }
 
-const SCENES = [AgentScene, RagScene, BackendScene, MvpScene];
+function WebScene() {
+  const scores = [
+    ['Performance', 96],
+    ['Accessibility', 100],
+    ['SEO', 100],
+  ];
+  return (
+    <div className="scene scene--web">
+      <div className="sc-browser">
+        <div className="sc-browser-bar">
+          <i />
+          <i />
+          <i />
+          <span>yourbusiness.com</span>
+        </div>
+        <div className="sc-browser-body">
+          <b>Your offer, said clearly.</b>
+          <span className="sc-line" />
+          <span className="sc-line short" />
+          <span className="sc-cta">Book a call</span>
+        </div>
+      </div>
+      <div className="sc-scores">
+        {scores.map(([label, v]) => (
+          <div key={label} className="sc-score" style={{ '--v': v / 100 }}>
+            <em>{v}</em>
+            <small>{label}</small>
+          </div>
+        ))}
+      </div>
+      <small className="sc-note">Example targets for every launch</small>
+    </div>
+  );
+}
+
+function SeoScene() {
+  return (
+    <div className="scene scene--seo">
+      <div className="sc-query">
+        <span className="sc-dot" />
+        ai chatbot development company
+      </div>
+      <ul className="sc-serp">
+        <li className="is-you">
+          <small>yourbusiness.com › services</small>
+          <b>AI Chatbot Development | Your Business</b>
+          <span>Custom chatbots trained on your documents. Pricing, process, FAQ…</span>
+        </li>
+        <li>
+          <small>competitor.com</small>
+          <b>Chatbot services</b>
+        </li>
+      </ul>
+      <div className="sc-progress">
+        <i />
+        <span>Indexing · speed · schema · content</span>
+      </div>
+      <small className="sc-note">Illustration of the goal</small>
+    </div>
+  );
+}
+
+function AeoScene() {
+  return (
+    <div className="scene scene--aeo">
+      <div className="sc-query">
+        <span className="sc-dot" />
+        Who can build an AI chatbot for my clinic?
+      </div>
+      <div className="sc-answer">
+        <small>AI answer</small>
+        <p>
+          <b>Your business</b> builds chatbots trained on clinic FAQs and booking rules, with pricing published on their
+          site <sup>[1]</sup>.
+        </p>
+      </div>
+      <ul className="sc-hits">
+        <li>
+          <span>yourbusiness.com/services</span>
+          <i style={{ '--s': 0.92 }} />
+          <em>cited</em>
+        </li>
+      </ul>
+      <small className="sc-note">Illustration of the goal</small>
+    </div>
+  );
+}
+
+const SCENES = [AgentScene, WebScene, SeoScene, AeoScene];
 
 export default function ServiceTabs({ items, motionEnabled }) {
   const [active, setActive] = useState(0);
@@ -212,6 +302,12 @@ export default function ServiceTabs({ items, motionEnabled }) {
                       </span>
                     ))}
                   </div>
+                  {item.href && (
+                    <Link to={item.href} className="htab-link">
+                      <span>{item.linkLabel || 'Explore service'}</span>
+                      <ArrowUpRight size={15} aria-hidden="true" />
+                    </Link>
+                  )}
                 </div>
               </Body>
             </li>

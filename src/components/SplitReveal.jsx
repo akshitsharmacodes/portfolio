@@ -8,26 +8,18 @@ import { maskWordVariant, scrollViewport } from '../config/motion';
  *
  * - Accepts plain strings and simple inline elements (e.g. <span className="text-accent">).
  *   Element wrappers are kept, so their styling (color, font, margins) still applies.
- * - Screen readers get the sentence once, from a visually hidden copy; the animated
- *   word fragments are aria-hidden.
+ * - The heading text exists once in the DOM: the animated word spans are the real text
+ *   (no hidden duplicate), so screen readers and crawlers read the sentence once.
  * - `inView`: trigger on scroll by itself. Without it, the component inherits the
  *   "hidden"/"visible" state from a parent motion element (used by SectionHeader and Hero).
  */
-
-function extractText(node) {
-  if (node === null || node === undefined || typeof node === 'boolean') return '';
-  if (typeof node === 'string' || typeof node === 'number') return String(node);
-  if (Array.isArray(node)) return node.map(extractText).join('');
-  if (isValidElement(node)) return extractText(node.props.children);
-  return '';
-}
 
 function splitWords(text, keyPrefix) {
   return text.split(/(\s+)/).map((part, index) => {
     if (!part) return null;
     if (/^\s+$/.test(part)) return ' ';
     return (
-      <span className="reveal-word" key={`${keyPrefix}-${index}`} aria-hidden="true">
+      <span className="reveal-word" key={`${keyPrefix}-${index}`}>
         <motion.span className="reveal-word-inner" variants={maskWordVariant}>
           {part}
         </motion.span>
@@ -92,7 +84,6 @@ export default function SplitReveal({
 
   return (
     <MotionTag className={className} variants={containerVariants} {...trigger} {...rest}>
-      <span className="sr-only">{extractText(children)}</span>
       {renderAnimated(children)}
     </MotionTag>
   );

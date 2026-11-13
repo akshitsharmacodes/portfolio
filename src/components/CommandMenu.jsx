@@ -22,16 +22,18 @@ import {
 } from 'lucide-react';
 import { siteConfig, isValidContent } from '../config/site';
 import { PALETTES } from '../config/palettes';
+import { useNavigate } from 'react-router-dom';
+import { services } from '../data/services';
 
+// Pages to jump to (the site is multi-page: agency for clients, /recruiters for HR)
 const SECTIONS = [
-  { id: 'hire-me', label: 'Services', show: true },
-  { id: 'work', label: 'Work', show: true },
-  { id: 'about', label: 'About', show: true },
-  { id: 'skills', label: 'Skills', show: true },
-  { id: 'experience', label: 'Experience', show: siteConfig.preferences.showExperience },
-  { id: 'awards', label: 'Recognition', show: siteConfig.preferences.showAwards },
-  { id: 'side-hustles', label: 'Ventures', show: siteConfig.preferences.showVentures },
-  { id: 'contact', label: 'Contact', show: true },
+  { path: '/', label: 'Home', show: true },
+  ...services.map((svc) => ({ path: `/services/${svc.slug}`, label: `Service: ${svc.name}`, show: true })),
+  { path: '/work', label: 'Case studies', show: true },
+  { path: '/pricing', label: 'Pricing', show: true },
+  { path: '/about', label: 'About', show: true },
+  { path: '/contact', label: 'Contact', show: true },
+  { path: '/recruiters', label: 'For recruiters (resume)', show: true },
 ];
 
 /**
@@ -58,14 +60,11 @@ export default function CommandMenu({
   const listRef = useRef(null);
 
   const openUrl = (url) => window.open(url, '_blank', 'noopener,noreferrer');
-  const goTo = (id) => {
+  const navigate = useNavigate();
+  const goTo = (path) => {
     onClose();
-    // Let the dialog unmount (and scroll lock release) before scrolling
-    requestAnimationFrame(() => {
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: motionEnabled ? 'smooth' : 'auto', block: 'start' });
-      history.replaceState(null, '', `#${id}`);
-    });
+    // Let the dialog unmount (and scroll lock release) before navigating
+    requestAnimationFrame(() => navigate(path));
   };
 
   const groups = useMemo(() => {
@@ -141,11 +140,11 @@ export default function CommandMenu({
       {
         name: 'Go to',
         items: SECTIONS.filter((sct) => sct.show).map((sct) => ({
-          id: `go-${sct.id}`,
+          id: `go-${sct.path.replace(/\W+/g, '-')}`,
           label: sct.label,
           icon: ArrowRight,
-          keywords: 'section jump navigate',
-          run: () => goTo(sct.id),
+          keywords: 'page jump navigate',
+          run: () => goTo(sct.path),
         })),
       },
       {

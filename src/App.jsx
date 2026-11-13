@@ -1,20 +1,19 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import ClientEngine from './components/ClientEngine';
-import ProjectGrid from './components/ProjectGrid';
-import About from './components/About';
-import Skills from './components/Skills';
-import Experience from './components/Experience';
-import Awards from './components/Awards';
-import Ventures from './components/Ventures';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Seo from './components/Seo';
+import HomePage from './pages/HomePage';
+import ServicePage from './pages/ServicePage';
+import WorkPage from './pages/WorkPage';
+import CaseStudyPage from './pages/CaseStudyPage';
+import PricingPage from './pages/PricingPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import RecruitersPage from './pages/RecruitersPage';
+import NotFoundPage from './pages/NotFoundPage';
 import { siteConfig } from './config/site';
-import { projects } from './data/projects';
-import CtaBand from './components/CtaBand';
-import Process from './components/Process';
 import { DEFAULT_PALETTE, PALETTE_KEY, THEME_CHOICE_KEY, isPalette } from './config/palettes';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -40,18 +39,21 @@ function writeStorage(key, value) {
   }
 }
 
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isBrowser = typeof window !== 'undefined';
+const prefersReducedMotion = () => isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export default function App() {
   // Theme: the inline script in index.html already applied it before first paint.
   // Without an explicit choice it follows the OS colour scheme (live).
   const [theme, setTheme] = useState(() => {
+    if (!isBrowser) return 'dark';
     const applied = document.documentElement.getAttribute('data-theme');
     if (applied === 'light' || applied === 'dark') return applied;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   const [palette, setPaletteState] = useState(() => {
+    if (!isBrowser) return DEFAULT_PALETTE;
     const applied = document.documentElement.getAttribute('data-palette');
     return isPalette(applied) ? applied : DEFAULT_PALETTE;
   });
@@ -170,8 +172,62 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  // ── Routing ────────────────────────────────────────────────────────────────
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Internal links: plain <a href="/..."> anywhere in the app navigate client-side, and
+  // "#section" links that point at the homepage work from inner pages too.
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = e.target.closest?.('a[href]');
+      if (!a || a.target || a.hasAttribute('download')) return;
+      const href = a.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('#')) {
+        if (href === '#main-content' || href === '#') return;
+        if (location.pathname !== '/' && !document.getElementById(href.slice(1))) {
+          e.preventDefault();
+          navigate(`/${href}`);
+        }
+        return;
+      }
+      if (href.startsWith('/') && !href.startsWith('//')) {
+        e.preventDefault();
+        navigate(href);
+      }
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, [location.pathname, navigate]);
+
+  // New page: scroll to the top, or to the #section the link pointed at
+  useEffect(() => {
+    if (location.hash) {
+      const id = decodeURIComponent(location.hash.slice(1));
+      const t = setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+      return () => clearTimeout(t);
+    }
+    window.scrollTo(0, 0);
+    return undefined;
+  }, [location.pathname, location.hash]);
+
+  // Everything a page may need from the shell
+  const app = {
+    motionEnabled,
+    theme,
+    palette,
+    openCalModal,
+    openCommand,
+    openProject,
+    toggleTheme,
+    toggleMotion,
+  };
+
   return (
     <>
+      <Seo />
       <div className={`portfolio-app theme-${theme}`}>
         {/* Skip to content for keyboard users */}
         <a href="#main-content" className="skip-link">
@@ -190,36 +246,17 @@ export default function App() {
         />
 
         <main id="main-content" tabIndex={-1}>
-          <Hero
-            motionEnabled={motionEnabled}
-            onOpenCalModal={openCalModal}
-            onOpenCommand={openCommand}
-            onToggleTheme={toggleTheme}
-            onToggleMotion={toggleMotion}
-            palette={palette}
-            theme={theme}
-          />
-
-          {/* Services / Hire Me */}
-          <ClientEngine motionEnabled={motionEnabled} />
-
-          <Process motionEnabled={motionEnabled} />
-
-          <ProjectGrid projects={projects} motionEnabled={motionEnabled} onSelectProject={openProject} />
-
-          <CtaBand onOpenCalModal={openCalModal} />
-
-          <About motionEnabled={motionEnabled} />
-
-          <Skills motionEnabled={motionEnabled} />
-
-          {siteConfig.preferences.showExperience && <Experience motionEnabled={motionEnabled} />}
-
-          {siteConfig.preferences.showAwards && <Awards motionEnabled={motionEnabled} />}
-
-          {(siteConfig.preferences.showVentures ?? true) && <Ventures motionEnabled={motionEnabled} />}
-
-          <Contact motionEnabled={motionEnabled} onOpenCalModal={openCalModal} />
+          <Routes>
+            <Route path="/" element={<HomePage app={app} />} />
+            <Route path="/services/:slug" element={<ServicePage app={app} />} />
+            <Route path="/work" element={<WorkPage app={app} />} />
+            <Route path="/work/:id" element={<CaseStudyPage app={app} />} />
+            <Route path="/pricing" element={<PricingPage app={app} />} />
+            <Route path="/about" element={<AboutPage app={app} />} />
+            <Route path="/contact" element={<ContactPage app={app} />} />
+            <Route path="/recruiters" element={<RecruitersPage app={app} />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
         </main>
 
         <Footer motionEnabled={motionEnabled} onToggleMotion={toggleMotion} onOpenCalModal={openCalModal} />

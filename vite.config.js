@@ -1,40 +1,27 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-function surgeSpaPlugin() {
-  return {
-    name: 'surge-spa',
-    closeBundle() {
-      const distIndex = path.resolve(__dirname, 'dist', 'index.html');
-      const dist200 = path.resolve(__dirname, 'dist', '200.html');
-      if (fs.existsSync(distIndex)) {
-        fs.copyFileSync(distIndex, dist200);
-      }
-    },
-  };
-}
-
-export default defineConfig({
-  plugins: [react(), surgeSpaPlugin()],
-  base: './', // Ensures asset paths resolve cleanly on Vercel, Netlify, Surge, GitHub Pages, or custom domains
+export default defineConfig(({ isSsrBuild }) => ({
+  // No SPA catch-all (e.g. Surge's 200.html): every real route is pre-rendered, unknown URLs must 404
+  plugins: [react()],
+  // Absolute asset paths: pages live at nested URLs (/services/seo, /work/matcha-ai)
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
     chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-framer': ['framer-motion'],
-          'vendor-react': ['react', 'react-dom'],
+    // Vendor chunks for the browser build only (the SSR pre-render bundle keeps deps external)
+    rollupOptions: isSsrBuild
+      ? {}
+      : {
+          output: {
+            manualChunks: {
+              'vendor-framer': ['framer-motion'],
+              'vendor-react': ['react', 'react-dom'],
+            },
+          },
         },
-      },
-    },
   },
   server: {
     port: 3001,
@@ -44,4 +31,4 @@ export default defineConfig({
       ignored: ['**/.claude/**', '**/temp-chrome/**', '**/.git/**'],
     },
   },
-});
+}));

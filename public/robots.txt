@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://akshitsharma.dev/sitemap.xml
+Sitemap: https://www.akshitsharma.dev/sitemap.xml

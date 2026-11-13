@@ -6,7 +6,34 @@
 
 export const siteConfig = {
   referenceWebsite: "https://touquirakhtar.com/",
-  websiteUrl: "https://akshitsharma.dev",
+  websiteUrl: "https://www.akshitsharma.dev",
+
+  /**
+   * Agency (client-facing default view). Founder-led: "we" in the copy, Akshit as founder and
+   * lead engineer, specialists brought in per project. No invented team, clients or reviews.
+   */
+  agency: {
+    name: "Gentle Tech Labs",
+    tagline: "AI agents, websites and search visibility for growing businesses",
+    availability: "Booking new projects · India & worldwide",
+    headline: "AI agents, websites and SEO that grow your business.",
+    headlineAccent: "grow your business.",
+    heroLine:
+      "Gentle Tech Labs is a founder-led studio from Chandigarh. We design and ship AI agents, chatbots, fast websites, SEO and AI-search (AEO) for clients across India and worldwide, with weekly demos and code you own.",
+    founderNote: "Led by Akshit Sharma, AI engineer and founder. Specialists join per project.",
+    // Working hours note for overseas clients
+    timezoneNote:
+      "Based in India (IST, UTC+5:30). Our afternoons overlap European mornings, our evenings overlap US East Coast mornings, and the Middle East, Singapore and Australia share most of our working day.",
+  },
+
+  /** Recruiter view (/recruiters) */
+  career: {
+    roles: ["AI / ML Engineer", "Backend Engineer", "Full-stack Engineer", "Founding / early-stage Engineer"],
+    availability: "Available immediately",
+    workModes: ["Remote (India)", "Remote (international)", "On-site / hybrid in Tricity", "Open to relocate"],
+    // Separate interview booking; falls back to the client booking link until one exists
+    interviewUrl: "https://cal.com/akshitsharmacodes",
+  },
 
   identity: {
     fullName: "Akshit Sharma",

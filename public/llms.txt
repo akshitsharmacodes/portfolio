@@ -1,0 +1,40 @@
+# Gentle Tech Labs
+
+> Founder-led studio from Chandigarh, India, building AI agents and chatbots, websites and web apps, SEO and AEO (AI search optimisation) for businesses in India and worldwide. Led by Akshit Sharma, AI engineer and founder; specialists join per project.
+
+## Services
+
+- [AI agents & chatbots](https://www.akshitsharma.dev/services/ai-agents-chatbots): custom agents, RAG chatbots and workflow automation with LangGraph, LangChain and Python.
+- [Web design & development](https://www.akshitsharma.dev/services/web-design-development): fast, premium websites and web apps in React / Next.js with technical SEO built in.
+- [SEO](https://www.akshitsharma.dev/services/seo): technical audits, on-page fixes, Core Web Vitals, local SEO and content.
+- [AEO / AI search](https://www.akshitsharma.dev/services/aeo-ai-search): getting cited by ChatGPT, Perplexity, Gemini and Google AI Overviews.
+- [Pricing](https://www.akshitsharma.dev/pricing): starting prices in INR and USD; fixed quotes after a free scoping call.
+
+## How engagements work
+
+1. Free 30-minute discovery call.
+2. Fixed-scope proposal with architecture, milestones, timeline and price within 48 hours.
+3. Weekly demos; work lands in a repository the client owns.
+4. Deployed, documented and tested with evals and monitoring.
+5. Post-launch support.
+
+## Case studies
+
+- [Zero-Ops AutoSRE](https://www.akshitsharma.dev/work/zero-ops-autosre): autonomous Site Reliability Engineering agent; Top 10 National Finalist, Hack-O-Octo 4.0 (GDG Chandigarh University).
+- [Matcha AI](https://www.akshitsharma.dev/work/matcha-ai): multi-agent resume and job-description evaluation system.
+- [CruiseContent](https://www.akshitsharma.dev/work/cruisecontent): AI-powered content platform with workflows and contextual retrieval.
+- [SIMS](https://www.akshitsharma.dev/work/sims): Smart India Hackathon 2025 internal-round winner at Amity University.
+- [NovaSight](https://www.akshitsharma.dev/work/nova-sight): real-time object detection in space-station environments with YOLOv8.
+
+## Founder
+
+- [Akshit Sharma](https://www.akshitsharma.dev/recruiters): AI/ML and backend engineer (Python, LangGraph, RAG, FastAPI, React). AI/ML Developer at LeadManch; former Gentleman Cadet, Officers Training Academy Gaya (TES-48); Amity University. Available immediately for full-time AI/ML, backend, full-stack or founding-engineer roles.
+
+## Contact
+
+- Book a call: https://cal.com/akshitsharmacodes
+- Email: akshitsharmacodes@gmail.com
+- Contact page: https://www.akshitsharma.dev/contact
+- LinkedIn: https://www.linkedin.com/in/akshitsharmacodes
+- GitHub: https://github.com/akshitsharmacodes
+- Upwork: https://www.upwork.com/freelancers/~016a5a49d7e054a783

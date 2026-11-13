@@ -3,19 +3,20 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { siteConfig, isValidContent } from '../config/site';
 import PalettePicker, { PaletteRow } from './PalettePicker';
 import MorphMenu, { MORPH_PANELS } from './MorphMenu';
-import { Menu, X, ArrowUpRight, ArrowRight, Calendar, Github, FileText, Sun, Moon, MessageCircle } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Menu, X, ArrowUpRight, ArrowRight, Calendar, Github, FileText, Sun, Moon, MessageCircle, BriefcaseBusiness } from 'lucide-react';
 
-// Secondary sections highlight the nearest desktop link, so the active pill never disappears mid-page
-const PRIMARY_FOR = { process: 'hire-me', skills: 'about', awards: 'about', experience: 'about', 'side-hustles': 'about' };
+// On the homepage, sections highlight the matching nav item while scrolling
+const PRIMARY_FOR = { 'hire-me': 'services', process: 'services', work: 'work', pricing: 'pricing', faq: 'contact', contact: 'contact' };
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
-/** Wordmark: "akshitsharma.dev" in mono */
+/** Wordmark: the agency name, linking home */
 function BrandMark({ onClick }) {
   return (
-    <a href="#" className="brand-mark" aria-label="akshitsharma.dev, back to top" onClick={onClick}>
+    <a href="/" className="brand-mark" aria-label={`${siteConfig.agency.name}, home`} onClick={onClick}>
       <span className="brand-word">
-        akshitsharma<span className="brand-tld">.dev</span>
+        gentle<span className="brand-tld">tech</span>labs
       </span>
     </a>
   );
@@ -34,8 +35,19 @@ function NavProgress({ motionEnabled }) {
   );
 }
 
-// Page order (used for scroll-spy); nav labels/visibility come from site config
-const SECTION_IDS = ['hire-me', 'process', 'work', 'about', 'skills', 'experience', 'awards', 'side-hustles', 'contact'];
+// Homepage sections, in page order (scroll-spy)
+const SECTION_IDS = ['hire-me', 'process', 'work', 'pricing', 'faq', 'contact'];
+
+/** Which nav item a route belongs to */
+function navIdForPath(pathname) {
+  if (pathname.startsWith('/services')) return 'services';
+  if (pathname.startsWith('/work')) return 'work';
+  if (pathname.startsWith('/pricing')) return 'pricing';
+  if (pathname.startsWith('/about')) return 'about';
+  if (pathname.startsWith('/contact')) return 'contact';
+  if (pathname.startsWith('/recruiters')) return 'recruiters';
+  return '';
+}
 
 export default function Header({
   theme,
@@ -47,6 +59,8 @@ export default function Header({
   onSetPalette,
   onOpenCalModal,
 }) {
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
@@ -83,6 +97,10 @@ export default function Header({
       setScrolled((prev) => (prev ? y > 8 : y > 24));
       const probe = y + 220;
       let current = '';
+      if (window.location.pathname !== '/') {
+        setActiveSection('');
+        return;
+      }
       for (const sectionId of SECTION_IDS) {
         const el = document.getElementById(sectionId);
         if (el && probe >= el.offsetTop && probe < el.offsetTop + el.offsetHeight) {
@@ -101,7 +119,7 @@ export default function Header({
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [pathname]);
 
   // Escape closes the drawer; Tab traps focus inside
   useEffect(() => {
@@ -153,18 +171,15 @@ export default function Header({
 
   // Same order as the page, so the active pill moves left → right while scrolling down
   const navLinks = [
-    // `primary` links appear in the desktop bar; every link appears in the mobile drawer
-    { label: 'Services', href: '#hire-me', id: 'hire-me', show: true, primary: true },
-    { label: 'Process', href: '#process', id: 'process', show: true },
-    { label: 'Work', href: '#work', id: 'work', show: true, primary: true },
-    { label: 'About', href: '#about', id: 'about', show: true, primary: true },
-    { label: 'Skills', href: '#skills', id: 'skills', show: true },
-    { label: 'Experience', href: '#experience', id: 'experience', show: siteConfig.preferences.showExperience },
-    { label: 'Recognition', href: '#awards', id: 'awards', show: siteConfig.preferences.showAwards },
-    { label: 'Ventures', href: '#side-hustles', id: 'side-hustles', show: siteConfig.preferences.showVentures },
-    { label: 'Contact', href: '#contact', id: 'contact', show: true, primary: true },
-  ].filter((item) => item.show);
-  const desktopLinks = navLinks.filter((item) => item.primary);
+    { label: 'Services', href: '/#hire-me', id: 'services' },
+    { label: 'Work', href: '/work', id: 'work' },
+    { label: 'Pricing', href: '/pricing', id: 'pricing' },
+    { label: 'About', href: '/about', id: 'about' },
+    { label: 'Contact', href: '/contact', id: 'contact' },
+  ];
+  const desktopLinks = navLinks;
+  // Active item: the current page, or (on the homepage) the section in view
+  const activeId = isHome ? PRIMARY_FOR[activeSection] || '' : navIdForPath(pathname);
 
   return (
     <>
@@ -182,7 +197,7 @@ export default function Header({
           >
             <ul className="nav-dock-list">
               {desktopLinks.map((link) => {
-                const isActive = (PRIMARY_FOR[activeSection] || activeSection) === link.id;
+                const isActive = activeId === link.id;
                 return (
                   <li key={link.href}>
                     <a
@@ -234,11 +249,21 @@ export default function Header({
               {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
             </button>
 
+            {/* Second door: recruiters / HR */}
+            <a
+              href="/recruiters"
+              className={`nav-recruiter-link desktop-only${pathname === '/recruiters' ? ' is-active' : ''}`}
+              aria-current={pathname === '/recruiters' ? 'page' : undefined}
+            >
+              <BriefcaseBusiness size={14} aria-hidden="true" />
+              <span>For recruiters</span>
+            </a>
+
             {/* Glow Ring: an iridescent ring orbits the icon disc and settles on hover */}
             <button
               type="button"
               className="nav-cta-btn glow-ring-btn desktop-only"
-              onClick={(e) => (onOpenCalModal ? onOpenCalModal(e.currentTarget) : (window.location.hash = '#contact'))}
+              onClick={(e) => (onOpenCalModal ? onOpenCalModal(e.currentTarget) : (window.location.href = '/contact'))}
             >
               <span className="glow-ring-disc" aria-hidden="true">
                 <Calendar size={13} />
@@ -304,8 +329,8 @@ export default function Header({
                 <li key={link.href} style={{ '--i': idx }}>
                   <a
                     href={link.href}
-                    className={`mobile-nav-item ${activeSection === link.id ? 'active' : ''}`}
-                    aria-current={activeSection === link.id ? 'location' : undefined}
+                    className={`mobile-nav-item ${activeId === link.id ? 'active' : ''}`}
+                    aria-current={activeId === link.id ? 'page' : undefined}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <span className="mobile-nav-num">{String(idx + 1).padStart(2, '0')}</span>
@@ -320,29 +345,25 @@ export default function Header({
               {onSetPalette && <PaletteRow palette={palette} onSetPalette={onSetPalette} />}
 
               <a
-                href="#contact"
+                href="/contact"
                 className="btn btn-primary glow-ring-btn mobile-drawer-cta"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="glow-ring-disc" aria-hidden="true">
                   <ArrowRight size={14} />
                 </span>
-                <span>Get in Touch</span>
+                <span>Start a project</span>
               </a>
 
-              {isValidContent(siteConfig.identity.resume) && (
-                <a
-                  href={siteConfig.identity.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-secondary btn-liquid-glass mobile-drawer-cta"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <FileText size={16} aria-hidden="true" />
-                  <span>View Resume</span>
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </a>
-              )}
+              <a
+                href="/recruiters"
+                className="btn btn-secondary btn-liquid-glass mobile-drawer-cta"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <FileText size={16} aria-hidden="true" />
+                <span>For recruiters: resume</span>
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </a>
 
               <div className="mobile-quick-links">
                 {isValidContent(siteConfig.contact.whatsapp) && (

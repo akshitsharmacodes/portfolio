@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { siteConfig, isValidContent } from '../config/site';
-import { ArrowDown, ArrowUpRight, Calendar, Sun, Moon, Pause, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { siteConfig } from '../config/site';
+import { ArrowRight, ArrowUpRight, Calendar, Sun, Moon, Pause, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { easeCurves } from '../config/motion';
 import MeshFlow from './MeshFlow';
@@ -10,7 +11,7 @@ import EclipseArc from './EclipseArc';
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
 // Tech marquee under the hero (✦ separators come from CSS)
-const STACK = ['Python', 'LangGraph', 'LangChain', 'RAG', 'FastAPI', 'Django', 'PostgreSQL', 'pgvector', 'Redis', 'OpenAI', 'Claude', 'Docker'];
+const STACK = ['AI agents', 'Chatbots', 'RAG', 'LangGraph', 'Web design', 'React & Next.js', 'SEO', 'AEO / AI search', 'FastAPI', 'Python', 'Schema', 'Core Web Vitals'];
 
 const containerVariants = {
   hidden: {},
@@ -49,11 +50,11 @@ export default function Hero({
   theme,
   palette,
 }) {
-  const { identity, metrics } = siteConfig;
-  const headlineLead = identity.headline.replace(identity.headlineAccent, '').trim();
+  const { agency, metrics } = siteConfig;
+  const headlineLead = agency.headline.replace(agency.headlineAccent, '').trim();
   const ready = usePreloaderDone();
-  // "Available for Hire · Contract & Freelance Projects": the second half hides on phones
-  const [availMain, ...rest] = identity.availability.split(' · ');
+  // "Booking new projects · India & worldwide": the second half hides on phones
+  const [availMain, ...rest] = agency.availability.split(' · ');
   const availMore = rest.join(' · ');
 
   const Wrap = motionEnabled ? motion.div : 'div';
@@ -71,22 +72,22 @@ export default function Hero({
       <div className="container hero-eclipse-inner">
         <Wrap className="hero-eclipse-content" {...wrapProps}>
           <Item {...itemProps}>
-            <a href="#contact" className="hero-status">
+            <Link to="/contact" className="hero-status">
               <span className="status-dot" aria-hidden="true" />
               <span>
                 {availMain}
                 {availMore && <span className="hero-status-more"> · {availMore}</span>}
               </span>
-            </a>
+            </Link>
           </Item>
 
           <Item {...itemProps}>
             <h1 className="hero-title">
               {/* Name stays in the h1 for search and screen readers; the nav already shows it */}
-              <span className="sr-only">{identity.fullName}, {identity.profession}: </span>
+              <span className="sr-only">{agency.name}, AI agent, web development, SEO and AEO studio: </span>
               <FocusHeadline
                 lead={headlineLead}
-                accent={identity.headlineAccent}
+                accent={agency.headlineAccent}
                 motionEnabled={motionEnabled}
                 ready={ready}
               />
@@ -94,7 +95,7 @@ export default function Hero({
           </Item>
 
           <Item {...itemProps}>
-            <p className="hero-intro">{identity.heroLine || identity.intro}</p>
+            <p className="hero-intro">{agency.heroLine}</p>
           </Item>
 
           <Item {...itemProps}>
@@ -109,23 +110,15 @@ export default function Hero({
                 </span>
                 <span>Book a discovery call</span>
               </button>
-              <a href="#work" className="btn btn-secondary btn-liquid-glass">
-                <span>See my work</span>
-                <ArrowDown size={15} aria-hidden="true" />
-              </a>
+              <Link to="/services/ai-agents-chatbots" className="btn btn-secondary btn-liquid-glass">
+                <span>Explore services</span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </Link>
             </div>
-            {isValidContent(identity.resume) && (
-              <a
-                href={identity.resume}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-link hero-resume"
-                aria-label="View resume (opens Google Drive)"
-              >
-                <span>or view my resume</span>
-                <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
+            <Link to="/recruiters" className="btn-link hero-resume">
+              <span>Hiring for a role? See Akshit's resume</span>
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
           </Item>
 
           {/* Elegant Prompt Ribbon (Revealed after preloader finishes & home screen loads) */}

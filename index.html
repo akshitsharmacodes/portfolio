@@ -8,11 +8,10 @@
     <title>Akshit Sharma | AI Agent &amp; RAG Developer for Hire</title>
     <meta name="title" content="Akshit Sharma | AI Agent &amp; RAG Developer for Hire" />
     <meta name="description" content="AI engineer building production AI agents, RAG pipelines and LangGraph workflows in Python and FastAPI. Book a free scoping call with Akshit Sharma." />
-    <meta name="keywords" content="best developer portfolio, Python developer, Python developer portfolio, AI developer, LangGraph, LangChain, RAG systems, AI agents, FastAPI, full stack developer, Akshit Sharma" />
     <meta name="author" content="Akshit Sharma" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="theme-color" content="#0a0a0a" />
-    <link rel="canonical" href="https://akshitsharma.dev/" />
+    <link rel="canonical" href="https://www.akshitsharma.dev/" />
 
     <!--
       Pre-paint bootstrap: apply the saved theme and motion preference before the first
@@ -52,8 +51,15 @@
             root.setAttribute('data-motion', 'off');
           }
 
-          if (motionOff) root.setAttribute('data-preload', 'skip');
-          else root.classList.add('is-preloading');
+          // The intro plays once per visitor (it delays the first paint of real content), and
+          // never for search/link-preview crawlers, so they render the page itself
+          var seen = localStorage.getItem('akshit-intro-seen') === '1';
+          var crawler = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview/i.test(navigator.userAgent);
+          if (motionOff || seen || crawler) root.setAttribute('data-preload', 'skip');
+          else {
+            root.classList.add('is-preloading');
+            localStorage.setItem('akshit-intro-seen', '1');
+          }
         } catch (e) {
           /* Fallback on storage errors: proceed without breaking styles */
         }
@@ -62,11 +68,12 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://akshitsharma.dev/" />
+    <meta property="og:url" content="https://www.akshitsharma.dev/" />
     <meta property="og:site_name" content="Akshit Sharma | Developer Portfolio" />
     <meta property="og:title" content="Akshit Sharma | AI Agent &amp; RAG Developer for Hire" />
     <meta property="og:description" content="AI engineer building production AI agents, RAG pipelines and LangGraph workflows in Python and FastAPI. Book a free scoping call with Akshit Sharma." />
-    <meta property="og:image" content="https://akshitsharma.dev/og-preview.png" />
+    <meta property="og:image" content="https://www.akshitsharma.dev/og-preview.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Akshit Sharma - Python & AI Developer Portfolio" />
@@ -74,21 +81,23 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://akshitsharma.dev/" />
+    <meta name="twitter:url" content="https://www.akshitsharma.dev/" />
     <meta name="twitter:title" content="Akshit Sharma | AI Agent &amp; RAG Developer for Hire" />
     <meta name="twitter:description" content="AI engineer building production AI agents, RAG pipelines and LangGraph workflows in Python and FastAPI. Book a free scoping call with Akshit Sharma." />
-    <meta name="twitter:image" content="https://akshitsharma.dev/og-preview.png" />
+    <meta name="twitter:image" content="https://www.akshitsharma.dev/og-preview.jpg" />
     <meta name="twitter:image:alt" content="Akshit Sharma - Python & AI Developer Portfolio" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Google Fonts: Geist (UI + display), Geist Mono (meta), Caveat (accent) -->
+    <!-- Google Fonts: Geist (UI + display), Geist Mono (meta), Caveat 600 (Ventures heading accent only) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -140,7 +149,7 @@
         transition: opacity 260ms ease;
       }
       .preloader.is-leaving .pl-stage,
-      .preloader.is-leaving .pl-col,
+      .preloader.is-leaving .pl-layer,
       .preloader.is-leaving .pl-hint { opacity: 0; transition: opacity 220ms ease; }
 
       /* Title card: name builds in word by word, then the role line ticks in under it */
@@ -198,35 +207,72 @@
       }
       .pl-role > span { display: inline-flex; transform: translateY(8px); }
 
-      /* Cards stream up both sides */
-      .pl-col {
+      /* Cards: three depth layers drifting diagonally toward the centre (a V), each card with
+         its own tilt, size and speed. Layers shift against the cursor / device tilt (parallax). */
+      .preloader { --cw: clamp(132px, 12vw, 176px); --mx: 0; --my: 0; }
+      .pl-layer {
         position: absolute;
-        top: 0;
-        width: clamp(96px, 12vw, 150px);
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        transform: translateY(100vh);
-        animation: plStream 2600ms cubic-bezier(0.3, 0.1, 0.3, 1) forwards;
+        inset: 0;
+        pointer-events: none;
+        transform: translate3d(calc(var(--mx) * var(--px)), calc(var(--my) * var(--px)), 0);
+        transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
       }
-      .pl-col.left { left: clamp(16px, 4vw, 56px); }
-      .pl-col.right { right: clamp(16px, 4vw, 56px); animation-delay: 160ms; }
+      .pl-layer.far  { --px: -10px; --s: 0.62; opacity: 0.45; filter: blur(1.4px); z-index: 1; }
+      .pl-layer.mid  { --px: -22px; --s: 0.82; opacity: 0.75; filter: blur(0.3px); z-index: 2; }
+      .pl-layer.near { --px: -40px; --s: 1;    opacity: 1;    z-index: 3; }
       .pl-card {
+        position: absolute;
+        top: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        aspect-ratio: 4 / 5;
-        padding: 10px;
+        gap: 6px;
+        width: calc(var(--cw) * var(--s));
+        padding: calc(12px * var(--s));
         border: 1px solid var(--pl-line);
-        border-radius: 14px;
+        border-radius: calc(16px * var(--s));
         background: var(--pl-card);
+        box-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
         font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 11px;
+        font-size: calc(10.5px * var(--s));
         color: var(--pl-dim);
+        will-change: transform;
+        animation: plDrift var(--dur) linear var(--delay) infinite;
       }
-      .pl-card b { font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 600; color: var(--pl-fg); }
+      .pl-card.l { left: var(--x); --dx: 30vh; }
+      .pl-card.r { right: var(--x); --dx: -30vh; }
+      .pl-card small { font-size: 1em; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
+      .pl-card b {
+        font-family: 'Geist', sans-serif;
+        font-size: calc(17px * var(--s));
+        font-weight: 650;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        color: var(--pl-fg);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .pl-card em { font-style: normal; }
+      .pl-card .bar {
+        display: block;
+        height: 3px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--pl-accent, #e5484d) calc(var(--v) * 100%), var(--pl-line) 0);
+      }
       .pl-card.hot { background: var(--pl-accent, #e5484d); border-color: transparent; color: rgba(255, 255, 255, 0.8); }
       .pl-card.hot b { color: #fff; }
+      .pl-card.hot .bar { background: linear-gradient(90deg, #fff calc(var(--v) * 100%), rgba(255, 255, 255, 0.3) 0); }
+      /* Keep the name readable: a soft clear zone behind the title card */
+      .pl-stage { z-index: 5; }
+      .pl-stage::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(ellipse 34% 24% at 50% 50%, var(--pl-bg) 35%, transparent 78%);
+      }
       .pl-hint {
         position: absolute;
         left: 50%;
@@ -241,150 +287,44 @@
         white-space: nowrap;
       }
       @keyframes plWord { to { opacity: 1; transform: none; filter: none; } }
-      @keyframes plStream { to { transform: translateY(-110%); } }
+      @keyframes plDrift {
+        from { transform: translate3d(0, 0, 0) rotate(var(--tilt)); }
+        to { transform: translate3d(var(--dx), calc(-100vh - 140%), 0) rotate(var(--tilt)); }
+      }
       @keyframes plFade { to { opacity: 0.8; } }
       @media (max-width: 640px) {
-        .pl-col, .pl-hint { display: none; }
+        .preloader { --cw: 104px; }
+        /* Phones: only the faint far layer, so cards never crowd the name or role pills */
+        .pl-layer.near, .pl-layer.mid, .pl-hint { display: none; }
+        .pl-layer.far { opacity: 0.4; }
+        .pl-card.l { --dx: 18vh; }
+        .pl-card.r { --dx: -18vh; }
       }
     </style>
     <noscript><style>.preloader { display: none; } html.is-preloading { overflow: auto; }</style></noscript>
 
     <!-- JSON-LD Structured Data for Akshit Sharma (Graph Schema: WebSite + ProfilePage + Person) -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "@id": "https://akshitsharma.dev/#website",
-            "url": "https://akshitsharma.dev/",
-            "name": "Akshit Sharma | Python & AI Developer Portfolio",
-            "description": "Interactive developer portfolio of Akshit Sharma, AI/ML developer specializing in Python, AI agents, LangGraph, and RAG systems.",
-            "publisher": {
-              "@id": "https://akshitsharma.dev/#person"
-            },
-            "inLanguage": "en-US"
-          },
-          {
-            "@type": "ProfilePage",
-            "@id": "https://akshitsharma.dev/#profilepage",
-            "url": "https://akshitsharma.dev/",
-            "name": "Akshit Sharma - Python & AI Developer Portfolio",
-            "isPartOf": {
-              "@id": "https://akshitsharma.dev/#website"
-            },
-            "about": {
-              "@id": "https://akshitsharma.dev/#person"
-            },
-            "mainEntity": {
-              "@id": "https://akshitsharma.dev/#person"
-            }
-          },
-          {
-            "@type": "ProfessionalService",
-            "@id": "https://akshitsharma.dev/#service",
-            "name": "Akshit Sharma: AI agent and RAG development",
-            "url": "https://akshitsharma.dev/",
-            "image": "https://akshitsharma.dev/og-preview.png",
-            "provider": { "@id": "https://akshitsharma.dev/#person" },
-            "founder": { "@id": "https://akshitsharma.dev/#person" },
-            "areaServed": "Worldwide",
-            "address": { "@type": "PostalAddress", "addressLocality": "Chandigarh", "addressCountry": "IN" },
-            "email": "akshitsharmacodes@gmail.com",
-            "hasOfferCatalog": {
-              "@type": "OfferCatalog",
-              "name": "AI engineering services",
-              "itemListElement": [
-                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Autonomous AI agents and workflows", "description": "Multi-agent systems with LangGraph and LangChain that automate repetitive business processes." } },
-                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Enterprise RAG and semantic retrieval", "description": "Retrieval-augmented generation pipelines over company documents with vector search and cited answers." } },
-                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Production backend engineering", "description": "FastAPI and Django backends with PostgreSQL and Redis." } },
-                { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "MVP to production delivery", "description": "Taking an AI prototype to a maintainable production system." } }
-              ]
-            }
-          },
-          {
-            "@type": "Person",
-            "@id": "https://akshitsharma.dev/#person",
-            "name": "Akshit Sharma",
-            "alternateName": ["akshitsharmacodes", "Akshit"],
-            "url": "https://akshitsharma.dev/",
-            "image": "https://akshitsharma.dev/og-preview.png",
-            "jobTitle": "AI Engineer (AI Agents & RAG)",
-            "address": { "@type": "PostalAddress", "addressLocality": "Chandigarh", "addressCountry": "IN" },
-            "description": "AI/ML developer building LLM-powered products, agentic workflows, and RAG systems with Python, LangGraph, FastAPI, and Django.",
-            "hasOccupation": [
-              {
-                "@type": "Occupation",
-                "name": "Python Developer",
-                "skills": "Python, FastAPI, Django, PostgreSQL, Redis, REST APIs, Microservices"
-              },
-              {
-                "@type": "Occupation",
-                "name": "AI/ML Developer",
-                "skills": "AI Agents, LangGraph, LangChain, Retrieval-Augmented Generation (RAG), Vector Databases, PyTorch"
-              }
-            ],
-            "worksFor": {
-              "@type": "Organization",
-              "name": "LeadManch"
-            },
-            "alumniOf": [
-              {
-                "@type": "CollegeOrUniversity",
-                "name": "Amity University, Mohali"
-              },
-              {
-                "@type": "EducationalOrganization",
-                "name": "Officers Training Academy, Gaya"
-              },
-              {
-                "@type": "EducationalOrganization",
-                "name": "Sainik School Kapurthala"
-              }
-            ],
-            "knowsAbout": [
-              "Python",
-              "Python Web Development",
-              "Artificial Intelligence",
-              "Machine Learning",
-              "AI Agents",
-              "LangChain",
-              "LangGraph",
-              "Retrieval-Augmented Generation (RAG)",
-              "FastAPI",
-              "Django",
-              "PostgreSQL",
-              "Redis",
-              "Vector Databases",
-              "Software Engineering"
-            ],
-            "award": [
-              "Smart India Hackathon 2025: 1st Place, internal round at Amity University",
-              "Zinnovatio 3.0 Finalist",
-              "Services Selection Board (SSB) Recommended (TES-48)"
-            ],
-            "sameAs": [
-              "https://www.linkedin.com/in/akshitsharmacodes",
-              "https://github.com/akshitsharmacodes",
-              "https://leetcode.com/u/akshitsharmacodes/",
-              "https://www.upwork.com/freelancers/~016a5a49d7e054a783?viewMode=1",
-              "https://cal.com/akshitsharmacodes"
-            ]
-          }
-        ]
-      }
-    </script>
+    <!-- Page-specific JSON-LD is injected here at build time (scripts/prerender.mjs) -->
+    <!--ld-page-->
 
-    <!-- Google Tag Manager & Google Analytics 4 (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C03K4ZTYVD"></script>
-    <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KDH7KZ88"></script>
+    <!--
+      Google Tag Manager (GTM-KDH7KZ88). GA4 (G-C03K4ZTYVD) is configured inside this container,
+      so it is not loaded separately (that double-counted every page view). GTM loads after the
+      page has finished loading, so it doesn't compete with the first paint.
+    -->
     <script>
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-      function gtag(){ window.dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', 'G-C03K4ZTYVD', { page_path: window.location.pathname });
+      window.addEventListener('load', function () {
+        var run = function () {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KDH7KZ88';
+          document.head.appendChild(s);
+        };
+        if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });
+        else setTimeout(run, 1500);
+      });
     </script>
   </head>
   <body>
@@ -393,19 +333,25 @@
     <div class="preloader" id="preloader" aria-hidden="true">
       <div class="pl-half top"></div>
       <div class="pl-half bottom"></div>
-      <div class="pl-col left">
-        <div class="pl-card"><span>01</span><b>Agents</b></div>
-        <div class="pl-card hot"><span>rag</span><b>Retrieval</b></div>
-        <div class="pl-card"><span>py</span><b>FastAPI</b></div>
-        <div class="pl-card"><span>db</span><b>pgvector</b></div>
-        <div class="pl-card"><span>05</span><b>Evals</b></div>
+      <div class="pl-layer far">
+          <div class="pl-card l" style="--x: 3vw; --dur: 6.2s; --delay: -1.2s; --tilt: -5deg"><small>pgvector</small><b>1536-d</b><em>embeddings</em></div>
+          <div class="pl-card l" style="--x: 13vw; --dur: 5.6s; --delay: -4.0s; --tilt: 4deg"><small>commit a91f</small><b>feat: agent tools</b><em>main · 2m ago</em></div>
+          <div class="pl-card l" style="--x: 19vw; --dur: 6.4s; --delay: -3.1s; --tilt: 2deg"><small>docker</small><b>healthy</b><em>api · worker · db</em></div>
+          <div class="pl-card r" style="--x: 4vw; --dur: 6.0s; --delay: -2.6s; --tilt: 5deg"><small>redis</small><b>98%</b><em>cache hit rate</em><i class="bar" style="--v: 0.98"></i></div>
+          <div class="pl-card r" style="--x: 15vw; --dur: 5.8s; --delay: -0.4s; --tilt: -3deg"><small>uptime</small><b>99.9%</b><em>last 30 days</em></div>
       </div>
-      <div class="pl-col right">
-        <div class="pl-card"><span>graph</span><b>LangGraph</b></div>
-        <div class="pl-card"><span>llm</span><b>Claude</b></div>
-        <div class="pl-card hot"><span>ship</span><b>Production</b></div>
-        <div class="pl-card"><span>cache</span><b>Redis</b></div>
-        <div class="pl-card"><span>ops</span><b>Docker</b></div>
+      <div class="pl-layer mid">
+          <div class="pl-card l" style="--x: 1vw; --dur: 4.5s; --delay: -4.3s; --tilt: 3deg"><small>claude</small><b>tool_use</b><em>3 calls</em></div>
+          <div class="pl-card l" style="--x: 7vw; --dur: 4.6s; --delay: -2.2s; --tilt: -3deg"><small>terminal</small><b>$ agent.run()</b><em>✓ resolved · 41s</em></div>
+          <div class="pl-card l" style="--x: 17vw; --dur: 4.8s; --delay: -3.6s; --tilt: 5deg"><small>langgraph</small><b>supervisor → tools</b><em>3 nodes</em></div>
+          <div class="pl-card r" style="--x: 9vw; --dur: 4.4s; --delay: -0.8s; --tilt: 4deg"><small>rag hit</small><b>refund-policy.pdf</b><em>score 0.94</em><i class="bar" style="--v: 0.94"></i></div>
+          <div class="pl-card r" style="--x: 19vw; --dur: 4.2s; --delay: -2.9s; --tilt: -4deg"><small>hack-o-octo 4.0</small><b>Top 10</b><em>national finalist</em></div>
+      </div>
+      <div class="pl-layer near">
+          <div class="pl-card l hot" style="--x: 10vw; --dur: 3.4s; --delay: -1.1s; --tilt: -6deg"><small>evals</small><b>96.4%</b><em>pass rate</em><i class="bar" style="--v: 0.964"></i></div>
+          <div class="pl-card l" style="--x: 2vw; --dur: 3.6s; --delay: -2.9s; --tilt: 3deg"><small>smart india hackathon</small><b>1st place</b><em>internal round 2025</em></div>
+          <div class="pl-card r" style="--x: 6vw; --dur: 3.2s; --delay: -2.3s; --tilt: 6deg"><small>post</small><b>/v1/agents/run</b><em>200 · 38 ms</em></div>
+          <div class="pl-card r hot" style="--x: 14vw; --dur: 3.3s; --delay: -0.2s; --tilt: -5deg"><small>deploy</small><b>production ✓</b><em>evals · docs · monitoring</em></div>
       </div>
       <div class="pl-stage">
         <div class="pl-tagline">
@@ -421,8 +367,9 @@
     </div>
     <script>
       /*
-        Intro loader: a name + role title card builds in word by word (CSS) while cards
-        stream up both sides, then the screen splits open onto the page. About 2.1s; waits for
+        Intro loader: a name + role title card builds in word by word (CSS) while snippet cards
+        drift diagonally toward the centre in three depth layers that shift with the cursor or
+        device tilt (parallax). Then the screen splits open onto the page. About 3s; waits for
         the page load if needed; skipped with motion off; any key / click / tap jumps to the split.
       */
       (function () {
@@ -448,6 +395,8 @@
           leaving = true;
           window.removeEventListener('keydown', leave, true);
           window.removeEventListener('pointerdown', leave, true);
+          window.removeEventListener('pointermove', onPointer);
+          window.removeEventListener('deviceorientation', onOrient);
           el.classList.add('is-leaving');
           root.classList.remove('is-preloading');
           // Start the hero entrance as the halves part, so they overlap
@@ -457,33 +406,29 @@
         function maybeLeave() { if (minDone && loaded) leave(); }
         if (!loaded) window.addEventListener('load', function () { loaded = true; maybeLeave(); });
 
-        setTimeout(function () { minDone = true; maybeLeave(); }, 2050);
+        // Parallax: layers shift against the pointer (or phone tilt), the nearest the most
+        function setTilt(mx, my) {
+          el.style.setProperty('--mx', mx.toFixed(3));
+          el.style.setProperty('--my', my.toFixed(3));
+        }
+        function onPointer(e) {
+          setTilt((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+        }
+        function onOrient(e) {
+          if (e.gamma == null) return;
+          setTilt(Math.max(-1, Math.min(1, e.gamma / 25)), Math.max(-1, Math.min(1, (e.beta - 40) / 25)));
+        }
+        window.addEventListener('pointermove', onPointer, { passive: true });
+        window.addEventListener('deviceorientation', onOrient, { passive: true });
+
+        setTimeout(function () { minDone = true; maybeLeave(); }, 3000);
         window.addEventListener('keydown', leave, true);
         window.addEventListener('pointerdown', leave, true);
-        setTimeout(leave, 4500);
+        setTimeout(leave, 5500);
       })();
     </script>
     <div id="root"></div>
-    <noscript>
-      <main style="max-width: 680px; margin: 48px auto; padding: 0 16px; font-family: Geist, system-ui, sans-serif">
-        <h1>Akshit Sharma, AI engineer: I build AI agents that eliminate repetitive work.</h1>
-        <p>AI engineer from Chandigarh, India, building production AI agents, RAG pipelines and LangGraph workflows with Python, FastAPI and Django.</p>
-        <h2>Services</h2>
-        <ul>
-          <li>Autonomous AI agents and workflows</li>
-          <li>Enterprise RAG and semantic retrieval</li>
-          <li>Production backend engineering</li>
-          <li>MVP to production delivery</li>
-        </ul>
-        <h2>Contact</h2>
-        <p>
-          <a href="mailto:akshitsharmacodes@gmail.com">akshitsharmacodes@gmail.com</a> ·
-          <a href="https://cal.com/akshitsharmacodes">Book a call</a> ·
-          <a href="https://www.linkedin.com/in/akshitsharmacodes">LinkedIn</a> ·
-          <a href="https://github.com/akshitsharmacodes">GitHub</a>
-        </p>
-      </main>
-    </noscript>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

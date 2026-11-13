@@ -1,6 +1,7 @@
 import React from 'react';
 import { siteConfig, isValidContent } from '../config/site';
-import { Zap, Bot, Database, Server, ArrowUpRight, Calendar, CheckCircle2, MessageCircle } from 'lucide-react';
+import { Bot, Globe, Search, Sparkles, ArrowUpRight, Calendar, CheckCircle2, MessageCircle } from 'lucide-react';
+import { services } from '../data/services';
 import { motion } from 'framer-motion';
 import ServiceTabs from './ServiceTabs';
 import { scrollViewportEarly, cardRevealVariant, luxuryTransition } from '../config/motion';
@@ -22,36 +23,17 @@ function UpworkLogo({ size = 18, className = '' }) {
   );
 }
 
-const clientPillars = [
-  {
-    icon: Bot,
-    num: '01',
-    title: 'Autonomous AI Agents & Workflows',
-    desc: 'Eliminate repetitive operational work. I architect multi-agent state graphs with LangGraph and LangChain that parse inputs, orchestrate tools, and deliver verified results.',
-    tags: ['LangGraph', 'LangChain', 'Agent Workflows', 'Decision Logic'],
-  },
-  {
-    icon: Database,
-    num: '02',
-    title: 'Enterprise RAG & Semantic Retrieval',
-    desc: 'Ground AI responses in your authentic enterprise data. Vector indexing in ChromaDB, hybrid relational querying in PostgreSQL, and Redis caching for low-latency throughput.',
-    tags: ['RAG Pipelines', 'ChromaDB', 'Vector Search', 'Hybrid Retrieval'],
-  },
-  {
-    icon: Server,
-    num: '03',
-    title: 'Production Backend Engineering',
-    desc: 'Scalable FastAPI and Django REST backends designed for enterprise reliability, asynchronous task queues with Celery and Redis, and automated data workflows.',
-    tags: ['FastAPI', 'Django REST', 'Celery', 'PostgreSQL', 'Redis'],
-  },
-  {
-    icon: Zap,
-    num: '04',
-    title: 'Fast MVP to Production Execution',
-    desc: 'From initial architecture to deployable software. Won the Smart India Hackathon 2025 internal round at Amity University; a track record of delivering maintainable, well-documented code on deadline.',
-    tags: ['MVP Architecture', 'Clean Code', 'Docker', 'AWS / Linux'],
-  },
-];
+// The four Gentle Tech Labs services, each linking to its own page
+const SERVICE_ICONS = [Bot, Globe, Search, Sparkles];
+const clientPillars = services.map((svc, i) => ({
+  icon: SERVICE_ICONS[i],
+  num: svc.num,
+  title: svc.name,
+  desc: `${svc.short} ${svc.intro}`,
+  tags: svc.stack.slice(0, 5),
+  href: `/services/${svc.slug}`,
+  linkLabel: `${svc.name}: from ${svc.from.inr} / ${svc.from.usd}`,
+}));
 
 const trustBadges = [
   { title: 'Upwork Escrow Protection', desc: 'Hire safely with hourly tracking or milestone escrow.' },
@@ -71,9 +53,9 @@ export default function ClientEngine({ motionEnabled = true }) {
       <div className="container">
         <SectionHeader
           motionEnabled={motionEnabled}
-          tag="Client Collaboration & Freelance"
-          title={<>Have a Software Task? <span className="text-accent">Hire Me.</span></>}
-          description="I help founders, tech leaders, and fast-growing businesses turn technical bottlenecks into scalable AI products, automated workflows, and robust backends."
+          tag="Services"
+          title={<>Four services. <span className="text-accent">One accountable team.</span></>}
+          description="AI that takes work off your team, websites that convert, and the search visibility to get found on Google and in AI assistants. Every project is led by our founder from first call to launch."
         />
 
         {/* Interactive service tabs with live architecture scenes */}
@@ -101,7 +83,7 @@ export default function ClientEngine({ motionEnabled = true }) {
                 className="client-banner-heading"
                 
               >
-                Ready to build or scale your system?
+                Ready to start your project?
               </HeadingTag>
             </div>
 
@@ -142,7 +124,7 @@ export default function ClientEngine({ motionEnabled = true }) {
                 className="btn btn-secondary btn-liquid-glass"
               >
                 <Calendar size={16} aria-hidden="true" />
-                <span>Book 15-Min Call</span>
+                <span>Book a discovery call</span>
               </a>
             </div>
           </div>

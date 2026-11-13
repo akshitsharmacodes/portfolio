@@ -78,7 +78,7 @@ export const experienceData = [
       "Trained in battle tactics, map reading and terrain navigation, weapons handling, drill and horsemanship, building structured decision-making under pressure, discipline and leadership.",
     ],
     tech: ["Leadership Under Pressure", "Tactical Decision Making", "High-Stakes Execution", "Discipline & Planning"],
-    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/overlay/Education/969402025/treasury/?profileId=ACoAAD03ZrYBE0jKVwqOPcT55T-q49VhhIIkYkI",
+    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/details/education/",
     credentialLabel: "View Joining Letter / Offer",
   },
 ];
@@ -165,7 +165,7 @@ export const awardsData = [
     badge: "Recommended",
     category: "Defense Selection",
     year: "2022",
-    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/overlay/Position/2369391183/treasury/?profileId=ACoAAD03ZrYBE0jKVwqOPcT55T-q49VhhIIkYkI",
+    credentialUrl: "https://www.linkedin.com/in/akshitsharmacodes/details/experience/",
     credentialLabel: "View SSB Recommendation Photo",
   },
 ];
