@@ -2961,3 +2961,126 @@ h3 .text-accent,
     padding: 0 6px;
   }
 }
+
+/* ==========================================================================
+   HOMEPAGE STREAMLINED UTILITY FOOTER (Option 4 + Option 1)
+   ========================================================================== */
+.footer-block-inner--compact {
+  padding: clamp(24px, 3.2vw, 36px) clamp(20px, 3.5vw, 40px) clamp(18px, 2.5vw, 24px);
+}
+
+.footer-home-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: clamp(24px, 4vw, 48px);
+  flex-wrap: wrap;
+}
+
+.footer-home-brand {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-brand-title {
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  font-weight: 700;
+  color: var(--block-fg);
+  text-decoration: none;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.footer-brand-title:hover {
+  opacity: 0.9;
+}
+
+.footer-brand-sub {
+  font-size: var(--fs-sm);
+  color: var(--block-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.footer-availability-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 4px 12px;
+  border: 1px solid var(--block-line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  letter-spacing: 0.04em;
+  color: var(--block-muted);
+  width: fit-content;
+}
+
+.footer-availability-chip .status-dot {
+  background: currentColor;
+}
+
+.footer-home-nav-grid {
+  display: flex;
+  gap: clamp(32px, 5vw, 64px);
+  flex-wrap: wrap;
+}
+
+.footer-nav-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.footer-nav-header {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--block-muted);
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.footer-nav-col .footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--block-muted);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  transition: color 160ms ease, transform 160ms ease;
+  width: fit-content;
+}
+
+.footer-nav-col .footer-link:hover {
+  color: var(--block-fg);
+  transform: translateX(2px);
+}
+
+.footer-block--home .footer-block-bottom {
+  margin-top: clamp(20px, 3vw, 32px);
+}
+
+@media (max-width: 680px) {
+  .footer-home-grid {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .footer-home-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 20px;
+    width: 100%;
+  }
+
+  .footer-block-inner--compact {
+    padding: 22px 18px 18px;
+  }
+}
+
