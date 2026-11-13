@@ -26,12 +26,18 @@ export default function MeshFlow({ motionEnabled }) {
     let colors = { ink: '20,20,20', accent: '215,38,61' };
 
     const toRgb = (value) => {
-      const probe = document.createElement('span');
-      probe.style.color = value;
-      document.body.appendChild(probe);
-      const rgb = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g) || ['0', '0', '0'];
-      probe.remove();
-      return rgb.slice(0, 3).join(',');
+      if (!value) return '20,20,20';
+      const str = String(value).trim();
+      if (str.startsWith('#')) {
+        let hex = str.slice(1);
+        if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
+        if (hex.length === 6) {
+          const num = parseInt(hex, 16);
+          return `${(num >> 16) & 255},${(num >> 8) & 255},${num & 255}`;
+        }
+      }
+      const match = str.match(/\d+(\.\d+)?/g);
+      return match && match.length >= 3 ? match.slice(0, 3).join(',') : '20,20,20';
     };
     const readColors = () => {
       const cs = getComputedStyle(document.documentElement);

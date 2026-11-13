@@ -375,7 +375,7 @@ export default function Header({
                 href="/contact"
                 className="btn btn-primary glow-ring-btn mobile-drawer-cta"
                 onClick={() => setMobileMenuOpen(false)}
-                aria-label="Contact: Start a project"
+                aria-label="Contact"
               >
                 <span className="glow-ring-disc" aria-hidden="true">
                   <ArrowRight size={14} />

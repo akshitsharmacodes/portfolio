@@ -17,7 +17,8 @@ export default function FocusHeadline({ lead, accent, motionEnabled, ready }) {
   const [frame, setFrame] = useState(null);
 
   useEffect(() => {
-    if (!motionEnabled) {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    if (!motionEnabled || isMobile) {
       setSharp(total);
       setFrame(null);
       return undefined;

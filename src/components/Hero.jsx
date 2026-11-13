@@ -121,7 +121,7 @@ export default function Hero({
       <div className="container hero-eclipse-inner">
         <Wrap className="hero-eclipse-content" {...wrapProps}>
           <Item {...itemProps}>
-            <Link to="/contact" className="hero-status" aria-label="Contact: Booking new projects">
+            <Link to="/contact" className="hero-status" aria-label="Contact">
               <span className="status-dot" aria-hidden="true" />
               <span>
                 {availMain}

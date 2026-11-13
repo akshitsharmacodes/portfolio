@@ -21,43 +21,56 @@ export default function VisitorCounter() {
 
   useEffect(() => {
     let isMounted = true;
+    let timerId = null;
 
-    try {
-      // In a session, only hit once to increment; subsequent reloads only fetch latest
-      const hasHit = sessionStorage.getItem('as_has_hit_counter');
-      const endpoint = hasHit
-        ? `https://countapi.mileshilliard.com/api/v1/get/${COUNTER_KEY}`
-        : `https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`;
+    const doFetch = () => {
+      try {
+        // In a session, only hit once to increment; subsequent reloads only fetch latest
+        const hasHit = sessionStorage.getItem('as_has_hit_counter');
+        const endpoint = hasHit
+          ? `https://countapi.mileshilliard.com/api/v1/get/${COUNTER_KEY}`
+          : `https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`;
 
-      fetch(endpoint)
-        .then((res) => {
-          if (!res.ok) throw new Error('Counter unavailable');
-          return res.json();
-        })
-        .then((data) => {
-          if (!isMounted) return;
-          if (typeof data?.value === 'number') {
-            const total = data.value + BASE_COUNT;
-            setCount(total);
-            sessionStorage.setItem('as_has_hit_counter', '1');
-            sessionStorage.setItem('as_visitor_count', String(total));
-            localStorage.setItem('as_last_known_count', String(total));
-          }
-        })
-        .catch(() => {
-          // Fallback to cached or baseline gracefully
-          if (!count && isMounted) {
-            setCount(BASE_COUNT);
-          }
-        });
-    } catch {
-      if (!count && isMounted) {
-        setCount(BASE_COUNT);
+        fetch(endpoint)
+          .then((res) => {
+            if (!res.ok) throw new Error('Counter unavailable');
+            return res.json();
+          })
+          .then((data) => {
+            if (!isMounted) return;
+            if (typeof data?.value === 'number') {
+              const total = data.value + BASE_COUNT;
+              setCount(total);
+              sessionStorage.setItem('as_has_hit_counter', '1');
+              sessionStorage.setItem('as_visitor_count', String(total));
+              localStorage.setItem('as_last_known_count', String(total));
+            }
+          })
+          .catch(() => {
+            // Fallback to cached or baseline gracefully
+            if (!count && isMounted) {
+              setCount(BASE_COUNT);
+            }
+          });
+      } catch {
+        if (!count && isMounted) {
+          setCount(BASE_COUNT);
+        }
       }
-    }
+    };
 
+    // Defer network call so footer hit counter never blocks hero LCP or initial render
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const handle = window.requestIdleCallback(doFetch, { timeout: 4000 });
+      return () => {
+        isMounted = false;
+        window.cancelIdleCallback(handle);
+      };
+    }
+    timerId = setTimeout(doFetch, 2500);
     return () => {
       isMounted = false;
+      clearTimeout(timerId);
     };
   }, []);
 

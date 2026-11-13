@@ -28,9 +28,9 @@ html.dark {
   --surface-tint-hover: rgba(255, 255, 255, 0.07);
 
   --text: #ededed;
-  --text-muted: #a1a1a1;
-  --text-dim: #8a8a8a;
-  --text-faint: #3d3d3d;
+  --text-muted: #b5b5b5;
+  --text-dim: #a1a1a1;
+  --text-faint: #525252;
 
   --accent: #e5484d;
   --accent-hover: #ec5d61;
@@ -81,9 +81,9 @@ html.light {
   --surface-tint-hover: rgba(0, 0, 0, 0.055);
 
   --text: #0a0a0a;
-  --text-muted: #52525b;
-  --text-dim: #6b6b74;
-  --text-faint: #d4d4d8;
+  --text-muted: #3f3f46;
+  --text-dim: #4b4b54;
+  --text-faint: #71717a;
 
   --accent: #dc2f3c;
   --accent-hover: #c42532;

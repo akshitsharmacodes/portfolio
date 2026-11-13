@@ -495,15 +495,24 @@ html[data-palette='lime'][data-theme='light'] .hero-headline-accent {
 
 .fr-word {
   display: inline-block;
-  filter: blur(9px);
-  opacity: 0.28;
-  transition: filter 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease;
+  opacity: 0.35;
+  transform: translateY(2px);
+  transition: opacity 320ms ease, transform 320ms ease;
+  will-change: opacity, transform;
 }
 
 .fr-word.is-sharp,
 html[data-motion='off'] .fr-word {
-  filter: none;
   opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .fr-word {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 .focus-frame {
@@ -512,6 +521,15 @@ html[data-motion='off'] .fr-word {
   top: 0;
   pointer-events: none;
   z-index: 1;
+  contain: layout style paint;
+  will-change: transform, width, height, opacity;
+  transform: translateZ(0);
+}
+
+@media (max-width: 768px) {
+  .focus-frame {
+    display: none !important;
+  }
 }
 
 .focus-frame i {
@@ -519,6 +537,7 @@ html[data-motion='off'] .fr-word {
   width: 14px;
   height: 14px;
   border: 0 solid var(--accent);
+  will-change: transform;
 }
 
 .focus-frame i:nth-child(1) { left: 0; top: 0; border-left-width: 2px; border-top-width: 2px; }

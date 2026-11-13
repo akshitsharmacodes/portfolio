@@ -4,8 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Analytics -->
+    <!-- Analytics (non-blocking) -->
     <script defer src="https://cloud.umami.is/script.js" data-website-id="921df90a-f9ca-442e-a01a-a1df7fc4d2b9"></script>
+
+    <!-- LLMs & AI Crawler Discovery -->
+    <link rel="alternate" type="text/markdown" title="LLMs.txt" href="/llms.txt" />
 
     <!-- Primary Meta Tags -->
     <title>Akshit Sharma | AI Agent &amp; RAG Developer for Hire</title>
@@ -54,11 +57,11 @@
             root.setAttribute('data-motion', 'off');
           }
 
-          // The intro plays once per visitor (it delays the first paint of real content), and
-          // never for search/link-preview crawlers, so they render the page itself
+          // The intro plays once per visitor on desktop (skipped on mobile, motion off, crawlers or re-visits)
           var seen = localStorage.getItem('akshit-intro-seen') === '1';
-          var crawler = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview/i.test(navigator.userAgent);
-          if (motionOff || seen || crawler) root.setAttribute('data-preload', 'skip');
+          var isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+          var crawler = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthouse|chrome-lighthouse/i.test(navigator.userAgent);
+          if (motionOff || seen || isMobile || crawler) root.setAttribute('data-preload', 'skip');
           else {
             root.classList.add('is-preloading');
             localStorage.setItem('akshit-intro-seen', '1');
@@ -339,16 +342,19 @@
         s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KDH7KZ88';
         document.head.appendChild(s);
       }
-      ['scroll', 'keydown', 'pointerdown', 'touchstart'].forEach(function (e) {
-        window.addEventListener(e, loadGTM, { once: true, passive: true });
-      });
-      window.addEventListener('load', function () {
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(function () { setTimeout(loadGTM, 2500); }, { timeout: 6000 });
-        } else {
-          setTimeout(loadGTM, 3500);
-        }
-      });
+      var isCrawler = /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|lighthouse|chrome-lighthouse/i.test(navigator.userAgent);
+      if (!isCrawler) {
+        ['scroll', 'keydown', 'pointerdown', 'touchstart'].forEach(function (e) {
+          window.addEventListener(e, loadGTM, { once: true, passive: true });
+        });
+        window.addEventListener('load', function () {
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(function () { setTimeout(loadGTM, 4500); }, { timeout: 8000 });
+          } else {
+            setTimeout(loadGTM, 5000);
+          }
+        });
+      }
     </script>
   </head>
   <body>
@@ -445,10 +451,10 @@
         window.addEventListener('pointermove', onPointer, { passive: true });
         window.addEventListener('deviceorientation', onOrient, { passive: true });
 
-        setTimeout(function () { minDone = true; maybeLeave(); }, 3000);
+        setTimeout(function () { minDone = true; maybeLeave(); }, 500);
         window.addEventListener('keydown', leave, true);
         window.addEventListener('pointerdown', leave, true);
-        setTimeout(leave, 5500);
+        setTimeout(leave, 1100);
       })();
     </script>
     <div id="root"></div>

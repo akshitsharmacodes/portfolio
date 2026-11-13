@@ -20,6 +20,8 @@ export default defineConfig(({ isSsrBuild }) => ({
               if (id.includes('node_modules/framer-motion')) return 'vendor-framer';
               if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
               if (id.includes('node_modules/react-router')) return 'vendor-router';
+              if (id.includes('node_modules/gsap')) return 'vendor-gsap';
+              if (id.includes('node_modules/lenis')) return 'vendor-lenis';
             },
           },
         },
