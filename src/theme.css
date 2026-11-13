@@ -20,8 +20,8 @@ html[data-palette='crimson'][data-theme='light'] {
   --surface-tint: rgba(20, 20, 20, 0.035);
   --surface-tint-hover: rgba(20, 20, 20, 0.06);
   --text: #141414;
-  --text-muted: #57524d;
-  --text-dim: #6b655f;
+  --text-muted: #433e38;
+  --text-dim: #544e47;
   --text-faint: #d9d2ca;
   --accent: #d7263d;
   --accent-hover: #b81d31;
@@ -41,8 +41,8 @@ html[data-palette='crimson'][data-theme='light'] {
   --mark: rgba(215, 38, 61, 0.14);
   --block-bg: #d7263d;
   --block-fg: #ffffff;
-  --block-muted: rgba(255, 255, 255, 0.78);
-  --block-line: rgba(255, 255, 255, 0.24);
+  --block-muted: rgba(255, 255, 255, 0.92);
+  --block-line: rgba(255, 255, 255, 0.28);
   --block-btn-bg: #ffffff;
   --block-btn-fg: #141414;
 }
@@ -85,8 +85,8 @@ html[data-palette='cobalt'][data-theme='light'] {
   --surface-tint: rgba(11, 16, 32, 0.035);
   --surface-tint-hover: rgba(11, 16, 32, 0.06);
   --text: #0b1020;
-  --text-muted: #4a5168;
-  --text-dim: #5d647c;
+  --text-muted: #383e53;
+  --text-dim: #4b5269;
   --text-faint: #d3d8e4;
   --accent: #2f5bff;
   --accent-hover: #2448d8;
@@ -157,8 +157,8 @@ html[data-palette='lime'][data-theme='light'] {
   --surface-tint: rgba(17, 17, 17, 0.035);
   --surface-tint-hover: rgba(17, 17, 17, 0.06);
   --text: #111111;
-  --text-muted: #50504a;
-  --text-dim: #63635c;
+  --text-muted: #3d3d37;
+  --text-dim: #4f4f48;
   --text-faint: #d6d6cb;
   /* Lime is too light for text on a light page: text/focus uses deep olive, fills use lime */
   --accent: #4d6b00;
@@ -230,8 +230,8 @@ html[data-palette='orange'][data-theme='light'] {
   --surface-tint: rgba(28, 25, 23, 0.035);
   --surface-tint-hover: rgba(28, 25, 23, 0.06);
   --text: #1c1917;
-  --text-muted: #57514b;
-  --text-dim: #6b635b;
+  --text-muted: #433e38;
+  --text-dim: #544d46;
   --text-faint: #ddd3c7;
   --accent: #ff5a1f;
   --accent-hover: #e84a10;
@@ -2100,23 +2100,21 @@ html[data-theme='dark'] .glass-tabs .filter-pill {
   inset: 0;
   border-radius: inherit;
   padding: 1.5px;
-  background: conic-gradient(from var(--glint, 0deg), transparent 0 55%, #ff6b6b, #ffd93d, #6bff95, #4dc3ff, #b06bff, transparent 95%);
+  background: conic-gradient(from 120deg, transparent 0 55%, #ff6b6b, #ffd93d, #6bff95, #4dc3ff, #b06bff, transparent 95%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0.55;
-  animation: glint 4.5s linear infinite;
-}
-
-@property --glint {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
+  animation: glint 4.5s ease-in-out infinite alternate;
+  will-change: opacity;
 }
 
 @keyframes glint {
-  to {
-    --glint: 360deg;
+  0% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0.85;
   }
 }
 
@@ -2233,12 +2231,13 @@ html[data-motion='off'] .glass-tabs .filter-pill::before {
   inset: -3.5px;
   border-radius: 50%;
   padding: 2.2px;
-  background: conic-gradient(from var(--ring, 0deg), #ff5a5a, #ffd93d, #6bff95, #4dc3ff, #b06bff, transparent 65%, #ff5a5a);
+  background: conic-gradient(from 0deg, #ff5a5a, #ffd93d, #6bff95, #4dc3ff, #b06bff, transparent 65%, #ff5a5a);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: ringOrbit 2.6s linear infinite;
   transition: opacity 300ms ease;
+  will-change: transform;
 }
 
 /* Atmospheric glow aura behind the ring */
@@ -2247,12 +2246,13 @@ html[data-motion='off'] .glass-tabs .filter-pill::before {
   position: absolute;
   inset: -5px;
   border-radius: 50%;
-  background: conic-gradient(from var(--ring, 0deg), #ff5a5a, #ffd93d, #6bff95, #4dc3ff, #b06bff, transparent 65%, #ff5a5a);
+  background: conic-gradient(from 0deg, #ff5a5a, #ffd93d, #6bff95, #4dc3ff, #b06bff, transparent 65%, #ff5a5a);
   filter: blur(5px);
   opacity: 0.4;
   z-index: -1;
   animation: ringOrbit 2.6s linear infinite;
-  transition: opacity 300ms ease, filter 300ms ease;
+  transition: opacity 300ms ease;
+  will-change: transform;
 }
 
 .glow-ring-btn:hover,
@@ -2284,15 +2284,9 @@ html[data-motion='off'] .glass-tabs .filter-pill::before {
   transform: scale(0.97) translateY(0);
 }
 
-@property --ring {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
 @keyframes ringOrbit {
   to {
-    --ring: 360deg;
+    transform: rotate(360deg);
   }
 }
 
@@ -2747,7 +2741,7 @@ html[data-theme='light'] .eclipse {
   border-radius: 50%;
   padding: 3px;
   background: conic-gradient(
-    from calc(var(--spark, 180deg) - 6deg),
+    from -6deg,
     transparent 0deg,
     #ffffff 6deg,
     transparent 12deg,
@@ -2776,34 +2770,30 @@ html[data-theme='light'] .eclipse {
 .eclipse.is-lit.is-animated .eclipse-spark {
   opacity: 0.75;
   animation: eclipseSpark 7s cubic-bezier(0.45, 0, 0.55, 1) 1.6s infinite alternate;
+  will-change: transform;
 }
 
 .eclipse.is-lit.is-animated .eclipse-bloom {
   animation: eclipseBreathe 6s ease-in-out 1.8s infinite alternate;
-}
-
-@property --spark {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 180deg;
+  will-change: transform, opacity;
 }
 
 @keyframes eclipseSpark {
   from {
-    --spark: 128deg;
+    transform: rotate(128deg);
   }
   to {
-    --spark: 232deg;
+    transform: rotate(232deg);
   }
 }
 
 @keyframes eclipseBreathe {
   from {
-    filter: blur(30px);
+    opacity: 0.65;
     transform: translateX(calc(-50% + var(--lx) * 6%)) scale(1);
   }
   to {
-    filter: blur(36px);
+    opacity: 0.95;
     transform: translateX(calc(-50% + var(--lx) * 6%)) scale(1.06);
   }
 }

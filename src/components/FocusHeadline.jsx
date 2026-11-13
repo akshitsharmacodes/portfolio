@@ -28,32 +28,49 @@ export default function FocusHeadline({ lead, accent, motionEnabled, ready }) {
     const words = [...wrap.querySelectorAll('[data-w]')];
     const PAD = 6;
 
-    const boxOf = (els) => {
-      const base = wrap.getBoundingClientRect();
-      let l = Infinity;
-      let t = Infinity;
-      let r = -Infinity;
-      let b = -Infinity;
-      els.forEach((el) => {
-        const rc = el.getBoundingClientRect();
-        l = Math.min(l, rc.left);
-        t = Math.min(t, rc.top);
-        r = Math.max(r, rc.right);
-        b = Math.max(b, rc.bottom);
-      });
-      return { x: l - base.left - PAD, y: t - base.top - PAD, w: r - l + PAD * 2, h: b - t + PAD * 2 };
+    // Single precomputation pass to avoid layout thrashing / forced reflows on each step
+    const base = wrap.getBoundingClientRect();
+    const wordBoxes = words.map((el) => {
+      const rc = el.getBoundingClientRect();
+      return {
+        x: rc.left - base.left - PAD,
+        y: rc.top - base.top - PAD,
+        w: rc.width + PAD * 2,
+        h: rc.height + PAD * 2,
+      };
+    });
+
+    const accentEls = words.slice(leadWords.length);
+    let al = Infinity;
+    let at = Infinity;
+    let ar = -Infinity;
+    let ab = -Infinity;
+    accentEls.forEach((el) => {
+      const rc = el.getBoundingClientRect();
+      al = Math.min(al, rc.left);
+      at = Math.min(at, rc.top);
+      ar = Math.max(ar, rc.right);
+      ab = Math.max(ab, rc.bottom);
+    });
+    const finalBox = {
+      x: al - base.left - PAD,
+      y: at - base.top - PAD,
+      w: ar - al + PAD * 2,
+      h: ab - at + PAD * 2,
     };
 
     const timers = [];
     let i = 0;
     const step = () => {
       if (i < total) {
-        setFrame({ ...boxOf([words[i]]), on: true });
+        if (wordBoxes[i]) {
+          setFrame({ ...wordBoxes[i], on: true });
+        }
         setSharp(i + 1);
         i += 1;
         timers.push(setTimeout(step, 210));
       } else {
-        setFrame({ ...boxOf(words.slice(leadWords.length)), on: true, final: true });
+        setFrame({ ...finalBox, on: true, final: true });
         timers.push(setTimeout(() => setFrame((f) => (f ? { ...f, on: false } : f)), 1500));
       }
     };

@@ -100,9 +100,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
 
 
     <!-- Intro loader styles: inline so they apply on the very first frame -->
@@ -312,21 +325,29 @@
 
     <!--
       Google Tag Manager (GTM-KDH7KZ88). GA4 (G-C03K4ZTYVD) is configured inside this container,
-      so it is not loaded separately (that double-counted every page view). GTM loads after the
-      page has finished loading, so it doesn't compete with the first paint.
+      so it is not loaded separately. GTM loads on first user interaction or after idle,
+      ensuring zero impact on initial render, TBT, and LCP.
     -->
     <script>
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      function loadGTM() {
+        if (window.__gtmLoaded) return;
+        window.__gtmLoaded = true;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KDH7KZ88';
+        document.head.appendChild(s);
+      }
+      ['scroll', 'keydown', 'pointerdown', 'touchstart'].forEach(function (e) {
+        window.addEventListener(e, loadGTM, { once: true, passive: true });
+      });
       window.addEventListener('load', function () {
-        var run = function () {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KDH7KZ88';
-          document.head.appendChild(s);
-        };
-        if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });
-        else setTimeout(run, 1500);
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(function () { setTimeout(loadGTM, 2500); }, { timeout: 6000 });
+        } else {
+          setTimeout(loadGTM, 3500);
+        }
       });
     </script>
   </head>

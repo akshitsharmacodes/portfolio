@@ -16,9 +16,10 @@ export default defineConfig(({ isSsrBuild }) => ({
       ? {}
       : {
           output: {
-            manualChunks: {
-              'vendor-framer': ['framer-motion'],
-              'vendor-react': ['react', 'react-dom'],
+            manualChunks(id) {
+              if (id.includes('node_modules/framer-motion')) return 'vendor-framer';
+              if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
+              if (id.includes('node_modules/react-router')) return 'vendor-router';
             },
           },
         },

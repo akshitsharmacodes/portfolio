@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import 'lenis/dist/lenis.css';
 import './enterprise.css';
 import './theme.css';
 import './pages.css';
@@ -10,7 +11,7 @@ import './pages.css';
 // AI crawlers; the client then renders fresh over it.
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <App />
     </BrowserRouter>
   </React.StrictMode>

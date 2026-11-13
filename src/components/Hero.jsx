@@ -72,7 +72,7 @@ export default function Hero({
       <div className="container hero-eclipse-inner">
         <Wrap className="hero-eclipse-content" {...wrapProps}>
           <Item {...itemProps}>
-            <Link to="/contact" className="hero-status">
+            <Link to="/contact" className="hero-status" aria-label="Contact: Booking new projects">
               <span className="status-dot" aria-hidden="true" />
               <span>
                 {availMain}
@@ -118,7 +118,7 @@ export default function Hero({
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
             </div>
-            <Link to="/recruiters" className="btn-link hero-resume">
+            <Link to="/recruiters" className="btn-link hero-resume" aria-label="For recruiters: view career profile and resume">
               <span className="hero-resume-desktop">Hiring for a role? See Akshit's resume</span>
               <span className="hero-resume-mobile">For recruiters & hiring</span>
               <ArrowUpRight size={14} aria-hidden="true" />

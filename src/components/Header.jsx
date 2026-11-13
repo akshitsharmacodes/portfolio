@@ -254,6 +254,7 @@ export default function Header({
               href="/recruiters"
               className={`nav-recruiter-link desktop-only${pathname === '/recruiters' ? ' is-active' : ''}`}
               aria-current={pathname === '/recruiters' ? 'page' : undefined}
+              aria-label="For recruiters: view career profile and resume"
               data-tooltip="For recruiters & hiring managers"
             >
               <BriefcaseBusiness size={14} aria-hidden="true" />
@@ -350,6 +351,7 @@ export default function Header({
                 href="/contact"
                 className="btn btn-primary glow-ring-btn mobile-drawer-cta"
                 onClick={() => setMobileMenuOpen(false)}
+                aria-label="Contact: Start a project"
               >
                 <span className="glow-ring-disc" aria-hidden="true">
                   <ArrowRight size={14} />
@@ -361,6 +363,7 @@ export default function Header({
                 href="/recruiters"
                 className="btn btn-secondary btn-liquid-glass mobile-drawer-cta"
                 onClick={() => setMobileMenuOpen(false)}
+                aria-label="For recruiters: view career profile and resume"
               >
                 <FileText size={16} aria-hidden="true" />
                 <span>For recruiters: resume</span>

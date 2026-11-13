@@ -155,7 +155,18 @@ export default function GridWarpHeadline({ lines, motionEnabled }) {
       wrap.classList.add('is-warping');
       paintSource();
     };
-    (document.fonts?.ready || Promise.resolve()).then(start);
+
+    // Defer canvas rendering until the footer approaches the viewport
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          (document.fonts?.ready || Promise.resolve()).then(start);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '400px' }
+    );
+    io.observe(wrap);
 
     const ro = new ResizeObserver(() => ready && paintSource());
     ro.observe(wrap);
@@ -166,6 +177,7 @@ export default function GridWarpHeadline({ lines, motionEnabled }) {
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
       ro.disconnect();
       mo.disconnect();
       wrap.removeEventListener('pointermove', onMove);
