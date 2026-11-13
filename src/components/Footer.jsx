@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { siteConfig, isValidContent } from '../config/site';
-import { ArrowUp, ArrowUpRight, Calendar, Download } from 'lucide-react';
+import { ArrowUpRight, Calendar, Download } from 'lucide-react';
 import GridWarpHeadline from './GridWarpHeadline';
 import VisitorCounter from './VisitorCounter';
 
@@ -57,11 +57,6 @@ export default function Footer({ motionEnabled = true, onToggleMotion, onOpenCal
   addLink('WhatsApp', contact.whatsapp);
   addLink('Resume', identity.resume);
   contact.otherLinks?.forEach((link) => addLink(link.label, link.url));
-
-  const scrollToTop = () => {
-    const reduce = document.documentElement.getAttribute('data-motion') === 'off';
-    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-  };
 
   return (
     <footer className="footer footer-block" role="contentinfo">
@@ -163,10 +158,6 @@ export default function Footer({ motionEnabled = true, onToggleMotion, onOpenCal
                 Animations: {motionEnabled ? 'On' : 'Off'}
               </button>
             )}
-            <button type="button" className="back-to-top" onClick={scrollToTop} aria-label="Scroll back to top of page">
-              <span>Top</span>
-              <ArrowUp size={14} aria-hidden="true" />
-            </button>
           </div>
         </div>
       </div>

@@ -120,35 +120,6 @@ export default function Hero({
               <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
           </Item>
-
-          {/* Subtle elegant mouse scroll animation */}
-          <Item
-            {...(motionEnabled
-              ? {
-                  variants: {
-                    hidden: { opacity: 0, y: 10 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.7, delay: 0.4, ease: easeCurves.luxuryDecel },
-                    },
-                  },
-                }
-              : {})}
-          >
-            <div className="hero-scroll-cue-wrapper">
-              <a
-                href="#hire-me"
-                className="hero-scroll-cue"
-                aria-label="Scroll down"
-                data-tooltip="Scroll down"
-              >
-                <span className="hero-scroll-mouse" aria-hidden="true">
-                  <span className="hero-scroll-wheel" />
-                </span>
-              </a>
-            </div>
-          </Item>
         </Wrap>
 
         <Item
