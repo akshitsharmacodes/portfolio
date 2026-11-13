@@ -2374,6 +2374,10 @@ html[data-motion='off'] .send-halo.is-ready .send-halo-disc::after {
   width: 360px;
 }
 
+.morph-panel--pricing {
+  width: 480px;
+}
+
 .morph-panel--about {
   width: 340px;
 }
@@ -2384,6 +2388,26 @@ html[data-motion='off'] .send-halo.is-ready .send-halo-disc::after {
 
 .morph-panel--contact {
   width: 460px;
+}
+
+.morph-pricing-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 4px 0 2px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cta-fg) 6%, transparent);
+  font-family: var(--font-mono);
+  font-size: var(--fs-2xs);
+  color: color-mix(in srgb, var(--cta-fg) 75%, transparent);
+}
+
+.morph-pricing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .morph-kicker--sub {

@@ -924,3 +924,51 @@ html[data-motion='off'] .work-card,
 html[data-motion='off'] .svc-other {
   transition: none;
 }
+
+/* ==========================================================================
+   FROST TRANSITION OVERLAY
+   Full-screen frosted blur wipe when transitioning between Recruiter and Client pages
+   ========================================================================== */
+.frost-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+}
+
+.frost-transition-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-strong);
+  box-shadow:
+    0 24px 48px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.frost-transition-sparkle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-fill, #22c55e);
+  box-shadow: 0 0 10px var(--accent-glow, rgba(34, 197, 94, 0.6));
+  animation: frostPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes frostPulse {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.2); opacity: 1; }
+}

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, Calendar, Mail, MessageCircle, Linkedin, Send } from 'lucide-react';
+import { ArrowUpRight, Calendar, Mail, MessageCircle, Linkedin, Send, ShieldCheck, Github, FileSignature } from 'lucide-react';
 import { projects } from '../data/projects';
 import { siteConfig, isValidContent } from '../config/site';
 import { experienceData, awardsData } from '../data/experience';
@@ -8,11 +8,11 @@ import { services as SERVICE_DATA } from '../data/services';
 
 /**
  * Morph Navbar dropdown: one shell under the pill nav that springs open and resizes
- * between panels (Services / Work / About / Contact) while their content cross-blurs and drifts
+ * between panels (Services / Work / Pricing / About / Contact) while their content cross-blurs and drifts
  * in the direction you moved. A highlight glides between items on hover.
  */
 // Same order as the nav, so content drifts in the direction the pointer moved
-export const MORPH_PANELS = ['services', 'work', 'about', 'contact'];
+export const MORPH_PANELS = ['services', 'work', 'pricing', 'about', 'contact'];
 
 
 function Item({ href, onNavigate, onClick, hl, setHl, id, children, className = '', external = false }) {
@@ -96,6 +96,46 @@ function Panel({ id, onNavigate, onOpenCalModal }) {
           <span className="morph-text">
             <b>All case studies</b>
             <small>Problem, build and outcome for each project</small>
+          </span>
+          <ArrowUpRight size={15} aria-hidden="true" />
+        </Item>
+      </div>
+    );
+  }
+
+  if (id === 'pricing') {
+    return (
+      <div className="morph-panel morph-panel--pricing" onMouseLeave={() => setHl(null)}>
+        <span className="morph-kicker">Pricing & deliverables</span>
+        <div className="morph-grid">
+          {SERVICE_DATA.map((s) => (
+            <Item key={s.slug} id={`price-${s.slug}`} href={`/services/${s.slug}`} {...common}>
+              <span className="morph-num">{s.num}</span>
+              <span className="morph-text">
+                <b>{s.name}</b>
+                <small>From {s.from.inr} / {s.from.usd}</small>
+              </span>
+            </Item>
+          ))}
+        </div>
+        <div className="morph-pricing-badges" aria-label="Project terms">
+          <span className="morph-pricing-badge">
+            <ShieldCheck size={13} aria-hidden="true" />
+            <span>Milestone payments</span>
+          </span>
+          <span className="morph-pricing-badge">
+            <Github size={13} aria-hidden="true" />
+            <span>Code you own</span>
+          </span>
+          <span className="morph-pricing-badge">
+            <FileSignature size={13} aria-hidden="true" />
+            <span>NDA on request</span>
+          </span>
+        </div>
+        <Item id="full-pricing" href="/pricing" className="morph-foot" {...common}>
+          <span className="morph-text">
+            <b>Explore full pricing & milestones</b>
+            <small>Fixed quotes within 48h · clear project roadmaps</small>
           </span>
           <ArrowUpRight size={15} aria-hidden="true" />
         </Item>

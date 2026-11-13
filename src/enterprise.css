@@ -664,15 +664,34 @@ html[data-theme='light'] .interactive-hover-card:hover,
 }
 
 .header-wrapper.is-scrolled .header-glass-dock {
-  max-width: min(1040px, calc(100vw - 32px));
+  max-width: min(1160px, calc(100vw - 32px));
   height: 52px;
-  padding: 0 10px 0 20px;
+  padding: 0 12px 0 20px;
   border-color: var(--border);
   border-radius: 9999px;
   box-shadow:
     0 20px 44px -10px rgba(0, 0, 0, 0.45),
     0 4px 12px -2px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+}
+
+.header-wrapper.is-scrolled .nav-dock-link {
+  height: 32px;
+  padding: 0 11px;
+}
+
+.header-wrapper.is-scrolled .dock-actions {
+  gap: 6px;
+}
+
+@media (max-width: 1200px) {
+  .header-wrapper.is-scrolled .nav-dock-link {
+    padding: 0 9px;
+    font-size: 0.82rem;
+  }
+  .header-wrapper.is-scrolled .nav-recruiter-link {
+    padding: 0 9px;
+  }
 }
 
 /* Wordmark */

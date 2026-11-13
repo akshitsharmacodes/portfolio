@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import FrostTransition from './components/FrostTransition';
 import Seo from './components/Seo';
 import HomePage from './pages/HomePage';
 import ServicePage from './pages/ServicePage';
@@ -228,6 +229,7 @@ export default function App() {
   return (
     <>
       <Seo />
+      <FrostTransition motionEnabled={motionEnabled} />
       <div className={`portfolio-app theme-${theme}`}>
         {/* Skip to content for keyboard users */}
         <a href="#main-content" className="skip-link">
